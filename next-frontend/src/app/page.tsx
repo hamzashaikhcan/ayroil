@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { Container } from '@/components/ui/container';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ProductArt } from '@/components/product/product-art';
 import { ProductThumb } from '@/components/product/product-thumb';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
 import { fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
@@ -169,16 +168,16 @@ export default async function HomePage() {
 			<div className='overflow-hidden border-y border-line bg-ink py-3 text-background'>
 				<div className='ticker flex whitespace-nowrap'>
 					{[
-						'Built in-house',
+						'Cold-pressed, not heat-extracted',
+						'No mineral oil, ever',
+						'Dermatologically tested',
 						'30-day returns',
-						'Carbon-neutral shipping',
 						'Made in small batches',
-						'Verified per batch',
-						'Built in-house',
+						'Cold-pressed, not heat-extracted',
+						'No mineral oil, ever',
+						'Dermatologically tested',
 						'30-day returns',
-						'Carbon-neutral shipping',
 						'Made in small batches',
-						'Verified per batch',
 					].map((t, i) => (
 						<div
 							key={i}
@@ -197,29 +196,29 @@ export default async function HomePage() {
 							<span className='marker-dot'>Why one product</span>
 						</div>
 						<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl'>
-							We only make one thing.
+							We only make one oil.
 							<span className='block text-muted'>So we can make it right.</span>
 						</h2>
 						<p className='mt-5 text-base leading-relaxed text-muted'>
-							Most brands ship a hundred SKUs and quietly hope you do not notice
-							the ones that are quietly bad. We do the opposite — one product,
-							signed batches, and our name on the label.
+							Most hair oil brands sell a dozen variants cut with cheap mineral
+							oil and silicone, and hope you cannot tell the difference. We make
+							one formula, cold-pressed in small batches, and put our name on it.
 						</p>
 					</div>
 
 					<div className='mt-12 grid grid-cols-1 gap-5 md:grid-cols-3'>
 						{[
 							{
-								k: 'Focused R&D',
-								d: 'Every test, every prototype, every lab — all of it points at one thing.',
+								k: 'Cold-pressed extraction',
+								d: 'Pressed at low temperature so the actives never get cooked out, unlike heat-extracted oils.',
 							},
 							{
 								k: 'Batch traceability',
-								d: 'Each unit is tied to a batch number you can look up. We know who made it and when.',
+								d: 'Each bottle is tied to a batch number you can look up. We know exactly when and how it was pressed.',
 							},
 							{
-								k: 'No filler SKUs',
-								d: 'We do not pad the catalog with adjacent products to drive AOV.',
+								k: 'No filler oils',
+								d: 'No mineral oil, no synthetic silicones standing in for the real thing.',
 							},
 						].map((s) => (
 							<div
@@ -236,30 +235,34 @@ export default async function HomePage() {
 			<section className='border-t border-line bg-surface py-20'>
 				<Container>
 					<div className='grid grid-cols-1 gap-12 md:grid-cols-2 md:items-center'>
-						<ProductArt
-							seed={`${product.slug}-spec`}
-							label={product.name}
-							className='aspect-[4/5]'
-						/>
+						<div className='relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-surface'>
+							<Image
+								src='https://res.cloudinary.com/dm2cefx8m/image/upload/v1782082474/the-problem_oareuu.png'
+								alt='Heavy, heat-extracted hair oil leaving a greasy residue'
+								fill
+								sizes='(max-width: 768px) 100vw, 50vw'
+								className='object-cover'
+							/>
+						</div>
 						<div>
 							<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
 								<span className='marker-dot'>The problem</span>
 							</div>
 							<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl'>
-								Most of what you buy was designed for a shelf, not for you.
+								Most hair oils leave a greasy film and call it &ldquo;nourishment.&rdquo;
 							</h2>
 							<p className='mt-5 text-base leading-relaxed text-muted'>
-								The category we work in is full of products built to look good
-								on a planogram and survive a year on a pallet. Ours was built to
-								be opened, used, and finished — and then replaced because it
-								actually got used up.
+								Heavy, heat-extracted oils sit on top of your hair instead of
+								absorbing into it. Ours was built to do one job — feed dry,
+								dull, frizzy hair without the residue you have to wash out the
+								next morning.
 							</p>
 							<ul className='mt-8 space-y-3'>
 								{[
-									'Designed around a single, specific job.',
-									'Tested against five competing products head to head.',
+									'Cold-pressed at low temperature to protect the actives.',
+									'Tested against five leading hair oils, head to head.',
 									'Reformulated three times before we agreed to ship it.',
-									'Shipped only after a 30-day in-house trial.',
+									'Shipped only after a 30-day in-house trial on real hair.',
 								].map((t) => (
 									<li key={t} className='flex gap-3 text-sm text-ink'>
 										<span className='mt-1 inline-block h-1.5 w-1.5 flex-none rounded-full bg-accent' />
@@ -279,7 +282,7 @@ export default async function HomePage() {
 							<span className='marker-dot'>How it works</span>
 						</div>
 						<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl'>
-							From our workshop to your doorstep.
+							From cold press to your shelf.
 						</h2>
 					</div>
 
@@ -287,15 +290,15 @@ export default async function HomePage() {
 						{[
 							{
 								k: '01',
-								t: 'Formulated',
-								d: 'Batch sized so each run gets the same care as the prototype.',
+								t: 'Cold-pressed',
+								d: 'Pressed at low temperature, batch sized so every run gets the same care as the prototype.',
 							},
 							{
 								k: '02',
-								t: 'Tested',
-								d: 'Every batch is sampled and verified against our in-house reference.',
+								t: 'Lab-tested',
+								d: 'Every batch is sampled and verified for purity before it is bottled.',
 							},
-							{ k: '03', t: 'Packed', d: 'Hand-packed in recyclable mailers.' },
+							{ k: '03', t: 'Hand-bottled', d: 'Hand-filled and capped in recyclable glass.' },
 							{
 								k: '04',
 								t: 'Shipped',
@@ -366,22 +369,22 @@ export default async function HomePage() {
 						<div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
 							{[
 								{
-									q: 'I switched two months ago and never went back.',
+									q: 'My hair finally feels nourished, not greasy. Switched two months ago and never went back.',
 									n: 'Sadia R.',
 									role: 'Verified buyer',
 								},
 								{
-									q: 'I appreciate that they did not bury the price in a subscription wall.',
+									q: 'No more flaky scalp, and a little goes a long way — one bottle lasted me almost two months.',
 									n: 'Anum K.',
 									role: 'Verified buyer',
 								},
 								{
-									q: 'The packaging is the least precious in this category. Refreshing.',
+									q: 'Smells incredible without being overpowering, and it does not weigh my hair down like my old oil did.',
 									n: 'Bilal P.',
 									role: 'Verified buyer',
 								},
 								{
-									q: 'I have tried four. This is the one I tell people about.',
+									q: 'I have tried four hair oils. This is the only one I actually finish the bottle of.',
 									n: 'Hanif Z.',
 									role: 'Verified buyer',
 								},
@@ -415,7 +418,7 @@ export default async function HomePage() {
 							How we stack up.
 						</h2>
 						<p className='mt-5 text-base leading-relaxed text-muted'>
-							An honest side-by-side against the category average.
+							An honest side-by-side against the average drugstore hair oil.
 						</p>
 					</div>
 
@@ -436,16 +439,16 @@ export default async function HomePage() {
 							</thead>
 							<tbody>
 								{[
-									['Setup fees', '$0', '$5–25'],
-									['MOQ', '1 unit', 'Subscription required'],
+									['Extraction', 'Cold-pressed', 'Heat-extracted'],
+									['Mineral oil', 'None', 'Common filler'],
 									[
 										'Ingredient list',
 										'Published, plain language',
-										'Trade-secret',
+										'Trade-secret blend',
 									],
 									['Returns', `${settings.returnsWindowDays} days`, '14 days'],
-									['Made', 'In-house', 'Outsourced'],
-									['Carbon offset', 'Standard', 'Add-on'],
+									['Made', 'Small batch, in-house', 'Mass-outsourced'],
+									['Patch tested', 'Every batch', 'Rare'],
 								].map(([k, a, b]) => (
 									<tr key={k} className='border-b border-line last:border-b-0'>
 										<td className='px-5 py-4 text-muted'>{k}</td>
@@ -470,13 +473,14 @@ export default async function HomePage() {
 								Less plastic. Less freight. Less talk.
 							</h2>
 							<p className='mt-5 text-base leading-relaxed text-muted'>
-								We ship in recyclable mailers, route freight to consolidate
-								carbon, and offset what is left through a verified registry.
+								Every bottle ships in recyclable glass, we route freight to
+								consolidate carbon, and offset what is left through a verified
+								registry.
 							</p>
 						</div>
 						<div className='grid grid-cols-1 gap-4 sm:grid-cols-3'>
 							{[
-								{ k: '84%', v: 'Recyclable packaging' },
+								{ k: '100%', v: 'Recyclable glass bottle' },
 								{ k: '0.4 kg', v: 'CO₂ per shipment' },
 								{ k: '100%', v: 'Carbon offset' },
 							].map((s) => (
@@ -531,7 +535,7 @@ export default async function HomePage() {
 								<span className='marker-dot'>Order now</span>
 							</div>
 							<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight md:text-5xl'>
-								One product. Yours, today.
+								One oil. Your hair, nourished.
 							</h2>
 							<p className='mt-4 max-w-lg text-base leading-relaxed text-background/70'>
 								{formatPrice(product.priceCents)} · ships in{' '}

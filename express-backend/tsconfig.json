@@ -1,8 +1,14 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
+    // CommonJS, not ESNext: with emitDecoratorMetadata on, TypeORM's circular
+    // entity relations (Order <-> OrderItem) emit a bare `Reflect.metadata(...,
+    // Order)` at module-eval time. Under native ESM that hits the live-binding
+    // TDZ ("Cannot access 'Order' before initialization"); CJS's `require()`
+    // tolerates it because the (still-filling-in) exports object is returned
+    // by reference. Doesn't affect `dev`, which runs through tsx instead of tsc.
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
     "lib": ["ES2022"],
     "outDir": "dist",
     "rootDir": "./src",

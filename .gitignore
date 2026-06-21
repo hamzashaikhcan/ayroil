@@ -1,0 +1,118 @@
+# ──────────────────────────────────────────────────────────
+# Dependencies
+# ──────────────────────────────────────────────────────────
+node_modules/
+.pnp
+.pnp.*
+.yarn/install-state.gz
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+
+# ──────────────────────────────────────────────────────────
+# Build output
+# ──────────────────────────────────────────────────────────
+dist/
+build/
+out/
+.next/
+.turbo/
+.swc/
+*.tsbuildinfo
+next-env.d.ts
+
+# ──────────────────────────────────────────────────────────
+# Environment & secrets — NEVER commit these
+# ──────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+.env.test
+*.pem
+*.key
+*.crt
+
+# ──────────────────────────────────────────────────────────
+# Logs
+# ──────────────────────────────────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ──────────────────────────────────────────────────────────
+# Testing & coverage
+# ──────────────────────────────────────────────────────────
+coverage/
+.nyc_output/
+*.lcov
+.jest-cache/
+playwright-report/
+test-results/
+
+# ──────────────────────────────────────────────────────────
+# Caches
+# ──────────────────────────────────────────────────────────
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# ──────────────────────────────────────────────────────────
+# IDE & editors
+# ──────────────────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json.example
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sublime-project
+*.sublime-workspace
+
+# ──────────────────────────────────────────────────────────
+# OS
+# ──────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# ──────────────────────────────────────────────────────────
+# Backups & temp files
+# ──────────────────────────────────────────────────────────
+*.bak
+*.tmp
+*.temp
+*~
+
+# ──────────────────────────────────────────────────────────
+# TypeORM / Postgres
+# ──────────────────────────────────────────────────────────
+ormconfig.local.json
+*.sqlite
+*.sqlite3
+*.db
+
+# ──────────────────────────────────────────────────────────
+# Uploads (Cloudinary handles real uploads — local cache only)
+# ──────────────────────────────────────────────────────────
+uploads/
+public/uploads/

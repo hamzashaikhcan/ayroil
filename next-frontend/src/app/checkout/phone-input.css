@@ -1,0 +1,77 @@
+/* Storefront overrides for react-phone-number-input so it matches the
+   checkout's design language. Imported only by the checkout client. */
+
+.PhoneInput {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  height: 44px;
+  padding: 0 12px;
+  background: var(--background);
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  transition: border-color 150ms ease;
+}
+
+.PhoneInput--focus,
+.PhoneInput:focus-within {
+  border-color: var(--ink);
+}
+
+.PhoneInputCountry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 6px;
+  padding-right: 8px;
+  border-right: 1px solid var(--line);
+}
+
+.PhoneInputCountryIcon {
+  width: 24px;
+  height: 18px;
+  box-shadow: none;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.PhoneInputCountryIcon--border {
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.08);
+  background: var(--surface);
+}
+
+.PhoneInputCountrySelectArrow {
+  width: 6px;
+  height: 6px;
+  margin-left: 2px;
+  border-style: solid;
+  border-color: var(--muted);
+  border-width: 0 1.5px 1.5px 0;
+  opacity: 1;
+}
+
+.PhoneInputInput {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font-size: 14px;
+  color: var(--ink);
+  outline: none;
+  height: 100%;
+  font-family: inherit;
+}
+
+.PhoneInputInput::placeholder {
+  color: var(--muted);
+}
+
+.PhoneInputCountrySelect {
+  font-family: inherit;
+  font-size: 14px;
+}
+
+/* Error state */
+.PhoneInput[data-invalid="true"] {
+  border-color: rgb(220 38 38 / 0.5);
+}

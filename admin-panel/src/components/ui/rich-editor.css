@@ -1,0 +1,62 @@
+/* BlockNote palette overrides so the editor matches the admin design system. */
+.rich-editor {
+  --bn-colors-editor-text: var(--ink);
+  --bn-colors-editor-background: transparent;
+  --bn-colors-menu-text: var(--ink);
+  --bn-colors-menu-background: var(--surface);
+  --bn-colors-tooltip-text: var(--background);
+  --bn-colors-tooltip-background: var(--ink);
+  --bn-colors-hovered-text: var(--ink);
+  --bn-colors-hovered-background: var(--surface-2);
+  --bn-colors-selected-text: var(--accent-deep);
+  --bn-colors-selected-background: var(--accent-soft);
+  --bn-colors-disabled-text: var(--muted-soft);
+  --bn-colors-disabled-background: var(--surface-2);
+  --bn-colors-border: var(--line);
+  --bn-colors-side-menu: var(--muted);
+  --bn-font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --bn-border-radius: 6px;
+}
+
+/* Outer shell caps the editor so the form doesn't grow forever as the
+   admin writes a long description. The inner editor scrolls. */
+.rich-editor {
+  max-height: 420px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rich-editor .bn-container {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rich-editor .bn-editor {
+  padding: 12px 14px 16px;
+  min-height: 220px;
+  max-height: 420px;
+  overflow-y: auto;
+  flex: 1 1 auto;
+  font-size: 14px;
+  line-height: 1.6;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.rich-editor .bn-editor::-webkit-scrollbar { width: 10px; }
+.rich-editor .bn-editor::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 999px;
+  border: 2px solid var(--surface-2);
+}
+.rich-editor .bn-editor::-webkit-scrollbar-track { background: transparent; }
+
+.rich-editor .bn-editor h1 { font-size: 22px; font-weight: 600; }
+.rich-editor .bn-editor h2 { font-size: 18px; font-weight: 600; }
+.rich-editor .bn-editor h3 { font-size: 16px; font-weight: 600; }
+
+.rich-editor .bn-editor a { color: var(--accent); text-decoration: underline; text-underline-offset: 2px; }

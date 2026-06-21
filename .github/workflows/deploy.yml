@@ -1,0 +1,187 @@
+name: Deploy to Hetzner
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+env:
+  HETZNER_HOST: 135.181.144.67
+  HETZNER_USER: root
+  NODE_VERSION: "20"
+
+jobs:
+  build-backend:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: express-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: express-backend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm run build
+      - name: Reinstall production-only deps for the shipped artifact
+        run: |
+          rm -rf node_modules
+          npm ci --omit=dev --no-audit --no-fund
+      - run: tar -czf backend.tar.gz dist node_modules package.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-build
+          path: express-backend/backend.tar.gz
+          retention-days: 7
+
+  build-frontend:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: next-frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: next-frontend/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Write build-time env
+        run: |
+          cat > .env.production.local <<EOF
+          NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL_FRONTEND }}
+          AUTH_SECRET_STOREFRONT=${{ vars.AUTH_SECRET_STOREFRONT }}
+          AUTH_TRUST_HOST=${{ vars.AUTH_TRUST_HOST }}
+          EOF
+      - run: npm run build
+      - name: Assemble standalone bundle
+        run: |
+          cp -r public .next/standalone/public 2>/dev/null || true
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/static
+          rm -f .env.production.local
+      - run: tar -czf frontend.tar.gz -C .next/standalone .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build
+          path: next-frontend/frontend.tar.gz
+          retention-days: 7
+
+  build-admin:
+    runs-on: ubuntu-latest
+    environment: production
+    defaults:
+      run:
+        working-directory: admin-panel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: admin-panel/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Write build-time env
+        run: |
+          cat > .env.production.local <<EOF
+          NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL_ADMIN }}
+          AUTH_SECRET_ADMIN=${{ vars.AUTH_SECRET_ADMIN }}
+          AUTH_TRUST_HOST=${{ vars.AUTH_TRUST_HOST }}
+          AZURE_OPENAI_ENDPOINT=${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY=${{ vars.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_DEPLOYMENT=${{ vars.AZURE_OPENAI_DEPLOYMENT }}
+          AZURE_OPENAI_API_VERSION=${{ vars.AZURE_OPENAI_API_VERSION }}
+          EOF
+      - run: npm run build
+      - name: Assemble standalone bundle
+        run: |
+          cp -r public .next/standalone/public 2>/dev/null || true
+          mkdir -p .next/standalone/.next
+          cp -r .next/static .next/standalone/.next/static
+          rm -f .env.production.local
+      - run: tar -czf admin.tar.gz -C .next/standalone .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-build
+          path: admin-panel/admin.tar.gz
+          retention-days: 7
+
+  deploy:
+    needs: [build-backend, build-frontend, build-admin]
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "${{ secrets.HETZNER_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H "$HETZNER_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Rewrite persistent env files on the server from this Environment
+        run: |
+          ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" "cat > /opt/ayroil/shared/express-backend.env" <<EOF
+          NODE_ENV=production
+          PORT=4400
+          DB_HOST=${{ vars.DB_HOST }}
+          DB_PORT=${{ vars.DB_PORT }}
+          DB_USER=${{ vars.DB_USER }}
+          DB_PASSWORD=${{ vars.DB_PASSWORD }}
+          DB_NAME=${{ vars.DB_NAME }}
+          AUTH_SECRET_STOREFRONT=${{ vars.AUTH_SECRET_STOREFRONT }}
+          AUTH_SECRET_ADMIN=${{ vars.AUTH_SECRET_ADMIN }}
+          CORS_ORIGINS=${{ vars.CORS_ORIGINS }}
+          SEED_ADMIN_EMAIL=${{ vars.SEED_ADMIN_EMAIL }}
+          SEED_ADMIN_PASSWORD=${{ vars.SEED_ADMIN_PASSWORD }}
+          CLOUDINARY_CLOUD_NAME=${{ vars.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ vars.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ vars.CLOUDINARY_API_SECRET }}
+          CLOUDINARY_FOLDER=${{ vars.CLOUDINARY_FOLDER }}
+          EOF
+          ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" "cat > /opt/ayroil/shared/next-frontend.env" <<EOF
+          NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL_FRONTEND }}
+          AUTH_SECRET_STOREFRONT=${{ vars.AUTH_SECRET_STOREFRONT }}
+          AUTH_TRUST_HOST=${{ vars.AUTH_TRUST_HOST }}
+          EOF
+          ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" "cat > /opt/ayroil/shared/admin-panel.env" <<EOF
+          NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_SITE_URL=${{ vars.NEXT_PUBLIC_SITE_URL_ADMIN }}
+          AUTH_SECRET_ADMIN=${{ vars.AUTH_SECRET_ADMIN }}
+          AUTH_TRUST_HOST=${{ vars.AUTH_TRUST_HOST }}
+          AZURE_OPENAI_ENDPOINT=${{ vars.AZURE_OPENAI_ENDPOINT }}
+          AZURE_OPENAI_API_KEY=${{ vars.AZURE_OPENAI_API_KEY }}
+          AZURE_OPENAI_DEPLOYMENT=${{ vars.AZURE_OPENAI_DEPLOYMENT }}
+          AZURE_OPENAI_API_VERSION=${{ vars.AZURE_OPENAI_API_VERSION }}
+          EOF
+          ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" "chmod 600 /opt/ayroil/shared/*.env"
+
+      - name: Ship release tarballs and run remote deploy
+        run: |
+          SHA="${{ github.sha }}"
+          ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" \
+            "mkdir -p /opt/ayroil/express-backend/releases/$SHA /opt/ayroil/next-frontend/releases/$SHA /opt/ayroil/admin-panel/releases/$SHA"
+
+          scp -i ~/.ssh/id_ed25519 artifacts/backend-build/backend.tar.gz "$HETZNER_USER@$HETZNER_HOST:/opt/ayroil/express-backend/releases/$SHA/release.tar.gz"
+          scp -i ~/.ssh/id_ed25519 artifacts/frontend-build/frontend.tar.gz "$HETZNER_USER@$HETZNER_HOST:/opt/ayroil/next-frontend/releases/$SHA/release.tar.gz"
+          scp -i ~/.ssh/id_ed25519 artifacts/admin-build/admin.tar.gz "$HETZNER_USER@$HETZNER_HOST:/opt/ayroil/admin-panel/releases/$SHA/release.tar.gz"
+
+          ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" bash -s <<EOF
+            set -euo pipefail
+            for app in express-backend next-frontend admin-panel; do
+              tar -xzf /opt/ayroil/\$app/releases/$SHA/release.tar.gz -C /opt/ayroil/\$app/releases/$SHA
+              rm -f /opt/ayroil/\$app/releases/$SHA/release.tar.gz
+            done
+            /opt/ayroil/deploy.sh all $SHA
+          EOF

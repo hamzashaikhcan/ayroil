@@ -4,6 +4,11 @@ import path from "node:path";
 const PROJECT_ROOT = path.resolve(__dirname);
 
 const nextConfig: NextConfig = {
+  // Ship a self-contained .next/standalone build (pruned node_modules + server.js)
+  // so CI can build once and the server only extracts + runs it — no `npm install`
+  // or `next build` against this app's deps on the deploy target.
+  output: "standalone",
+
   // Pin Turbopack to *this* directory so the workspace auto-detection
   // doesn't walk up and grab ~/package-lock.json as the project root.
   turbopack: {

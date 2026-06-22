@@ -14,6 +14,7 @@ usersRouter.get("/", async (req, res) => {
   const q = (req.query.q as string | undefined)?.trim();
   const qb = AppDataSource.getRepository(User)
     .createQueryBuilder("u")
+    .where("u.role != :adminRole", { adminRole: ROLES.ADMIN })
     .orderBy("u.createdAt", "DESC")
     .take(500);
   if (q) qb.andWhere("(u.email ILIKE :q OR u.name ILIKE :q)", { q: `%${q}%` });

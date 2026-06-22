@@ -14,6 +14,7 @@ import { SiteSettings } from "../entities/SiteSettings.js";
 import { newOrderNumber } from "../lib/orderNumber.js";
 import { guestKeyFromRequest } from "../lib/guest.js";
 import { sendOrderConfirmationEmail, sendShippedOrderEmail, sendDeliveredReviewEmail } from "../lib/email.js";
+import { sendNewOrderSlackAlert } from "../lib/slack.js";
 import { reconcileStockForStatusChange, STOCK_RELEASED_STATUSES } from "../lib/orderStock.js";
 import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
@@ -119,8 +120,11 @@ ordersRouter.post("/checkout", async (req, res) => {
   }
   await AppDataSource.getRepository(CartItem).delete({ cart: { id: cart.id } });
 
-  // Order confirmation email — fire-and-forget, never blocks checkout.
-  if (settings) void sendOrderConfirmationEmail(order, settings);
+  // Order confirmation email + Slack alert — fire-and-forget, never blocks checkout.
+  if (settings) {
+    void sendOrderConfirmationEmail(order, settings);
+    void sendNewOrderSlackAlert(order, settings);
+  }
 
   res.status(201).json(order);
 });

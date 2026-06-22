@@ -46,7 +46,7 @@ const EMPTY_FORM: FormState = {
   city: "",
   region: "",
   postalCode: "",
-  country: "US",
+  country: "PK",
   isDefault: false,
 };
 
@@ -86,7 +86,7 @@ export default function AddressesPage() {
       city: a.city,
       region: a.region,
       postalCode: a.postalCode,
-      country: (a.country || "US") as Country,
+      country: (a.country || "PK") as Country,
       isDefault: a.isDefault,
     });
     setError(null);

@@ -49,4 +49,9 @@ export const ENV = {
     apiSecret: process.env.CLOUDINARY_API_SECRET ?? "",
     uploadFolder: process.env.CLOUDINARY_FOLDER ?? "products",
   },
+
+  slack: {
+    token: process.env.SLACK_TOKEN ?? "",
+    alertChannel: process.env.SLACK_ALERT_CHANNEL ?? "",
+  },
 };

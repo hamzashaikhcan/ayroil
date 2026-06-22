@@ -90,7 +90,7 @@ export function CheckoutClient({
     city: "",
     region: "",
     postalCode: "",
-    country: "US",
+    country: "PK",
   });
 
   const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({});

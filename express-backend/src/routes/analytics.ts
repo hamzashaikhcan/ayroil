@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { Between, In, Not } from "typeorm";
-import { ORDER_STATUS } from "@consts";
+import { ORDER_STATUS, ROLES } from "@consts";
 import { AppDataSource } from "../data-source.js";
 import { Order } from "../entities/Order.js";
 import { OrderItem } from "../entities/OrderItem.js";
@@ -45,10 +45,10 @@ analyticsRouter.get("/overview", async (req, res) => {
   );
 
   const newUsers = await userRepo.count({
-    where: { createdAt: Between(range.from, range.to) },
+    where: { createdAt: Between(range.from, range.to), role: Not(ROLES.ADMIN) },
   });
 
-  const totalUsers = await userRepo.count();
+  const totalUsers = await userRepo.count({ where: { role: Not(ROLES.ADMIN) } });
   const totalProducts = await productRepo.count();
 
   const recentOrders = await orderRepo.find({

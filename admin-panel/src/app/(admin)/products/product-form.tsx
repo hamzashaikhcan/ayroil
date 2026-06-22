@@ -357,14 +357,14 @@ function HighlightsField({
   }
 
   return (
-    <textarea
-      rows={5}
-      value={raw}
-      onChange={(e) => handleChange(e.target.value)}
-      placeholder={"Built in-house\n30-day returns\nCarbon-neutral shipping"}
-      className="w-full rounded-md border border-line bg-surface-2 px-3 py-2 text-sm leading-relaxed text-ink placeholder:text-muted focus:border-ink/30 focus:bg-surface focus:outline-none"
-    />
-  );
+		<textarea
+			rows={5}
+			value={raw}
+			onChange={(e) => handleChange(e.target.value)}
+			placeholder={'Built in-house\n7-days returns\nCarbon-neutral shipping'}
+			className='w-full rounded-md border border-line bg-surface-2 px-3 py-2 text-sm leading-relaxed text-ink placeholder:text-muted focus:border-ink/30 focus:bg-surface focus:outline-none'
+		/>
+	);
 }
 
 function FaqsField({

@@ -218,17 +218,17 @@ export default async function HomePage() {
 						'Cold-pressed, not heat-extracted',
 						'No mineral oil, ever',
 						'Dermatologically tested',
-						'30-day returns',
+						'7-days returns',
 						'Made in small batches',
 						'Cold-pressed, not heat-extracted',
 						'No mineral oil, ever',
 						'Dermatologically tested',
-						'30-day returns',
+						'7-days returns',
 						'Made in small batches',
 					].map((t, i) => (
 						<div
 							key={i}
-							className='mx-8 inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.25em]'>
+							className='mx-4 inline-flex items-center gap-3 font-mono text-xs uppercase tracking-[0.2em] sm:mx-6 sm:tracking-[0.25em]'>
 							<span className='inline-block h-1 w-1 rounded-full bg-accent' />
 							{t}
 						</div>
@@ -532,7 +532,7 @@ export default async function HomePage() {
 								{ k: '100%', v: 'Carbon offset' },
 							].map((s) => (
 								<div
-									key={s.k}
+									key={s.v}
 									className='rounded-2xl border border-line bg-surface p-6'>
 									<div className='font-display text-3xl text-ink'>{s.k}</div>
 									<div className='mt-2 font-mono text-xs uppercase tracking-[0.18em] text-muted'>

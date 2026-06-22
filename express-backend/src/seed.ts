@@ -90,64 +90,64 @@ export async function runSeeds(): Promise<void> {
   const productCount = await products.count();
   if (productCount === 0) {
     await products.save(
-      products.create({
-        slug: "product-one",
-        name: "Product One",
-        tagline: "Built with intent.",
-        shortDescription:
-          "Our first product — engineered around a single problem and one quiet promise.",
-        longDescription:
-          "Product One is the first thing we've ever made for sale. It came out of two years of testing, a pile of rejected prototypes, and a stubborn opinion about how a single product should feel in someone's hands.",
-        priceCents: 2400,
-        compareAtCents: 2900,
-        costCents: 900,
-        stock: 250,
-        sku: "PO-001",
-        active: true,
-        images: [],
-        highlights: [
-          "Engineered around one job",
-          "Designed and built in Brooklyn",
-          "30-day return window",
-          "Carbon-neutral shipping",
-        ],
-        ingredients: [
-          {
-            name: "Active 01",
-            description:
-              "The core compound that does the actual work — measured and verified per batch.",
-          },
-          {
-            name: "Active 02",
-            description:
-              "Stabilizes the formula and keeps it shelf-stable without preservatives.",
-          },
-          {
-            name: "Carrier",
-            description:
-              "A gentle base that helps the actives reach where they need to go.",
-          },
-        ],
-        faqs: [
-          {
-            q: "How long does one bottle last?",
-            a: "Used as directed, one bottle covers about 30 days of regular use.",
-          },
-          {
-            q: "Is it safe for sensitive skin / sensitive teeth?",
-            a: "Yes — it's formulated without sulfates, parabens, or artificial dyes.",
-          },
-          {
-            q: "Where is it made?",
-            a: "Brooklyn, NY. Every batch is hand-finished and QA'd in-house.",
-          },
-          {
-            q: "What's your return policy?",
-            a: `30 days, full refund, no questions. Email ${SITE.supportEmail}.`,
-          },
-        ],
-      }),
-    );
+			products.create({
+				slug: 'product-one',
+				name: 'Product One',
+				tagline: 'Built with intent.',
+				shortDescription:
+					'Our first product — engineered around a single problem and one quiet promise.',
+				longDescription:
+					"Product One is the first thing we've ever made for sale. It came out of two years of testing, a pile of rejected prototypes, and a stubborn opinion about how a single product should feel in someone's hands.",
+				priceCents: 2400,
+				compareAtCents: 2900,
+				costCents: 900,
+				stock: 250,
+				sku: 'PO-001',
+				active: true,
+				images: [],
+				highlights: [
+					'Engineered around one job',
+					'Designed and built in Brooklyn',
+					'7-days return window',
+					'Carbon-neutral shipping',
+				],
+				ingredients: [
+					{
+						name: 'Active 01',
+						description:
+							'The core compound that does the actual work — measured and verified per batch.',
+					},
+					{
+						name: 'Active 02',
+						description:
+							'Stabilizes the formula and keeps it shelf-stable without preservatives.',
+					},
+					{
+						name: 'Carrier',
+						description:
+							'A gentle base that helps the actives reach where they need to go.',
+					},
+				],
+				faqs: [
+					{
+						q: 'How long does one bottle last?',
+						a: 'Used as directed, one bottle covers about 30 days of regular use.',
+					},
+					{
+						q: 'Is it safe for sensitive skin / sensitive teeth?',
+						a: "Yes — it's formulated without sulfates, parabens, or artificial dyes.",
+					},
+					{
+						q: 'Where is it made?',
+						a: "Brooklyn, NY. Every batch is hand-finished and QA'd in-house.",
+					},
+					{
+						q: "What's your return policy?",
+						a: `30 days, full refund, no questions. Email ${SITE.supportEmail}.`,
+					},
+				],
+			}),
+		);
     console.log(`[seed] Created placeholder product: product-one`);
   }
 }

@@ -47,7 +47,16 @@
     border-radius: 9999px; background: var(--accent);
     margin-right: 0.5rem; vertical-align: middle;
   }
-  .ticker { animation: ticker 50s linear infinite; }
+  .ticker {
+    animation: ticker 7s linear infinite;
+    will-change: transform;
+  }
+  @media (min-width: 768px) {
+    .ticker { animation-duration: 10s; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker { animation: none; }
+  }
   @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
   /* Typography for rendered product longDescription HTML from the admin editor. */

@@ -7,7 +7,7 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { BuyBlock } from "@/components/product/buy-block";
 import { StickyBuyBar } from "@/components/product/sticky-buy-bar";
 import { ProductDescription } from "@/components/product/product-description";
-import { fetchProductBySlug, FALLBACK_PRODUCT } from "@/lib/server-api";
+import { fetchProductBySlug, fetchProductReviews, FALLBACK_PRODUCT } from "@/lib/server-api";
 import { fetchSettings } from "@/lib/settings";
 import { formatPrice } from "@/lib/utils";
 
@@ -38,11 +38,17 @@ export async function generateMetadata(props: PageProps<"/shop/[slug]">): Promis
 
 export default async function PDP(props: PageProps<"/shop/[slug]">) {
   const { slug } = await props.params;
-  const [product, settings] = await Promise.all([
+  const [product, reviews, settings] = await Promise.all([
     fetchProductBySlug(slug).then((p) => p ?? (slug === FALLBACK_PRODUCT.slug ? FALLBACK_PRODUCT : null)),
+    fetchProductReviews(slug),
     fetchSettings(),
   ]);
   if (!product) notFound();
+
+  const reviewCount = reviews.length;
+  const averageRating = reviewCount
+    ? reviews.reduce((sum, review) => sum + review.rating, 0) / reviewCount
+    : 0;
 
   const productLd = {
     "@context": "https://schema.org",
@@ -61,6 +67,25 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
     },
+    aggregateRating: reviewCount
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: averageRating.toFixed(1),
+          reviewCount,
+        }
+      : undefined,
+    review: reviews.slice(0, 10).map((review) => ({
+      "@type": "Review",
+      author: { "@type": "Person", name: maskName(review.customerName) },
+      datePublished: review.createdAt,
+      reviewBody: review.comment || undefined,
+      reviewRating: {
+        "@type": "Rating",
+        ratingValue: review.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+    })),
   };
 
   const breadcrumbLd = {
@@ -124,6 +149,15 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
               </div>
               <h1 className="font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl">{product.name}</h1>
               {product.tagline ? <p className="mt-2 text-base text-muted">{product.tagline}</p> : null}
+              {reviewCount ? (
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <StarRating rating={averageRating} size="lg" />
+                  <span className="text-sm font-medium text-ink">{averageRating.toFixed(1)}</span>
+                  <span className="text-sm text-muted">
+                    {reviewCount} verified {reviewCount === 1 ? "review" : "reviews"}
+                  </span>
+                </div>
+              ) : null}
 
               <div className="mt-6 flex flex-wrap items-end gap-3">
                 <div className="font-display text-3xl text-ink">{formatPrice(product.priceCents)}</div>
@@ -196,6 +230,59 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
         </section>
       ) : null}
 
+      {reviews.length ? (
+        <section className="border-t border-line py-16">
+          <Container>
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-3xl">
+                <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted">
+                  <span className="marker-dot">Reviews</span>
+                </div>
+                <h2 className="font-display mt-4 text-2xl tracking-tight text-ink">
+                  What customers are saying
+                </h2>
+              </div>
+              <div className="rounded-2xl border border-line bg-surface px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <StarRating rating={averageRating} size="lg" />
+                  <div>
+                    <div className="font-display text-2xl leading-none text-ink">{averageRating.toFixed(1)}</div>
+                    <div className="mt-1 text-xs text-muted">
+                      {reviewCount} verified {reviewCount === 1 ? "review" : "reviews"}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-2">
+              {reviews.map((review) => (
+                <article key={review.id} className="rounded-2xl border border-line bg-surface p-6">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <div className="font-display text-lg text-ink">{maskName(review.customerName)}</div>
+                      <div className="mt-1 text-xs text-muted">
+                        {new Date(review.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </div>
+                    </div>
+                    <StarRating rating={review.rating} />
+                  </div>
+                  {review.comment.trim() ? (
+                    <p className="mt-4 text-sm leading-relaxed text-muted">{review.comment}</p>
+                  ) : (
+                    <p className="mt-4 text-sm leading-relaxed text-muted">Rated {review.rating} out of 5.</p>
+                  )}
+                </article>
+              ))}
+            </div>
+          </Container>
+        </section>
+      ) : null}
+
       {product.faqs?.length ? (
         <section className="border-t border-line py-16">
           <Container>
@@ -219,5 +306,36 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
         </section>
       ) : null}
     </>
+  );
+}
+
+function maskName(name: string): string {
+  const first = name.trim().split(/\s+/)[0] ?? "";
+  if (first.length <= 1) return first ? `${first}****` : "A****";
+  return `${first[0]}${"*".repeat(Math.max(4, first.length - 2))}${first[first.length - 1]}`;
+}
+
+function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }) {
+  const rounded = Math.round(rating);
+  const starClass = size === "lg" ? "h-5 w-5" : "h-4 w-4";
+
+  return (
+    <div className="flex items-center gap-0.5" aria-label={`${rating.toFixed(1)} out of 5 stars`}>
+      {[1, 2, 3, 4, 5].map((value) => (
+        <svg
+          key={value}
+          aria-hidden="true"
+          viewBox="0 0 20 20"
+          className={`${starClass} ${value <= rounded ? "text-amber-500" : "text-line-strong"}`}
+          fill={value <= rounded ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="1.6"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m10 2.5 2.3 4.7 5.2.8-3.8 3.7.9 5.2-4.6-2.5-4.6 2.5.9-5.2L2.5 8l5.2-.8L10 2.5Z" />
+        </svg>
+      ))}
+    </div>
   );
 }

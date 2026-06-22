@@ -2,9 +2,16 @@ import { Router } from "express";
 import { z } from "zod";
 import { AppDataSource } from "../data-source.js";
 import { Product } from "../entities/Product.js";
+import { Review } from "../entities/Review.js";
 import { requireAdmin } from "../middleware/auth.js";
 
 export const productsRouter: Router = Router();
+
+function maskCustomerName(name: string): string {
+  const first = name.trim().split(/\s+/)[0] ?? "";
+  if (first.length <= 1) return first ? `${first}****` : "A****";
+  return `${first[0]}${"*".repeat(Math.max(4, first.length - 2))}${first[first.length - 1]}`;
+}
 
 productsRouter.get("/", async (req, res) => {
   const repo = AppDataSource.getRepository(Product);
@@ -16,7 +23,60 @@ productsRouter.get("/", async (req, res) => {
   if (!includeInactive) qb.andWhere("p.active = true");
   if (q) qb.andWhere("(p.name ILIKE :q OR p.slug ILIKE :q)", { q: `%${q}%` });
   const items = await qb.getMany();
-  res.json(items);
+
+  if (!items.length) return res.json(items);
+
+  const productIds = items.map((item) => item.id);
+  const reviewRows = await AppDataSource.getRepository(Review)
+    .createQueryBuilder("r")
+    .leftJoin("r.product", "p")
+    .select("p.id", "productId")
+    .addSelect("COUNT(r.id)", "reviewCount")
+    .addSelect("AVG(r.rating)", "averageRating")
+    .where("p.id IN (:...productIds)", { productIds })
+    .groupBy("p.id")
+    .getRawMany<{ productId: string; reviewCount: string; averageRating: string | null }>();
+
+  const reviewSummaryByProductId = new Map(
+    reviewRows.map((row) => [
+      row.productId,
+      {
+        reviewCount: Number(row.reviewCount),
+        averageRating: row.averageRating ? Number(row.averageRating) : 0,
+      },
+    ]),
+  );
+
+  res.json(
+    items.map((item) => ({
+      ...item,
+      reviewCount: reviewSummaryByProductId.get(item.id)?.reviewCount ?? 0,
+      averageRating: reviewSummaryByProductId.get(item.id)?.averageRating ?? 0,
+    })),
+  );
+});
+
+productsRouter.get("/:slug/reviews", async (req, res) => {
+  const product = await AppDataSource.getRepository(Product).findOne({
+    where: { slug: req.params.slug, active: true },
+  });
+  if (!product) return res.status(404).json({ error: "Not found" });
+
+  const reviews = await AppDataSource.getRepository(Review).find({
+    where: { product: { id: product.id } },
+    order: { createdAt: "DESC" },
+    take: 50,
+  });
+
+  res.json(
+    reviews.map((review) => ({
+      id: review.id,
+      rating: review.rating,
+      comment: review.comment,
+      customerName: maskCustomerName(review.customerName),
+      createdAt: review.createdAt,
+    })),
+  );
 });
 
 productsRouter.get("/:slug", async (req, res) => {

@@ -43,8 +43,18 @@ export type Product = {
   highlights: string[];
   ingredients: { name: string; description: string }[];
   faqs: { q: string; a: string }[];
+  reviewCount?: number;
+  averageRating?: number;
   createdAt: string;
   updatedAt: string;
+};
+
+export type ProductReview = {
+  id: string;
+  rating: number;
+  comment: string;
+  customerName: string;
+  createdAt: string;
 };
 
 export type CartView = {

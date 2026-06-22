@@ -1,4 +1,4 @@
-import { API_URL, type Product } from "./api";
+import { API_URL, type Product, type ProductReview } from "./api";
 
 export async function fetchPrimaryProduct(): Promise<Product | null> {
   try {
@@ -29,6 +29,16 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
     return (await res.json()) as Product;
   } catch {
     return null;
+  }
+}
+
+export async function fetchProductReviews(slug: string): Promise<ProductReview[]> {
+  try {
+    const res = await fetch(`${API_URL}/products/${encodeURIComponent(slug)}/reviews`, { cache: "no-store" });
+    if (!res.ok) return [];
+    return (await res.json()) as ProductReview[];
+  } catch {
+    return [];
   }
 }
 

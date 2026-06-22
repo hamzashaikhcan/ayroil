@@ -78,6 +78,13 @@ export default async function ShopPage(props: PageProps<"/shop">) {
                   <div className="mt-3 flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="font-display text-base text-ink truncate">{p.name}</div>
+                      {p.reviewCount ? (
+                        <ProductRatingSummary
+                          rating={p.averageRating ?? 0}
+                          count={p.reviewCount}
+                          className="mt-1"
+                        />
+                      ) : null}
                       <div className="mt-0.5 text-xs text-muted truncate">{p.tagline ?? p.shortDescription}</div>
                     </div>
                     <div className="text-right">
@@ -96,6 +103,49 @@ export default async function ShopPage(props: PageProps<"/shop">) {
         </Container>
       </section>
     </>
+  );
+}
+
+function ProductRatingSummary({
+  rating,
+  count,
+  className,
+}: {
+  rating: number;
+  count: number;
+  className?: string;
+}) {
+  return (
+    <div className={`flex items-center gap-1.5 ${className ?? ""}`}>
+      <StarRating rating={rating} />
+      <span className="text-xs text-muted">
+        {rating.toFixed(1)} ({count})
+      </span>
+    </div>
+  );
+}
+
+function StarRating({ rating }: { rating: number }) {
+  const rounded = Math.round(rating);
+
+  return (
+    <div className="flex items-center gap-0.5" aria-label={`${rating.toFixed(1)} out of 5 stars`}>
+      {[1, 2, 3, 4, 5].map((value) => (
+        <svg
+          key={value}
+          aria-hidden="true"
+          viewBox="0 0 20 20"
+          className={`h-3.5 w-3.5 ${value <= rounded ? "text-amber-500" : "text-line-strong"}`}
+          fill={value <= rounded ? "currentColor" : "none"}
+          stroke="currentColor"
+          strokeWidth="1.7"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="m10 2.5 2.3 4.7 5.2.8-3.8 3.7.9 5.2-4.6-2.5-4.6 2.5.9-5.2L2.5 8l5.2-.8L10 2.5Z" />
+        </svg>
+      ))}
+    </div>
   );
 }
 

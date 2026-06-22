@@ -28,6 +28,7 @@ export function StickyBuyBar({
   const add = useCart((s) => s.add);
   const [visible, setVisible] = useState(false);
   const [pending, setPending] = useState(false);
+  const [done, setDone] = useState(false);
   const [buying, setBuying] = useState(false);
   const soldOut = product.stock <= 0;
   const image = product.images?.[0] ?? null;
@@ -58,6 +59,8 @@ export function StickyBuyBar({
         product.slug,
         offer,
       );
+      setDone(true);
+      setTimeout(() => setDone(false), 1500);
     } finally {
       setPending(false);
     }
@@ -122,29 +125,46 @@ export function StickyBuyBar({
               type="button"
               onClick={onAdd}
               disabled={pending || soldOut}
-              aria-label={soldOut ? "Sold out" : pending ? "Adding to cart" : "Add to cart"}
-              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-md border border-white/[0.12] bg-white/[0.06] px-2.5 text-sm font-medium text-background transition-colors hover:bg-white/[0.12] disabled:opacity-40 sm:px-4"
+              aria-label={soldOut ? "Sold out" : pending ? "Adding to cart" : done ? "Added to cart" : "Add to cart"}
+              className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-md border px-2.5 text-sm font-medium transition-colors disabled:opacity-40 sm:px-4 ${
+                done
+                  ? "border-emerald-400/30 bg-emerald-500/15 text-emerald-300"
+                  : "border-white/[0.12] bg-white/[0.06] text-background hover:bg-white/[0.12]"
+              }`}
             >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 14 14"
-                aria-hidden
-                className="flex-none sm:hidden"
-              >
-                <path
-                  d="M2 3h1.5l1 6.3a1 1 0 001 .85h5a1 1 0 001-.8L12.5 5H4"
-                  stroke="currentColor"
-                  strokeWidth="1.3"
-                  fill="none"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <circle cx="5.5" cy="12" r="0.75" fill="currentColor" />
-                <circle cx="10" cy="12" r="0.75" fill="currentColor" />
-              </svg>
+              {done ? (
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className="flex-none sm:hidden">
+                  <path
+                    d="M2.5 7.2l3 3 6-6.4"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 14 14"
+                  aria-hidden
+                  className="flex-none sm:hidden"
+                >
+                  <path
+                    d="M2 3h1.5l1 6.3a1 1 0 001 .85h5a1 1 0 001-.8L12.5 5H4"
+                    stroke="currentColor"
+                    strokeWidth="1.3"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="5.5" cy="12" r="0.75" fill="currentColor" />
+                  <circle cx="10" cy="12" r="0.75" fill="currentColor" />
+                </svg>
+              )}
               <span className="hidden whitespace-nowrap sm:inline">
-                {soldOut ? "Sold out" : pending ? "Adding…" : "Add to cart"}
+                {soldOut ? "Sold out" : pending ? "Adding…" : done ? "Added" : "Add to cart"}
               </span>
             </button>
 

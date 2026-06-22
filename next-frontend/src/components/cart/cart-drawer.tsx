@@ -121,8 +121,8 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
             <span className="font-display text-xl text-ink">{formatPrice(subtotal)}</span>
           </div>
           <p className="mt-2 text-xs text-muted">Shipping and tax calculated at checkout.</p>
-          <Button href="/checkout" variant="primary" size="lg" className="mt-4 w-full">Checkout</Button>
-          <Button href="/cart" variant="secondary" size="md" className="mt-2 w-full">View cart</Button>
+          <Button href="/checkout" variant="primary" size="lg" className="mt-4 w-full" onClick={onClose}>Checkout</Button>
+          <Button href="/cart" variant="secondary" size="md" className="mt-2 w-full" onClick={onClose}>View cart</Button>
         </div>
       </aside>
     </div>

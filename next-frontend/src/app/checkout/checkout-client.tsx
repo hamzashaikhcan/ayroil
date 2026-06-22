@@ -395,6 +395,28 @@ export function CheckoutClient({
           ) : null}
         </fieldset>
 
+        <fieldset className="rounded-2xl border border-line bg-surface p-5 sm:p-6">
+          <legend className="px-2 font-mono text-xs uppercase tracking-[0.22em] text-muted">
+            Payment
+          </legend>
+          <div className="flex items-start gap-3 rounded-md border border-ink bg-ink/5 p-3 text-sm">
+            <input
+              type="radio"
+              name="paymentMethod"
+              checked
+              readOnly
+              aria-label="Cash on Delivery"
+              className="mt-0.5"
+            />
+            <div className="min-w-0">
+              <div className="font-medium text-ink">Cash on Delivery (COD)</div>
+              <div className="mt-0.5 text-xs text-muted">
+                Pay in cash to the courier when your order arrives. No card or online payment needed.
+              </div>
+            </div>
+          </div>
+        </fieldset>
+
         {submitError ? (
           <div className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
             {submitError}
@@ -450,7 +472,7 @@ export function CheckoutClient({
                 : `Place order · ${formatPrice(totalCents)}`}
           </Button>
           <p className="mt-3 text-xs leading-relaxed text-muted">
-            This is a demo checkout — no payment is captured. {settings.returnsWindowDays}-day return window applies.
+            Pay {formatPrice(totalCents)} in cash on delivery — no payment is taken now. {settings.returnsWindowDays}-day return window applies.
             {!session ? (
               <>
                 {" "}

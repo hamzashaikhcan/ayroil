@@ -8,7 +8,6 @@ import { ProductThumb } from '@/components/product/product-thumb';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
 import { fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
 import { fetchSettings } from '@/lib/settings';
-import { formatPrice } from '@/lib/utils';
 
 const HOME_TITLE =
 	'Ayroil Herbal Hair Oil — Nourishing Care for Hair Fall & Dandruff';
@@ -576,28 +575,46 @@ export default async function HomePage() {
 
 			<section className='border-t border-line bg-ink text-background'>
 				<Container className='py-20'>
-					<div className='grid grid-cols-1 gap-10 md:grid-cols-[1.4fr_1fr] md:items-end'>
+					<div className='grid grid-cols-1 gap-10 md:grid-cols-[1.25fr_1fr] md:items-end'>
 						<div>
 							<div className='font-mono text-xs uppercase tracking-[0.22em] text-background/60'>
-								<span className='marker-dot'>Order now</span>
+								<span className='marker-dot'>Ready when you are</span>
 							</div>
 							<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight md:text-5xl'>
-								One oil. Your hair, nourished.
+								Find the formula that fits your routine.
 							</h2>
 							<p className='mt-4 max-w-lg text-base leading-relaxed text-background/70'>
-								{formatPrice(product.priceCents)} · ships in{' '}
-								{settings.estStandardDays} business days · free over{' '}
-								{formatPrice(settings.freeShippingThresholdCents)}.
+								Browse the full storefront, compare what is available, and choose
+								the product that makes sense for your hair and scalp.
 							</p>
+							<div className='mt-8 grid max-w-2xl grid-cols-1 gap-4 border-t border-background/15 pt-6 sm:grid-cols-3'>
+								{[
+									{ k: `${settings.estStandardDays}d`, v: 'Standard shipping' },
+									{ k: `${settings.returnsWindowDays}d`, v: 'Returns window' },
+									{ k: 'Support', v: 'Before or after you order' },
+								].map((s) => (
+									<div key={s.v}>
+										<div className='font-display text-2xl'>{s.k}</div>
+										<div className='mt-1 font-mono text-[10px] uppercase tracking-[0.16em] text-background/55 sm:text-xs'>
+											{s.v}
+										</div>
+									</div>
+								))}
+							</div>
 						</div>
 						<div className='flex flex-wrap gap-3 md:justify-end'>
-							<AddToCartButton product={product} />
 							<Button
-								href={`/shop/${product.slug}`}
+								href='/shop'
+								variant='accent'
+								size='lg'>
+								Shop products
+							</Button>
+							<Button
+								href='/benefits'
 								variant='ghost'
 								size='lg'
-								className='text-background hover:bg-background/10'>
-								Read the spec →
+								className='border border-background/25 !bg-background !text-ink hover:!bg-background/90'>
+								Benefits
 							</Button>
 						</div>
 					</div>

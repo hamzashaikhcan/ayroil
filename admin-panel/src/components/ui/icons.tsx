@@ -59,6 +59,14 @@ export function IconAnalytics(p: Props) {
   );
 }
 
+export function IconStar(p: Props) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M8 2.2l1.7 3.4 3.8.6-2.8 2.7.7 3.8L8 10.9l-3.4 1.8.7-3.8-2.8-2.7 3.8-.6L8 2.2z" />
+    </svg>
+  );
+}
+
 export function IconSettings(p: Props) {
   return (
     <svg {...base} {...p}>

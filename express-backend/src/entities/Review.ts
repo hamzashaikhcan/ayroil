@@ -39,6 +39,9 @@ export class Review {
   @Column({ type: "varchar", length: 120 })
   customerName!: string;
 
+  @Column({ type: "boolean", default: false })
+  visible!: boolean;
+
   @CreateDateColumn()
   createdAt!: Date;
 }

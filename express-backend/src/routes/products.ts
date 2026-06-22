@@ -34,6 +34,7 @@ productsRouter.get("/", async (req, res) => {
     .addSelect("COUNT(r.id)", "reviewCount")
     .addSelect("AVG(r.rating)", "averageRating")
     .where("p.id IN (:...productIds)", { productIds })
+    .andWhere("r.visible = true")
     .groupBy("p.id")
     .getRawMany<{ productId: string; reviewCount: string; averageRating: string | null }>();
 
@@ -63,7 +64,7 @@ productsRouter.get("/:slug/reviews", async (req, res) => {
   if (!product) return res.status(404).json({ error: "Not found" });
 
   const reviews = await AppDataSource.getRepository(Review).find({
-    where: { product: { id: product.id } },
+    where: { product: { id: product.id }, visible: true },
     order: { createdAt: "DESC" },
     take: 50,
   });

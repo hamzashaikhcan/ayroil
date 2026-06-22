@@ -14,6 +14,8 @@ const STATUS_MAP: Record<string, string> = {
   draft: "pill-mute",
   admin: "pill-info",
   user: "pill-mute",
+  visible: "pill-good",
+  hidden: "pill-warn",
 };
 
 export function StatusPill({ value }: { value: string }) {

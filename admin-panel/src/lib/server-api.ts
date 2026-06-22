@@ -114,6 +114,25 @@ export async function fetchOrders(): Promise<RecentOrder[]> {
   }
 }
 
+export type AdminReview = {
+  id: string;
+  rating: number;
+  comment: string;
+  customerName: string;
+  visible: boolean;
+  createdAt: string;
+  product: { id: string; slug: string; name: string } | null;
+  order: { id: string; number: string } | null;
+};
+
+export async function fetchReviews(status: "all" | "visible" | "hidden" = "all"): Promise<AdminReview[]> {
+  try {
+    return await adminServerFetch<AdminReview[]>(`/reviews?status=${status}`);
+  } catch {
+    return [];
+  }
+}
+
 export async function fetchProducts(): Promise<Array<{
   id: string;
   slug: string;
@@ -145,4 +164,3 @@ export async function fetchUsers(): Promise<Array<{
     return [];
   }
 }
-

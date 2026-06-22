@@ -236,6 +236,7 @@ ordersRouter.post("/:number/review", async (req, res) => {
     rating: parsed.data.rating,
     comment: parsed.data.comment.trim(),
     customerName: order.customerName,
+    visible: false,
   });
   await orderRepo.update({ id: order.id }, { reviewTokenUsedAt: new Date() });
 

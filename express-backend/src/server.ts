@@ -13,6 +13,7 @@ import { wishlistRouter } from "./routes/wishlist.js";
 import { addressesRouter } from "./routes/addresses.js";
 import { ordersRouter } from "./routes/orders.js";
 import { usersRouter } from "./routes/users.js";
+import { reviewsRouter } from "./routes/reviews.js";
 import { analyticsRouter } from "./routes/analytics.js";
 import { uploadsRouter } from "./routes/uploads.js";
 import { settingsRouter } from "./routes/settings.js";
@@ -47,6 +48,7 @@ async function main() {
   app.use("/addresses", addressesRouter);
   app.use("/orders", ordersRouter);
   app.use("/users", usersRouter);
+  app.use("/reviews", reviewsRouter);
   app.use("/analytics", analyticsRouter);
   app.use("/uploads", uploadsRouter);
   app.use("/settings", settingsRouter);

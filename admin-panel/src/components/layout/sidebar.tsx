@@ -12,6 +12,7 @@ import {
   IconProducts,
   IconCustomers,
   IconAnalytics,
+  IconStar,
   IconSettings,
   IconStore,
   IconLogout,
@@ -37,6 +38,7 @@ const NAV: NavItem[] = [
   { href: "/orders", label: "Orders", Icon: IconOrders },
   { href: "/carts", label: "Active carts", Icon: IconCart },
   { href: "/products", label: "Products", Icon: IconProducts },
+  { href: "/reviews", label: "Reviews", Icon: IconStar },
   { href: "/customers", label: "Customers", Icon: IconCustomers },
   { href: "/analytics", label: "Analytics", Icon: IconAnalytics },
 ];

@@ -4,6 +4,7 @@ import { CheckoutClient } from "./checkout-client";
 import { auth } from "@/auth";
 import jwt from "jsonwebtoken";
 import { API_URL } from "@/lib/api";
+import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
 
 export const metadata: Metadata = {
   title: "Checkout",
@@ -62,8 +63,10 @@ export default async function CheckoutPage() {
           <p className="mt-3 max-w-xl text-sm text-muted">
             {session
               ? "Signed in as " + session.user.email + ". You can also create an account during checkout."
-              : "No account needed. We will email your order confirmation. Want to save your details for next time? "}
-            {!session ? (
+              : AUTH_UI_ENABLED
+                ? "No account needed. We will email your order confirmation. Want to save your details for next time? "
+                : "No account needed. We will email your order confirmation."}
+            {!session && AUTH_UI_ENABLED ? (
               <a href="/login" className="text-ink underline underline-offset-4">Sign in</a>
             ) : null}
           </p>

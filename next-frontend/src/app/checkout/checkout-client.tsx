@@ -13,6 +13,7 @@ import { useSettings } from "@/components/providers/settings-context";
 import { formatPrice } from "@/lib/utils";
 import { relayUrl } from "@/lib/api";
 import { COUNTRIES } from "@/lib/countries";
+import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
 
 type Address = {
   id: string;
@@ -473,7 +474,7 @@ export function CheckoutClient({
           </Button>
           <p className="mt-3 text-xs leading-relaxed text-muted">
             Pay {formatPrice(totalCents)} in cash on delivery — no payment is taken now. {settings.returnsWindowDays}-day return window applies.
-            {!session ? (
+            {!session && AUTH_UI_ENABLED ? (
               <>
                 {" "}
                 <Link href="/login" className="text-ink underline underline-offset-4">

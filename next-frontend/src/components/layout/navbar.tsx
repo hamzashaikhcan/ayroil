@@ -8,6 +8,7 @@ import { Wordmark } from "./wordmark";
 import { useCart } from "@/stores/cart-store";
 import { CartDrawer } from "@/components/cart/cart-drawer";
 import { cn } from "@/lib/utils";
+import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
 
 const PRIMARY = [
   { href: "/shop", label: "Shop" },
@@ -94,21 +95,23 @@ export function Navbar() {
               </svg>
             </button>
 
-            {status === "authenticated" && session ? (
-              <Link
-                href="/account"
-                className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3 py-2 text-sm text-ink hover:bg-ink/5"
-              >
-                {session.user.name?.split(" ")[0] ?? "Account"}
-              </Link>
-            ) : (
-              <Link
-                href="/login"
-                className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-2 text-sm text-ink hover:bg-ink/5"
-              >
-                Sign in
-              </Link>
-            )}
+            {AUTH_UI_ENABLED ? (
+              status === "authenticated" && session ? (
+                <Link
+                  href="/account"
+                  className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3 py-2 text-sm text-ink hover:bg-ink/5"
+                >
+                  {session.user.name?.split(" ")[0] ?? "Account"}
+                </Link>
+              ) : (
+                <Link
+                  href="/login"
+                  className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-2 text-sm text-ink hover:bg-ink/5"
+                >
+                  Sign in
+                </Link>
+              )
+            ) : null}
 
             <button
               type="button"
@@ -189,13 +192,17 @@ export function Navbar() {
                   {item.label}
                 </Link>
               ))}
-              <div className="my-2 h-px bg-line" />
-              <Link
-                href={session ? "/account" : "/login"}
-                className="block rounded-md px-3 py-3 text-sm font-medium text-ink hover:bg-ink/5"
-              >
-                {session ? "Account" : "Sign in"}
-              </Link>
+              {AUTH_UI_ENABLED ? (
+                <>
+                  <div className="my-2 h-px bg-line" />
+                  <Link
+                    href={session ? "/account" : "/login"}
+                    className="block rounded-md px-3 py-3 text-sm font-medium text-ink hover:bg-ink/5"
+                  >
+                    {session ? "Account" : "Sign in"}
+                  </Link>
+                </>
+              ) : null}
             </div>
           </div>
         </>

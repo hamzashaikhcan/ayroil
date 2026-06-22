@@ -41,6 +41,10 @@ export type Settings = {
   estStandardDays: string;
   returnsWindowDays: number;
   returnsPolicyUrl: string;
+  productTimerEnabled: boolean;
+  productTimerDurationSeconds: number;
+  productTimerDiscountPercent: number;
+  productTimerMessage: string;
   companyName: string;
   foundedYear: number;
   taxId: string;
@@ -92,6 +96,10 @@ const FALLBACK: Settings = {
   estStandardDays: SITE.shipping.estStandardDays,
   returnsWindowDays: SITE.returns.windowDays,
   returnsPolicyUrl: SITE.returns.policyUrl,
+  productTimerEnabled: false,
+  productTimerDurationSeconds: 300,
+  productTimerDiscountPercent: 10,
+  productTimerMessage: "Offer ends in",
   companyName: SITE.legal.companyName,
   foundedYear: SITE.legal.foundedYear,
   taxId: SITE.legal.taxId,

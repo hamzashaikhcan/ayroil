@@ -14,6 +14,7 @@ type State = {
     qty?: number,
     image?: string | null,
     slug?: string,
+    offer?: { discountPercent: number; expiresAt: string },
   ) => Promise<void>;
   setQty: (itemId: string, qty: number) => Promise<void>;
   remove: (itemId: string) => Promise<void>;
@@ -43,7 +44,7 @@ export const useCart = create<State>((set, get) => ({
       set({ cart: EMPTY, ready: true });
     }
   },
-  add: async (productId, name, priceCents, qty = 1, image = null, slug = "") => {
+  add: async (productId, name, priceCents, qty = 1, image = null, slug = "", offer) => {
     // optimistic: bump locally first
     const prev = get().cart ?? EMPTY;
     const existing = prev.items.find((i) => i.productId === productId);
@@ -80,7 +81,7 @@ export const useCart = create<State>((set, get) => ({
     try {
       const cart = await call<CartView>("/cart/items", {
         method: "POST",
-        body: JSON.stringify({ productId, quantity: qty }),
+        body: JSON.stringify({ productId, quantity: qty, offer }),
       });
       set({ cart });
     } catch {

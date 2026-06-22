@@ -39,8 +39,6 @@ export function StickySaveBar({
           </Button>
         </div>
       </div>
-      {/* Spacer so the last card never sits behind the bar */}
-      <div className="h-20" aria-hidden />
     </>
   );
 }

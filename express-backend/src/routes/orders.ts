@@ -53,17 +53,25 @@ ordersRouter.post("/checkout", async (req, res) => {
     return res.status(400).json({ error: "Cart is empty" });
   }
 
+  const settings = await AppDataSource.getRepository(SiteSettings).findOne({ where: {} });
+  const discountPercent = cart.offerExpiresAt && cart.offerExpiresAt.getTime() > Date.now()
+    ? Math.max(0, Math.min(95, cart.offerDiscountPercent ?? 0))
+    : 0;
+  const effectivePriceCents = (priceCents: number) =>
+    discountPercent > 0 ? Math.max(0, Math.round(priceCents * (100 - discountPercent) / 100)) : priceCents;
+
   let subtotalCents = 0;
   let costCents = 0;
   const lineSnapshots = cart.items.map((i) => {
-    const line = i.product.priceCents * i.quantity;
+    const unitPriceCents = effectivePriceCents(i.product.priceCents);
+    const line = unitPriceCents * i.quantity;
     const cost = i.product.costCents * i.quantity;
     subtotalCents += line;
     costCents += cost;
     return {
       product: i.product,
       productName: i.product.name,
-      unitPriceCents: i.product.priceCents,
+      unitPriceCents,
       unitCostCents: i.product.costCents,
       quantity: i.quantity,
     };
@@ -112,7 +120,6 @@ ordersRouter.post("/checkout", async (req, res) => {
   await AppDataSource.getRepository(CartItem).delete({ cart: { id: cart.id } });
 
   // Order confirmation email — fire-and-forget, never blocks checkout.
-  const settings = await AppDataSource.getRepository(SiteSettings).findOne({ where: {} });
   if (settings) void sendOrderConfirmationEmail(order, settings);
 
   res.status(201).json(order);

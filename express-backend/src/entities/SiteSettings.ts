@@ -106,6 +106,19 @@ export class SiteSettings {
   @Column({ type: "varchar", length: 500, default: "/policies/returns" })
   returnsPolicyUrl!: string;
 
+  // Product detail urgency timer — optional countdown shown near purchase CTA.
+  @Column({ type: "boolean", default: false })
+  productTimerEnabled!: boolean;
+
+  @Column({ type: "int", default: 300 })
+  productTimerDurationSeconds!: number;
+
+  @Column({ type: "int", default: 10 })
+  productTimerDiscountPercent!: number;
+
+  @Column({ type: "varchar", length: 180, default: "Offer ends in" })
+  productTimerMessage!: string;
+
   // Email — Resend integration used to send order confirmation emails.
   // resendApiKey is a secret: the public GET /settings route strips it
   // before responding to unauthenticated/storefront callers.

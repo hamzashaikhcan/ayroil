@@ -37,6 +37,10 @@ export type SettingsLike = {
   estStandardDays: string;
   returnsWindowDays: number;
   returnsPolicyUrl: string;
+  productTimerEnabled: boolean;
+  productTimerDurationSeconds: number;
+  productTimerDiscountPercent: number;
+  productTimerMessage: string;
   resendApiKey: string;
   resendFromEmail: string;
   companyName: string;

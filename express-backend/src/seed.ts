@@ -39,6 +39,10 @@ export async function runSeeds(): Promise<void> {
         estStandardDays: SITE.shipping.estStandardDays,
         returnsWindowDays: SITE.returns.windowDays,
         returnsPolicyUrl: SITE.returns.policyUrl,
+        productTimerEnabled: false,
+        productTimerDurationSeconds: 300,
+        productTimerDiscountPercent: 10,
+        productTimerMessage: "Offer ends in",
         companyName: SITE.legal.companyName,
         foundedYear: SITE.legal.foundedYear,
         taxId: SITE.legal.taxId,
@@ -70,6 +74,18 @@ export async function runSeeds(): Promise<void> {
       }),
     );
     console.log(`[seed] Seeded SiteSettings from consts/index.ts`);
+  } else {
+    const existingSettings = await settings.findOne({ where: {}, order: { createdAt: "ASC" } });
+    if (
+      existingSettings &&
+      (!existingSettings.productTimerMessage ||
+        existingSettings.productTimerMessage === "Your cart price is reserved for" ||
+        existingSettings.productTimerMessage === "Buy before the timer ends to claim this discount")
+    ) {
+      existingSettings.productTimerMessage = "Offer ends in";
+      await settings.save(existingSettings);
+      console.log(`[seed] Updated product timer message default`);
+    }
   }
 
   const existing = await users.findOne({ where: { email: ENV.seed.adminEmail } });

@@ -15,6 +15,10 @@ type CommerceSlice = Pick<
   | "estStandardDays"
   | "returnsWindowDays"
   | "returnsPolicyUrl"
+  | "productTimerEnabled"
+  | "productTimerDurationSeconds"
+  | "productTimerDiscountPercent"
+  | "productTimerMessage"
 >;
 
 export function CommerceForm({ initial }: { initial: SettingsLike }) {
@@ -27,6 +31,10 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
     estStandardDays: initial.estStandardDays,
     returnsWindowDays: initial.returnsWindowDays,
     returnsPolicyUrl: initial.returnsPolicyUrl,
+    productTimerEnabled: initial.productTimerEnabled,
+    productTimerDurationSeconds: initial.productTimerDurationSeconds,
+    productTimerDiscountPercent: initial.productTimerDiscountPercent,
+    productTimerMessage: normalizeTimerMessage(initial.productTimerMessage),
   };
 
   const { s, setS, patch, pending, saved, error, onSubmit } = useSettingsSave<CommerceSlice>(slice);
@@ -131,6 +139,63 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
         </div>
       </Card>
 
+      <Card
+        title="Product detail timer"
+        subtitle="Optional countdown shown above the product purchase box. Use it as a short urgency nudge."
+      >
+        <label className="flex items-start gap-3 rounded-md border border-line bg-surface-2 p-3">
+          <input
+            type="checkbox"
+            checked={s.productTimerEnabled}
+            onChange={(e) => patch("productTimerEnabled", e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-line text-ink"
+          />
+          <span>
+            <span className="block text-sm font-medium text-ink">Show timer on product detail pages</span>
+            <span className="mt-0.5 block text-xs text-muted">
+              Hidden when off. The timer restarts for each visitor when the page loads.
+            </span>
+          </span>
+        </label>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[1fr_160px_180px]">
+          <Field
+            label="Timer message"
+            value={s.productTimerMessage}
+            onChange={(v) => patch("productTimerMessage", v)}
+            placeholder="Offer ends in"
+          />
+          <NumberField
+            label="Discount (%)"
+            value={s.productTimerDiscountPercent}
+            onChange={(v) => patch("productTimerDiscountPercent", Math.max(1, Math.min(95, v)))}
+          />
+          <NumberField
+            label="Duration (seconds)"
+            value={s.productTimerDurationSeconds}
+            onChange={(v) => patch("productTimerDurationSeconds", Math.max(1, Math.min(86400, v)))}
+          />
+        </div>
+
+        <div className="mt-3 flex flex-wrap gap-2">
+          {[
+            { label: "15 sec", value: 15 },
+            { label: "1 min", value: 60 },
+            { label: "5 min", value: 300 },
+            { label: "15 min", value: 900 },
+          ].map((preset) => (
+            <button
+              key={preset.value}
+              type="button"
+              onClick={() => patch("productTimerDurationSeconds", preset.value)}
+              className="h-8 rounded-md border border-line bg-surface px-2.5 text-xs font-medium text-ink hover:bg-surface-2"
+            >
+              {preset.label}
+            </button>
+          ))}
+        </div>
+      </Card>
+
       <StickySaveBar pending={pending} saved={saved} error={error} />
     </form>
   );
@@ -146,6 +211,14 @@ function previewMoney(cents: number, code: string, symbol: string, locale: strin
   } catch {
     return `${symbol}${(cents / 100).toFixed(cents % 100 === 0 ? 0 : 2)}`;
   }
+}
+
+function normalizeTimerMessage(message: string): string {
+  const trimmed = message.trim();
+  if (!trimmed || trimmed === "Your cart price is reserved for" || trimmed === "Buy before the timer ends to claim this discount") {
+    return "Offer ends in";
+  }
+  return trimmed;
 }
 
 function MoneyField({

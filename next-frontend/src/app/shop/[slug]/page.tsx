@@ -4,12 +4,10 @@ import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { Badge } from "@/components/ui/badge";
 import { ProductGallery } from "@/components/product/product-gallery";
-import { BuyBlock } from "@/components/product/buy-block";
-import { StickyBuyBar } from "@/components/product/sticky-buy-bar";
 import { ProductDescription } from "@/components/product/product-description";
+import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
 import { fetchProductBySlug, fetchProductReviews, FALLBACK_PRODUCT } from "@/lib/server-api";
 import { fetchSettings } from "@/lib/settings";
-import { formatPrice } from "@/lib/utils";
 
 export async function generateMetadata(props: PageProps<"/shop/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;
@@ -144,39 +142,33 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
             </div>
 
             <div>
-              <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted">
-                {settings.siteName}
-              </div>
-              <h1 className="font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl">{product.name}</h1>
-              {product.tagline ? <p className="mt-2 text-base text-muted">{product.tagline}</p> : null}
-              {reviewCount ? (
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <StarRating rating={averageRating} size="lg" />
-                  <span className="text-sm font-medium text-ink">{averageRating.toFixed(1)}</span>
-                  <span className="text-sm text-muted">
-                    {reviewCount} verified {reviewCount === 1 ? "review" : "reviews"}
-                  </span>
+              <ProductPurchasePanel
+                product={product}
+                estimatedShippingDays={settings.estStandardDays}
+                sentinelId="pdp-buy-block"
+                timer={{
+                  enabled: settings.productTimerEnabled,
+                  durationSeconds: settings.productTimerDurationSeconds,
+                  discountPercent: settings.productTimerDiscountPercent,
+                  message: settings.productTimerMessage,
+                  storageKey: `${product.id}:${settings.productTimerDurationSeconds}:${settings.productTimerDiscountPercent}:${settings.productTimerMessage}`,
+                }}
+              >
+                <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted">
+                  {settings.siteName}
                 </div>
-              ) : null}
-
-              <div className="mt-6 flex flex-wrap items-end gap-3">
-                <div className="font-display text-3xl text-ink">{formatPrice(product.priceCents)}</div>
-                {product.compareAtCents ? (
-                  <div className="font-mono text-sm text-muted line-through">{formatPrice(product.compareAtCents)}</div>
+                <h1 className="font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl">{product.name}</h1>
+                {product.tagline ? <p className="mt-2 text-base text-muted">{product.tagline}</p> : null}
+                {reviewCount ? (
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <StarRating rating={averageRating} size="lg" />
+                    <span className="text-sm font-medium text-ink">{averageRating.toFixed(1)}</span>
+                    <span className="text-sm text-muted">
+                      {reviewCount} verified {reviewCount === 1 ? "review" : "reviews"}
+                    </span>
+                  </div>
                 ) : null}
-                <span className="ml-1">
-                  <Badge tone={product.stock > 0 ? "accent" : "outline"}>
-                    {product.stock > 0
-                      ? product.stock < 10
-                        ? `Only ${product.stock} left`
-                        : `In stock · ships in ${settings.estStandardDays}d`
-                      : "Sold out"}
-                  </Badge>
-                </span>
-              </div>
-
-              {/* Above-the-fold purchase block — qty + add to cart + buy now + free-ship hint */}
-              <BuyBlock product={product} sentinelId="pdp-buy-block" />
+              </ProductPurchasePanel>
 
               {/* Quick facts strip */}
               <div className="mt-6 grid grid-cols-3 gap-4 rounded-xl border border-line bg-surface p-5">
@@ -211,8 +203,6 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
           </div>
         </Container>
       </section>
-
-      <StickyBuyBar product={product} sentinelId="pdp-buy-block" />
 
       {product.ingredients?.length ? (
         <section className="border-t border-line bg-surface py-16">

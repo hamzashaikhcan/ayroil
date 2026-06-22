@@ -26,6 +26,12 @@ export class Cart {
   @OneToMany(() => CartItem, (ci) => ci.cart, { cascade: true, eager: true })
   items!: CartItem[];
 
+  @Column({ type: "int", default: 0 })
+  offerDiscountPercent!: number;
+
+  @Column({ type: "timestamp", nullable: true })
+  offerExpiresAt!: Date | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

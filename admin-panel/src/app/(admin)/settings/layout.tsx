@@ -20,12 +20,14 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
   const isSettingsChrome = SETTINGS_PATHS.has(pathname);
 
   if (!isSettingsChrome) {
-    return <div className="min-w-0">{children}</div>;
+    return <div className="min-w-0 pb-20">{children}</div>;
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-[200px_1fr] lg:grid-cols-[220px_1fr]">
-      <SettingsNav />
+    <div className="grid grid-cols-1 gap-6 pb-20 md:grid-cols-[200px_1fr] lg:grid-cols-[220px_1fr]">
+      <div className="md:sticky md:top-20 md:self-start">
+        <SettingsNav />
+      </div>
       <div className="min-w-0">{children}</div>
     </div>
   );

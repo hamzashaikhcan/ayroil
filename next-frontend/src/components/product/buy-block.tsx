@@ -8,7 +8,15 @@ import { Button } from "@/components/ui/button";
 import { formatPrice } from "@/lib/utils";
 import { useSettings } from "@/components/providers/settings-context";
 
-export function BuyBlock({ product, sentinelId }: { product: Product; sentinelId?: string }) {
+export function BuyBlock({
+  product,
+  sentinelId,
+  offer,
+}: {
+  product: Product;
+  sentinelId?: string;
+  offer?: { discountPercent: number; expiresAt: string };
+}) {
   const router = useRouter();
   const add = useCart((s) => s.add);
   const cart = useCart((s) => s.cart);
@@ -37,6 +45,7 @@ export function BuyBlock({ product, sentinelId }: { product: Product; sentinelId
         qty,
         product.images?.[0] ?? null,
         product.slug,
+        offer,
       );
       setDone(true);
       setTimeout(() => setDone(false), 1500);
@@ -56,6 +65,7 @@ export function BuyBlock({ product, sentinelId }: { product: Product; sentinelId
         qty,
         product.images?.[0] ?? null,
         product.slug,
+        offer,
       );
       router.push("/checkout");
     } finally {

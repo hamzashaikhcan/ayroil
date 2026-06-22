@@ -4,6 +4,7 @@ import { AppDataSource } from "../data-source.js";
 import { Cart } from "../entities/Cart.js";
 import { CartItem } from "../entities/CartItem.js";
 import { Product } from "../entities/Product.js";
+import { SiteSettings } from "../entities/SiteSettings.js";
 import { User } from "../entities/User.js";
 import { guestKeyFromRequest } from "../lib/guest.js";
 import { requireAdmin } from "../middleware/auth.js";
@@ -41,12 +42,18 @@ async function getOrCreateCart(req: import("express").Request): Promise<Cart> {
 
 cartRouter.get("/", async (req, res) => {
   const cart = await getOrCreateCart(req);
-  res.json(serialize(cart));
+  res.json(await serialize(cart));
 });
 
 const addSchema = z.object({
   productId: z.string().uuid(),
   quantity: z.number().int().min(1).max(99).default(1),
+  offer: z
+    .object({
+      discountPercent: z.number().int().min(1).max(95),
+      expiresAt: z.string().datetime(),
+    })
+    .optional(),
 });
 
 cartRouter.post("/items", async (req, res) => {
@@ -56,6 +63,23 @@ cartRouter.post("/items", async (req, res) => {
   const productRepo = AppDataSource.getRepository(Product);
   const product = await productRepo.findOne({ where: { id: parsed.data.productId } });
   if (!product) return res.status(404).json({ error: "Product not found" });
+
+  if (parsed.data.offer) {
+    const settings = await AppDataSource.getRepository(SiteSettings).findOne({ where: {} });
+    const expiresAt = new Date(parsed.data.offer.expiresAt);
+    const now = Date.now();
+    const maxExpiresAt = now + (settings?.productTimerDurationSeconds ?? 0) * 1000 + 5000;
+    const validOffer =
+      !!settings?.productTimerEnabled &&
+      parsed.data.offer.discountPercent === settings.productTimerDiscountPercent &&
+      expiresAt.getTime() > now &&
+      expiresAt.getTime() <= maxExpiresAt;
+    if (validOffer) {
+      cart.offerDiscountPercent = parsed.data.offer.discountPercent;
+      cart.offerExpiresAt = expiresAt;
+      await AppDataSource.getRepository(Cart).save(cart);
+    }
+  }
 
   const itemRepo = AppDataSource.getRepository(CartItem);
   const existing = cart.items.find((i) => i.product.id === product.id);
@@ -70,7 +94,7 @@ cartRouter.post("/items", async (req, res) => {
   const fresh = await AppDataSource.getRepository(Cart).findOne({
     where: { id: cart.id },
   });
-  res.json(serialize(fresh!));
+  res.json(await serialize(fresh!));
 });
 
 const updateSchema = z.object({ quantity: z.number().int().min(0).max(99) });
@@ -93,7 +117,7 @@ cartRouter.patch("/items/:itemId", async (req, res) => {
   const fresh = await AppDataSource.getRepository(Cart).findOne({
     where: { id: cart.id },
   });
-  res.json(serialize(fresh!));
+  res.json(await serialize(fresh!));
 });
 
 cartRouter.delete("/items/:itemId", async (req, res) => {
@@ -103,7 +127,7 @@ cartRouter.delete("/items/:itemId", async (req, res) => {
   const fresh = await AppDataSource.getRepository(Cart).findOne({
     where: { id: cart.id },
   });
-  res.json(serialize(fresh!));
+  res.json(await serialize(fresh!));
 });
 
 cartRouter.delete("/", async (req, res) => {
@@ -113,19 +137,28 @@ cartRouter.delete("/", async (req, res) => {
   const fresh = await AppDataSource.getRepository(Cart).findOne({
     where: { id: cart.id },
   });
-  res.json(serialize(fresh!));
+  res.json(await serialize(fresh!));
 });
 
-function serialize(cart: Cart) {
+function discountedPriceCents(priceCents: number, discountPercent: number): number {
+  if (discountPercent <= 0) return priceCents;
+  return Math.max(0, Math.round(priceCents * (100 - discountPercent) / 100));
+}
+
+async function serialize(cart: Cart) {
+  const discountPercent =
+    cart.offerExpiresAt && cart.offerExpiresAt.getTime() > Date.now()
+      ? Math.max(0, Math.min(95, cart.offerDiscountPercent ?? 0))
+      : 0;
   const items = cart.items.map((i) => ({
     id: i.id,
     productId: i.product.id,
     slug: i.product.slug,
     name: i.product.name,
-    priceCents: i.product.priceCents,
+    priceCents: discountedPriceCents(i.product.priceCents, discountPercent),
     image: i.product.images?.[0] ?? null,
     quantity: i.quantity,
-    lineTotalCents: i.product.priceCents * i.quantity,
+    lineTotalCents: discountedPriceCents(i.product.priceCents, discountPercent) * i.quantity,
   }));
   const subtotalCents = items.reduce((a, i) => a + i.lineTotalCents, 0);
   return {

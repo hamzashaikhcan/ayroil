@@ -18,9 +18,11 @@ import { formatPrice } from "@/lib/utils";
 export function StickyBuyBar({
   product,
   sentinelId,
+  offer,
 }: {
   product: Product;
   sentinelId: string;
+  offer?: { discountPercent: number; expiresAt: string };
 }) {
   const router = useRouter();
   const add = useCart((s) => s.add);
@@ -54,6 +56,7 @@ export function StickyBuyBar({
         1,
         product.images?.[0] ?? null,
         product.slug,
+        offer,
       );
     } finally {
       setPending(false);
@@ -71,6 +74,7 @@ export function StickyBuyBar({
         1,
         product.images?.[0] ?? null,
         product.slug,
+        offer,
       );
       router.push("/checkout");
     } finally {

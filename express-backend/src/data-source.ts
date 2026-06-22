@@ -9,6 +9,7 @@ import { CartItem } from "./entities/CartItem.js";
 import { WishlistItem } from "./entities/WishlistItem.js";
 import { Order } from "./entities/Order.js";
 import { OrderItem } from "./entities/OrderItem.js";
+import { Review } from "./entities/Review.js";
 import { SiteSettings } from "./entities/SiteSettings.js";
 
 export const AppDataSource = new DataSource({
@@ -20,5 +21,5 @@ export const AppDataSource = new DataSource({
   database: ENV.db.name,
   synchronize: true,
   logging: ENV.nodeEnv === "development" ? ["error", "warn"] : ["error"],
-  entities: [User, Product, Address, Cart, CartItem, WishlistItem, Order, OrderItem, SiteSettings],
+  entities: [User, Product, Address, Cart, CartItem, WishlistItem, Order, OrderItem, Review, SiteSettings],
 });

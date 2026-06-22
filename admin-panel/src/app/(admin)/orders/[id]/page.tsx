@@ -31,6 +31,7 @@ type Order = {
   items: { productName: string; quantity: number; unitPriceCents: number }[];
   createdAt: string;
   notes: string | null;
+  trackingNumber: string | null;
 };
 
 export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) {
@@ -55,7 +56,12 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
           </div>
           <div className="mt-1 text-xs text-muted">{new Date(order.createdAt).toLocaleString()}</div>
         </div>
-        <OrderActions id={order.id} status={order.status} paymentStatus={order.paymentStatus} />
+        <OrderActions
+          id={order.id}
+          status={order.status}
+          paymentStatus={order.paymentStatus}
+          trackingNumber={order.trackingNumber}
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[2fr_1fr]">

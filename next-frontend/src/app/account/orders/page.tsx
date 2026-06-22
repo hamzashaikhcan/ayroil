@@ -32,7 +32,6 @@ export default function OrdersPage() {
 
   useEffect(() => {
     reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function onCancel(o: Order) {

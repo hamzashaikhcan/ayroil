@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Container } from '@/components/ui/container';
@@ -8,6 +9,52 @@ import { AddToCartButton } from '@/components/product/add-to-cart-button';
 import { fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
 import { fetchSettings } from '@/lib/settings';
 import { formatPrice } from '@/lib/utils';
+
+const HOME_TITLE =
+	'Ayroil Herbal Hair Oil — Nourishing Care for Hair Fall & Dandruff';
+const HOME_DESCRIPTION =
+	'Ayroil is a cold-pressed herbal hair oil that nourishes dry, dull hair, helps reduce hair fall, and soothes an itchy, flaky scalp. No mineral oil, ever.';
+
+export async function generateMetadata(): Promise<Metadata> {
+	// Next.js replaces (not deep-merges) nested metadata objects like
+	// `openGraph`/`twitter` when a page defines its own — re-supply the
+	// settings-driven image/siteName/locale here so they aren't dropped.
+	const settings = await fetchSettings();
+	const ogImages = settings.ogImageUrl ? [{ url: settings.ogImageUrl }] : undefined;
+
+	return {
+		// `absolute` bypasses the root layout's title template, so this page's
+		// title is exactly what's below — not suffixed with the site-wide name.
+		title: { absolute: HOME_TITLE },
+		description: HOME_DESCRIPTION,
+		keywords: [
+			'herbal hair oil',
+			'nourishing hair oil',
+			'cold-pressed hair oil',
+			'hair fall control oil',
+			'dandruff relief hair oil',
+			'flaky scalp care',
+			'frizz control hair oil',
+			'natural scalp care',
+		],
+		alternates: { canonical: '/' },
+		openGraph: {
+			type: 'website',
+			siteName: settings.siteName,
+			title: HOME_TITLE,
+			description: HOME_DESCRIPTION,
+			url: '/',
+			locale: 'en_US',
+			images: ogImages,
+		},
+		twitter: {
+			card: 'summary_large_image',
+			title: HOME_TITLE,
+			description: HOME_DESCRIPTION,
+			images: settings.ogImageUrl ? [settings.ogImageUrl] : undefined,
+		},
+	};
+}
 
 export default async function HomePage() {
 	const [product, settings] = await Promise.all([

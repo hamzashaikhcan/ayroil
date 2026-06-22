@@ -1,9 +1,11 @@
+import crypto from "node:crypto";
 import { Router } from "express";
 import { z } from "zod";
 import { ORDER_STATUS, PAYMENT_STATUS } from "@consts";
 import { AppDataSource } from "../data-source.js";
 import { Order } from "../entities/Order.js";
 import { OrderItem } from "../entities/OrderItem.js";
+import { Review } from "../entities/Review.js";
 import { Cart } from "../entities/Cart.js";
 import { CartItem } from "../entities/CartItem.js";
 import { Product } from "../entities/Product.js";
@@ -11,7 +13,7 @@ import { User } from "../entities/User.js";
 import { SiteSettings } from "../entities/SiteSettings.js";
 import { newOrderNumber } from "../lib/orderNumber.js";
 import { guestKeyFromRequest } from "../lib/guest.js";
-import { sendOrderConfirmationEmail } from "../lib/email.js";
+import { sendOrderConfirmationEmail, sendShippedOrderEmail, sendDeliveredReviewEmail } from "../lib/email.js";
 import { reconcileStockForStatusChange, STOCK_RELEASED_STATUSES } from "../lib/orderStock.js";
 import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
@@ -177,6 +179,69 @@ ordersRouter.delete("/mine/:number", requireAuth, async (req, res) => {
   res.json({ ok: true });
 });
 
+/**
+ * Public, token-based review lookup/submission — no session involved. The
+ * token (minted on DELIVERED, see PATCH /:id below) is the only credential;
+ * same trust model as a password-reset link. reviewTokenUsedAt being set is
+ * what makes the link single-use: both routes re-check it on every call.
+ *
+ * Keep these before the admin /:id routes, otherwise Express treats an order
+ * number as the :id segment and the nested /review path never gets here.
+ */
+function reviewTokenIsValid(order: Order | null, token: string | undefined): order is Order {
+  return !!order && !!token && order.reviewToken === token && !order.reviewTokenUsedAt && order.status === ORDER_STATUS.DELIVERED;
+}
+
+ordersRouter.get("/:number/review", async (req, res) => {
+  const order = await AppDataSource.getRepository(Order).findOne({
+    where: { number: String(req.params.number) },
+    relations: { items: { product: true } },
+  });
+  if (!reviewTokenIsValid(order, req.query.token as string | undefined)) {
+    return res.status(410).json({ error: "This review link is invalid or has already been used." });
+  }
+  res.json({
+    number: order.number,
+    customerName: order.customerName,
+    items: order.items.map((i) => ({
+      productName: i.productName,
+      slug: i.product?.slug ?? null,
+      image: i.product?.images?.[0] ?? null,
+    })),
+  });
+});
+
+const reviewSubmitSchema = z.object({
+  token: z.string().min(1),
+  rating: z.coerce.number().int().min(1).max(5),
+  comment: z.string().max(1000).optional().default(""),
+});
+
+ordersRouter.post("/:number/review", async (req, res) => {
+  const parsed = reviewSubmitSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Invalid", issues: parsed.error.issues });
+
+  const orderRepo = AppDataSource.getRepository(Order);
+  const order = await orderRepo.findOne({
+    where: { number: String(req.params.number) },
+    relations: { items: { product: true } },
+  });
+  if (!reviewTokenIsValid(order, parsed.data.token)) {
+    return res.status(410).json({ error: "This review link is invalid or has already been used." });
+  }
+
+  await AppDataSource.getRepository(Review).save({
+    order,
+    product: order.items[0]?.product ?? null,
+    rating: parsed.data.rating,
+    comment: parsed.data.comment.trim(),
+    customerName: order.customerName,
+  });
+  await orderRepo.update({ id: order.id }, { reviewTokenUsedAt: new Date() });
+
+  res.json({ ok: true });
+});
+
 // Admin endpoints
 ordersRouter.get("/", requireAdmin, async (req, res) => {
   const status = req.query.status as string | undefined;
@@ -216,6 +281,7 @@ const adminUpdateSchema = z.object({
     PAYMENT_STATUS.REFUNDED,
   ]).optional(),
   notes: z.string().optional().nullable(),
+  trackingNumber: z.string().max(64).optional().nullable(),
 });
 
 ordersRouter.patch("/:id", requireAdmin, async (req, res) => {
@@ -233,8 +299,38 @@ ordersRouter.patch("/:id", requireAdmin, async (req, res) => {
     await reconcileStockForStatusChange(existing, fromStatus, parsed.data.status);
   }
 
+  // Transitioning into DELIVERED mints a one-time review token and fires the
+  // "please review" email automatically — no separate admin action needed.
+  if (parsed.data.status === ORDER_STATUS.DELIVERED && fromStatus !== ORDER_STATUS.DELIVERED) {
+    const reviewToken = crypto.randomBytes(32).toString("hex");
+    await repo.update({ id }, { reviewToken, reviewTokenUsedAt: null });
+    const settings = await AppDataSource.getRepository(SiteSettings).findOne({ where: {} });
+    if (settings) void sendDeliveredReviewEmail(existing, settings, reviewToken);
+  }
+
   const fresh = await repo.findOne({ where: { id } });
   res.json(fresh);
+});
+
+/**
+ * Manual "your order shipped" notification — decoupled from the status
+ * PATCH above so the admin can set/update the tracking number first and
+ * choose when to actually email the customer (and resend if needed).
+ */
+ordersRouter.post("/:id/notify-shipped", requireAdmin, async (req, res) => {
+  const id = String(req.params.id);
+  const order = await AppDataSource.getRepository(Order).findOne({
+    where: { id },
+    relations: { items: { product: true } },
+  });
+  if (!order) return res.status(404).json({ error: "Not found" });
+  if (!order.trackingNumber?.trim()) {
+    return res.status(400).json({ error: "Add a tracking number before sending the shipped email." });
+  }
+  const settings = await AppDataSource.getRepository(SiteSettings).findOne({ where: {} });
+  if (!settings) return res.status(400).json({ error: "Email isn't configured yet." });
+  await sendShippedOrderEmail(order, settings);
+  res.json({ ok: true });
 });
 
 ordersRouter.delete("/:id", requireAdmin, async (req, res) => {

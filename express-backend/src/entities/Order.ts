@@ -80,6 +80,20 @@ export class Order {
   @Column({ type: "text", nullable: true })
   notes!: string | null;
 
+  // Shipping — courier tracking number, admin-entered. The "shipped" email
+  // is only sendable once this is set (see POST /orders/:id/notify-shipped).
+  @Column({ type: "varchar", length: 64, nullable: true })
+  trackingNumber!: string | null;
+
+  // Review flow — set when an order transitions to DELIVERED. The token is
+  // a one-time bearer credential for the public, unauthenticated review
+  // page; reviewTokenUsedAt being non-null is what makes the link single-use.
+  @Column({ type: "varchar", length: 64, nullable: true })
+  reviewToken!: string | null;
+
+  @Column({ type: "timestamp", nullable: true })
+  reviewTokenUsedAt!: Date | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

@@ -8,6 +8,7 @@ import { getActiveCurrency, formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { ImageUploader } from "@/components/ui/image-uploader";
+import { SwitchField } from "@/components/ui/switch-field";
 import { AiProductWidget } from "@/components/ai-product-widget";
 import type { GeneratedProduct } from "@/lib/ai-types";
 
@@ -213,18 +214,12 @@ export function ProductForm({
 
       <div className="space-y-5">
         <Card title="Status">
-          <label className="flex cursor-pointer items-start gap-2.5 rounded-md border border-line bg-surface-2 p-3 text-sm">
-            <input
-              type="checkbox"
-              checked={p.active}
-              onChange={(e) => patch("active", e.target.checked)}
-              className="mt-0.5"
-            />
-            <span>
-              <span className="block font-medium text-ink">Active</span>
-              <span className="block text-xs text-muted">Visible on the storefront.</span>
-            </span>
-          </label>
+          <SwitchField
+            checked={p.active}
+            onChange={(checked) => patch("active", checked)}
+            label="Active"
+            description="Visible on the storefront."
+          />
         </Card>
 
         {error ? (

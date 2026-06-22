@@ -4,6 +4,7 @@ import { Card, Field, NumberField } from "../_shared/fields";
 import { StickySaveBar } from "../_shared/save-bar";
 import { useSettingsSave } from "../_shared/use-settings-save";
 import { CURRENCIES, type SettingsLike } from "../_shared/types";
+import { SwitchField } from "@/components/ui/switch-field";
 
 type CommerceSlice = Pick<
   SettingsLike,
@@ -143,20 +144,12 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
         title="Product detail timer"
         subtitle="Optional countdown shown above the product purchase box. Use it as a short urgency nudge."
       >
-        <label className="flex items-start gap-3 rounded-md border border-line bg-surface-2 p-3">
-          <input
-            type="checkbox"
-            checked={s.productTimerEnabled}
-            onChange={(e) => patch("productTimerEnabled", e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-line text-ink"
-          />
-          <span>
-            <span className="block text-sm font-medium text-ink">Show timer on product detail pages</span>
-            <span className="mt-0.5 block text-xs text-muted">
-              Hidden when off. The timer restarts for each visitor when the page loads.
-            </span>
-          </span>
-        </label>
+        <SwitchField
+          checked={s.productTimerEnabled}
+          onChange={(checked) => patch("productTimerEnabled", checked)}
+          label="Show timer on product detail pages"
+          description="Hidden when off. The timer restarts for each visitor when the page loads."
+        />
 
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-[1fr_160px_180px]">
           <Field

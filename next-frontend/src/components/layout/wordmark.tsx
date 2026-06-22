@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSettings } from "@/components/providers/settings-context";
+import { cloudinaryTransform } from "@/lib/cloudinary";
 
 /**
  * Brand mark used in the navbar and footer.
@@ -26,19 +27,24 @@ export function Wordmark({
 
   const px = size === "sm" ? "text-sm" : size === "lg" ? "text-2xl" : "text-lg";
   const h = size === "sm" ? "h-5" : size === "lg" ? "h-8" : "h-6";
+  const heightPx = size === "sm" ? 20 : size === "lg" ? 32 : 24;
   const badgeBox = size === "sm" ? "h-5 w-5" : size === "lg" ? "h-7 w-7" : "h-6 w-6";
 
   // Prefer the logo for the active surface.
   const logoUrl = theme === "dark" ? settings.whiteLogoUrl : settings.darkLogoUrl;
 
   if (logoUrl) {
+    // Cap the download to ~3x the display height (covers high-DPI screens)
+    // instead of shipping the admin's full-resolution upload on every page.
+    const optimizedUrl = cloudinaryTransform(logoUrl, `f_auto,q_auto,h_${heightPx * 3}`);
     return (
       <Link href="/" className="inline-flex items-center gap-2" aria-label={settings.siteName}>
         <span className={`relative inline-block ${h} w-auto`} style={{ aspectRatio: "auto" }}>
           {/* eslint-disable-next-line @next/next/no-img-element -- need natural width for a logo */}
           <img
-            src={logoUrl}
+            src={optimizedUrl}
             alt={settings.siteName}
+            height={heightPx}
             className={`${h} w-auto object-contain`}
             draggable={false}
           />

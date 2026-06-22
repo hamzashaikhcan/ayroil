@@ -91,6 +91,7 @@ export function StickyBuyBar({
         visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-full opacity-0"
       }`}
       aria-hidden={!visible}
+      inert={!visible}
     >
       <div className="mx-auto w-full max-w-5xl px-2 pb-2 sm:px-3 sm:pb-3">
         <div

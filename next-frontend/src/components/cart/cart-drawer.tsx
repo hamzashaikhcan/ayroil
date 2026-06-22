@@ -55,7 +55,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   const toFree = Math.max(0, freeAt - subtotal);
 
   return (
-    <div className={`fixed inset-0 z-[90] ${open ? "" : "pointer-events-none"}`} aria-hidden={!open}>
+    <div className={`fixed inset-0 z-[90] ${open ? "" : "pointer-events-none"}`} aria-hidden={!open} inert={!open}>
       <div className={`absolute inset-0 bg-ink/30 transition-opacity ${open ? "opacity-100" : "opacity-0"}`} onClick={onClose} />
       <aside
         className={`absolute right-0 top-0 flex h-full w-full max-w-md flex-col border-l border-line-strong bg-surface shadow-[0_24px_80px_-24px_rgba(0,0,0,0.35)] transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"}`}

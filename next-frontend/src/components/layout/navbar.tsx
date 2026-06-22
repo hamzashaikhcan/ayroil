@@ -113,7 +113,7 @@ export function Navbar() {
             <button
               type="button"
               onClick={() => setDrawerOpen(true)}
-              aria-label="Open cart"
+              aria-label={`Cart, ${totalUnits} item${totalUnits === 1 ? "" : "s"}`}
               className="relative inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-2 text-sm font-medium text-accent-ink hover:bg-accent-deep sm:gap-2 sm:px-4"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className="sm:hidden">
@@ -121,8 +121,8 @@ export function Navbar() {
                 <circle cx="5.5" cy="12" r="0.75" fill="currentColor" />
                 <circle cx="10" cy="12" r="0.75" fill="currentColor" />
               </svg>
-              <span className="hidden sm:inline">Cart</span>
-              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1.5 text-xs font-mono text-background">
+              <span className="hidden sm:inline" aria-hidden>Cart</span>
+              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1.5 text-xs font-mono text-background" aria-hidden>
                 {totalUnits}
               </span>
             </button>

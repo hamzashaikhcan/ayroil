@@ -46,20 +46,18 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_auto] xl:items-start">
+        <div className="min-w-0">
           <Link href="/orders" className="text-xs text-muted hover:text-ink">← Back to orders</Link>
           <div className="mt-2 flex items-center gap-3">
             <h2 className="text-xl font-semibold tracking-tight text-ink">Order {order.number}</h2>
             <StatusPill value={order.status} />
-            <StatusPill value={order.paymentStatus} />
           </div>
           <div className="mt-1 text-xs text-muted">{new Date(order.createdAt).toLocaleString()}</div>
         </div>
         <OrderActions
           id={order.id}
           status={order.status}
-          paymentStatus={order.paymentStatus}
           trackingNumber={order.trackingNumber}
         />
       </div>

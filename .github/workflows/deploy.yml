@@ -149,7 +149,7 @@ jobs:
           CLOUDINARY_API_SECRET=${{ vars.CLOUDINARY_API_SECRET }}
           CLOUDINARY_FOLDER=${{ vars.CLOUDINARY_FOLDER }}
           SLACK_TOKEN=${{ secrets.SLACK_TOKEN }}
-          SLACK_ALERT_CHANNEL=${{ vars.SLACK_ALERT_CHANNEL }}
+          SLACK_ALERT_CHANNEL="${{ vars.SLACK_ALERT_CHANNEL }}"
           EOF
           ssh -i ~/.ssh/id_ed25519 "$HETZNER_USER@$HETZNER_HOST" "cat > /opt/ayroil/shared/next-frontend.env" <<EOF
           NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}

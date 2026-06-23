@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { headers } from "next/headers";
+import Script from "next/script";
 import { SITE } from "@consts";
 import { Providers } from "@/components/providers";
 import { SettingsProvider } from "@/components/providers/settings-context";
@@ -14,6 +15,7 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: ["latin"], display: "swap" });
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"], display: "swap" });
+const GA_MEASUREMENT_ID = "G-ECSBHST4TC";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();
@@ -110,6 +112,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body className="min-h-full bg-background text-ink flex flex-col" suppressHydrationWarning>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="lazyOnload"
+        />
+        <Script id="google-analytics" strategy="lazyOnload">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_MEASUREMENT_ID}');
+          `}
+        </Script>
         <SettingsProvider value={settings}>
           <Providers>
             <Navbar />

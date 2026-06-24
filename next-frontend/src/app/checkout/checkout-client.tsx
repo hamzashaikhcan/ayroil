@@ -3,7 +3,7 @@
 import "react-phone-number-input/style.css";
 import "./phone-input.css";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import PhoneInput, { isValidPhoneNumber, type Country } from "react-phone-number-input";
@@ -14,6 +14,7 @@ import { formatPrice } from "@/lib/utils";
 import { relayUrl } from "@/lib/api";
 import { COUNTRIES } from "@/lib/countries";
 import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
+import { trackInitiateCheckout, trackPurchase } from "@/lib/analytics";
 
 type Address = {
   id: string;
@@ -119,6 +120,15 @@ export function CheckoutClient({
     [addresses, selectedAddressId],
   );
 
+  useEffect(() => {
+    if (!ready || items.length === 0) return;
+    trackInitiateCheckout(
+      items.map((i) => ({ id: i.productId, name: i.name, priceCents: i.priceCents, quantity: i.quantity })),
+    );
+    // Fire once per checkout-page visit, not on every cart mutation.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready]);
+
   function selectAddress(id: string | "new") {
     setSelectedAddressId(id);
     // Reset touched state so switching mode doesn't shout about fields
@@ -184,6 +194,11 @@ export function CheckoutClient({
         throw new Error(text || `Checkout failed (${res.status})`);
       }
       const order = (await res.json()) as { number: string };
+      trackPurchase(
+        items.map((i) => ({ id: i.productId, name: i.name, priceCents: i.priceCents, quantity: i.quantity })),
+        totalCents,
+        order.number,
+      );
       await clear();
       router.push(`/orders/${order.number}`);
     } catch (err) {

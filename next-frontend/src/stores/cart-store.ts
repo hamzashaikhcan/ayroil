@@ -2,6 +2,7 @@
 
 import { create } from "zustand";
 import { relayUrl, type CartView } from "@/lib/api";
+import { trackAddToCart } from "@/lib/analytics";
 
 type State = {
   cart: CartView | null;
@@ -84,6 +85,7 @@ export const useCart = create<State>((set, get) => ({
         body: JSON.stringify({ productId, quantity: qty, offer }),
       });
       set({ cart });
+      trackAddToCart({ id: productId, name, priceCents, quantity: qty });
     } catch {
       set({ cart: prev });
     }

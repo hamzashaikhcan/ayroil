@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import type { Product } from "@/lib/api";
 import { formatPrice } from "@/lib/utils";
@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { BuyBlock } from "@/components/product/buy-block";
 import { StickyBuyBar } from "@/components/product/sticky-buy-bar";
 import { ProductUrgencyTimer } from "@/components/product/product-urgency-timer";
+import { trackViewContent } from "@/lib/analytics";
 
 export function ProductPurchasePanel({
   product,
@@ -56,6 +57,10 @@ export function ProductPurchasePanel({
   const offer = discountActive && deadline
     ? { discountPercent: timer.discountPercent, expiresAt: new Date(deadline).toISOString() }
     : undefined;
+
+  useEffect(() => {
+    trackViewContent({ id: product.id, name: product.name, priceCents: product.priceCents });
+  }, [product.id, product.name, product.priceCents]);
 
   return (
     <>

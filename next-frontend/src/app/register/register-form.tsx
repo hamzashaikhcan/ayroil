@@ -7,6 +7,7 @@ import { signIn } from "next-auth/react";
 import { relayUrl } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
+import { trackCompleteRegistration } from "@/lib/analytics";
 
 export function RegisterForm() {
   const router = useRouter();
@@ -34,6 +35,7 @@ export function RegisterForm() {
       }
       const signed = await signIn("credentials", { email, password, redirect: false });
       if (signed?.error) throw new Error("Could not sign in after register");
+      trackCompleteRegistration();
       router.push("/account");
       router.refresh();
     } catch (err) {

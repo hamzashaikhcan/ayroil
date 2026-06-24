@@ -25,6 +25,10 @@ export function setActiveCurrency(next: { code: string; symbol: string; locale: 
   active.locale = next.locale;
 }
 
+export function getActiveCurrencyCode(): string {
+  return active.code;
+}
+
 export function formatPrice(cents: number): string {
   try {
     return new Intl.NumberFormat(active.locale, {

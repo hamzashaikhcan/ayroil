@@ -113,19 +113,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <body className="min-h-full bg-background text-ink flex flex-col" suppressHydrationWarning>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
-        <Script
-          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
-          strategy="lazyOnload"
-        />
-        <Script id="google-analytics" strategy="lazyOnload">
+        {/* Stubs define window.gtag/fbq and their call queues immediately
+            (afterInteractive, negligible cost) so events fired by user
+            interactions are queued correctly even before the real GA/Pixel
+            scripts below have finished loading. The external scripts stay
+            lazyOnload since they're the actual network-weight cost. */}
+        <Script id="google-analytics-stub" strategy="afterInteractive">
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+            window.gtag = gtag;
             gtag('js', new Date());
             gtag('config', '${GA_MEASUREMENT_ID}');
           `}
         </Script>
-        <Script id="meta-pixel" strategy="lazyOnload">
+        <Script id="meta-pixel-stub" strategy="afterInteractive">
           {`
             !function(f,b,e,v,n,t,s)
             {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -139,6 +141,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             fbq('track', 'PageView');
           `}
         </Script>
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="lazyOnload"
+        />
         <noscript>
           <img
             height="1"

@@ -9,6 +9,13 @@ declare global {
 
 function track(eventName: string, params?: Record<string, unknown>) {
   if (typeof window === "undefined") return;
+  if (process.env.NODE_ENV !== "production") {
+    console.debug(`[analytics] ${eventName}`, {
+      params,
+      fbqLoaded: typeof window.fbq === "function",
+      gtagLoaded: typeof window.gtag === "function",
+    });
+  }
   window.gtag?.("event", eventName, params);
   window.fbq?.("track", eventName, params);
 }

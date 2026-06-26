@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
@@ -36,12 +37,27 @@ export async function generateMetadata(props: PageProps<"/shop/[slug]">): Promis
 
 export default async function PDP(props: PageProps<"/shop/[slug]">) {
   const { slug } = await props.params;
-  const [product, reviews, settings] = await Promise.all([
+  const [product, reviews, settings, headerList] = await Promise.all([
     fetchProductBySlug(slug).then((p) => p ?? (slug === FALLBACK_PRODUCT.slug ? FALLBACK_PRODUCT : null)),
     fetchProductReviews(slug),
     fetchSettings(),
+    headers(),
   ]);
   if (!product) notFound();
+
+  const proto = headerList.get("x-forwarded-proto") ?? "https";
+  const host = headerList.get("host") ?? settings.domain;
+  const origin = `${proto}://${host}`;
+  const absolute = (url: string) => (/^https?:\/\//.test(url) ? url : `${origin}${url.startsWith("/") ? "" : "/"}${url}`);
+
+  const productUrl = absolute(`/shop/${product.slug}`);
+  // image is a required Merchant-listings field — always emit at least the brand OG image as a fallback.
+  const productImages = (product.images?.length ? product.images : [settings.ogImageUrl]).map(absolute);
+
+  // Standard shipping window comes from settings as a range string like "3–5"; parse min/max for transit time.
+  const dayMatches = settings.estStandardDays.match(/\d+/g);
+  const minTransitDays = dayMatches?.[0] ? Number(dayMatches[0]) : undefined;
+  const maxTransitDays = dayMatches?.[1] ? Number(dayMatches[1]) : minTransitDays;
 
   const reviewCount = reviews.length;
   const averageRating = reviewCount
@@ -54,16 +70,51 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
     name: product.name,
     description: product.shortDescription,
     sku: product.sku ?? undefined,
-    image: product.images?.length ? product.images : undefined,
+    image: productImages,
     brand: { "@type": "Brand", name: settings.siteName },
     offers: {
       "@type": "Offer",
+      url: productUrl,
       priceCurrency: settings.currencyCode,
       price: (product.priceCents / 100).toFixed(2),
+      itemCondition: "https://schema.org/NewCondition",
       availability:
         product.stock > 0
           ? "https://schema.org/InStock"
           : "https://schema.org/OutOfStock",
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "US",
+        returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: settings.returnsWindowDays,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value:
+            product.priceCents >= settings.freeShippingThresholdCents
+              ? "0.00"
+              : (settings.standardShippingCents / 100).toFixed(2),
+          currency: settings.currencyCode,
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "US",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: minTransitDays ?? 3,
+            maxValue: maxTransitDays ?? 5,
+            unitCode: "DAY",
+          },
+        },
+      },
     },
     aggregateRating: reviewCount
       ? {
@@ -90,9 +141,9 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "/" },
-      { "@type": "ListItem", position: 2, name: "Shop", item: "/shop" },
-      { "@type": "ListItem", position: 3, name: product.name, item: `/shop/${product.slug}` },
+      { "@type": "ListItem", position: 1, name: "Home", item: absolute("/") },
+      { "@type": "ListItem", position: 2, name: "Shop", item: absolute("/shop") },
+      { "@type": "ListItem", position: 3, name: product.name, item: productUrl },
     ],
   };
 

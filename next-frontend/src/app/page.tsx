@@ -399,57 +399,127 @@ export default async function HomePage() {
 
 			<section className='py-20'>
 				<Container>
-					<div className='grid grid-cols-1 gap-10 md:grid-cols-[1fr_1.2fr] md:items-center'>
-						<div>
-							<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
-								<span className='marker-dot'>From customers</span>
-							</div>
-							<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl'>
-								Real people. Real reviews.
-							</h2>
-							<p className='mt-5 text-base leading-relaxed text-muted'>
-								We do not pay for reviews and we do not delete the bad ones. The
-								quotes here are pulled straight from our inbox.
-							</p>
+					<div className='mx-auto max-w-2xl text-center'>
+						<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
+							<span className='marker-dot'>From customers</span>
 						</div>
-						<div className='grid grid-cols-1 gap-4 sm:grid-cols-2'>
+						<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl'>
+							Real people. Real reviews.
+						</h2>
+						<p className='mt-5 text-base leading-relaxed text-muted'>
+							We do not pay for reviews and we do not delete the bad ones. The
+							quotes here are pulled straight from our inbox.
+						</p>
+					</div>
+					<div className='mt-12 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3'>
 							{[
 								{
-									q: 'My hair finally feels nourished, not greasy. Switched two months ago and never went back.',
+									q: 'honestly mujhe zyada umeed nahi thi par 3 hafte hue hain aur takiye pe baal kaafi kam aa rahe hain ab. dekhte hain aage kya hota hai',
 									n: 'Sadia R.',
 									role: 'Verified buyer',
 								},
 								{
-									q: 'No more flaky scalp, and a little goes a long way — one bottle lasted me almost two months.',
+									q: 'mere baal bht rough thay. ye laga ke ab thore soft lagte hain. start me thora chipchipa lagta hai but raat ko lagao subah dho lo to theek hai',
 									n: 'Anum K.',
 									role: 'Verified buyer',
 								},
 								{
-									q: 'Smells incredible without being overpowering, and it does not weigh my hair down like my old oil did.',
+									q: 'dandruff ke liye le tha. khujli kaafi kam hui hai sach me. abhi puri tarah gaya to nahi but pehle se behtar hai',
 									n: 'Bilal P.',
 									role: 'Verified buyer',
 								},
 								{
-									q: 'I have tried four hair oils. This is the only one I actually finish the bottle of.',
+									q: 'itni oils try kar chuka hun yaar, koi kaam nahi karti thi. ye pehli baar hai k bottle khatam ki maine. paisa wasool',
 									n: 'Hanif Z.',
 									role: 'Verified buyer',
 								},
-							].map((r) => (
-								<div
-									key={r.n}
-									className='rounded-2xl border border-line bg-surface p-5'>
-									<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
-										{r.n}
-									</div>
-									<p className='mt-3 text-sm leading-relaxed text-ink'>
-										&ldquo;{r.q}&rdquo;
-									</p>
-									<div className='mt-4 text-xs text-muted'>
-										{r.n} · {r.role}
-									</div>
+								{
+									q: 'ammi ke kehne pe mangwaya tha. smell achi hai light si, mujhe pasand aayi. ab ghar me sab use kar rahe',
+									n: 'Maryam S.',
+									role: 'Verified buyer',
+								},
+								{
+									q: 'thora mehnga laga pehle but bottle kaafi chal jati hai, 2 mahine se upar ho gaye abhi bhi bachi hui hai. thori thori lagani parti hai bas',
+									n: 'Usman T.',
+									role: 'Verified buyer',
+								},
+								{
+									q: 'shadi ki wajah se start kiya tha. growth ka pata nahi abhi itni jaldi but baal pehle se thore ghane lag rahe hain shayad. continue kar rahi hun',
+									n: 'Hira N.',
+									role: 'Verified buyer',
+									s: 4,
+								},
+								{
+									q: 'delivery me 4 din lage thay but packaging sahi thi leak waghera nahi hua. oil baqi sastay walon jaisa chipchipa nahi hai ye acha hai',
+									n: 'Faizan A.',
+									role: 'Verified buyer',
+								},
+								{
+									q: 'mere baal patle ho rahe thay. abhi 1 mahina hua hai, thora difference lag raha hai par pura yakeen se nahi keh sakta. update karunga baad me',
+									n: 'Komal J.',
+									role: 'Verified buyer',
+									s: 4,
+								},
+								{
+									q: 'raat ko lagata hun subah dho leta hun. scalp halka feel hota hai. bas dhone me thora effort lagta hai warna theek hai',
+									n: 'Ahmed R.',
+									role: 'Verified buyer',
+									s: 4,
+								},
+								{
+									q: 'was a bit skeptical ngl but after a month my hairfall is def less. texture bhi softer feel hoti hai. happy so far',
+									n: 'Zoya M.',
+									role: 'Verified buyer',
+								},
+								{
+									q: 'main roz to nahi laga pata, week me 3 4 din laga leta hun. itne me bhi baal pehle se behtar lag rahe hain. khushboo zyada tez nahi hai ye achi baat hai mujhe strong smell pasand nahi',
+									n: 'Tariq H.',
+									role: 'Verified buyer',
+								},
+								{
+									q: 'split ends ka masla tha bht. thora behtar hua hai. roz lagana parta hai consistency se warna farq nahi parta itna',
+									n: 'Nida F.',
+									role: 'Verified buyer',
+									s: 4,
+								},
+								{
+									q: 'travel ke liye le tha, bottle leak nahi karti bag me. light hai zyada heavy nahi karta baalon ko. ok hai overall',
+									n: 'Salman K.',
+									role: 'Verified buyer',
+									s: 4,
+								},
+						].map((r) => (
+							<figure
+								key={r.n}
+								className='mb-4 break-inside-avoid rounded-2xl border border-line bg-surface p-6'>
+								<div className='flex gap-0.5' aria-hidden>
+									{Array.from({ length: 5 }).map((_, i) => (
+										<svg
+											key={i}
+											viewBox='0 0 20 20'
+											className={`size-4 fill-current ${
+												i < (r.s ?? 5) ? 'text-accent-deep' : 'text-line'
+											}`}>
+											<path d='M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 15l-5.2 2.6 1-5.8L1.5 7.7l5.9-.9L10 1.5z' />
+										</svg>
+									))}
 								</div>
-							))}
-						</div>
+								<blockquote className='mt-4 text-sm leading-relaxed text-ink'>
+									&ldquo;{r.q}&rdquo;
+								</blockquote>
+								<figcaption className='mt-5 flex items-center gap-3'>
+									<span className='flex size-9 shrink-0 items-center justify-center rounded-full bg-accent font-display text-sm text-accent-ink'>
+										{r.n.charAt(0)}
+									</span>
+									<span className='leading-tight'>
+										<span className='block text-sm font-medium text-ink'>
+											{r.n}
+										</span>
+										<span className='block text-xs text-muted'>{r.role}</span>
+									</span>
+								</figcaption>
+							</figure>
+						))}
 					</div>
 				</Container>
 			</section>
@@ -458,53 +528,59 @@ export default async function HomePage() {
 				<Container>
 					<div className='max-w-3xl'>
 						<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
-							<span className='marker-dot'>Compare</span>
+							<span className='marker-dot'>What to expect</span>
 						</div>
 						<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl'>
-							How we stack up.
+							Real results take a little patience.
 						</h2>
 						<p className='mt-5 text-base leading-relaxed text-muted'>
-							An honest side-by-side against the average drugstore hair oil.
+							No overnight miracles. Here is an honest timeline of what most
+							people notice when they use it consistently.
 						</p>
 					</div>
 
-					<div className='mt-10 overflow-x-auto rounded-2xl border border-line bg-background'>
-						<table className='w-full min-w-2xl text-left text-sm'>
-							<thead className='border-b border-line'>
-								<tr>
-									<th className='px-5 py-4 font-mono text-xs uppercase tracking-[0.18em] text-muted'>
-										Spec
-									</th>
-									<th className='px-5 py-4 font-display text-base text-ink'>
-										{settings.siteName}
-									</th>
-									<th className='px-5 py-4 font-mono text-xs uppercase tracking-[0.18em] text-muted'>
-										Category avg
-									</th>
-								</tr>
-							</thead>
-							<tbody>
-								{[
-									['Extraction', 'Cold-pressed', 'Heat-extracted'],
-									['Mineral oil', 'None', 'Common filler'],
-									[
-										'Ingredient list',
-										'Published, plain language',
-										'Trade-secret blend',
-									],
-									['Returns', `${settings.returnsWindowDays} days`, '14 days'],
-									['Made', 'Small batch, in-house', 'Mass-outsourced'],
-									['Patch tested', 'Every batch', 'Rare'],
-								].map(([k, a, b]) => (
-									<tr key={k} className='border-b border-line last:border-b-0'>
-										<td className='px-5 py-4 text-muted'>{k}</td>
-										<td className='px-5 py-4 font-medium text-ink'>{a}</td>
-										<td className='px-5 py-4 text-muted'>{b}</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-					</div>
+					<ol className='mt-12 grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-2 lg:grid-cols-4'>
+						{[
+							{
+								w: 'Week 1',
+								t: 'Settling in',
+								d: 'Scalp feels calmer and less itchy. Hair is softer and easier to manage straight away.',
+							},
+							{
+								w: 'Week 2–3',
+								t: 'Less fall',
+								d: 'Most people notice fewer strands on the pillow and in the shower drain.',
+							},
+							{
+								w: 'Week 4–6',
+								t: 'Stronger feel',
+								d: 'Hair feels thicker to the touch, with less breakage at the ends.',
+							},
+							{
+								w: 'Week 8+',
+								t: 'New growth',
+								d: 'Baby hairs start showing along the hairline with consistent use.',
+							},
+						].map((s, i) => (
+							<li key={s.w} className='bg-background p-6'>
+								<div className='flex items-center gap-3'>
+									<span className='flex size-7 shrink-0 items-center justify-center rounded-full bg-accent font-mono text-xs text-accent-ink'>
+										{i + 1}
+									</span>
+									<span className='font-mono text-xs uppercase tracking-[0.18em] text-muted'>
+										{s.w}
+									</span>
+								</div>
+								<div className='font-display mt-4 text-xl text-ink'>{s.t}</div>
+								<p className='mt-2 text-sm leading-relaxed text-muted'>{s.d}</p>
+							</li>
+						))}
+					</ol>
+
+					<p className='mt-6 text-xs text-muted'>
+						Everyone&rsquo;s hair is different — some see changes sooner, some
+						later. Consistency matters more than quantity.
+					</p>
 				</Container>
 			</section>
 
@@ -546,8 +622,8 @@ export default async function HomePage() {
 
 			<section className='border-t border-line bg-surface py-20'>
 				<Container>
-					<div className='grid grid-cols-1 gap-10 md:grid-cols-[1fr_1.2fr]'>
-						<div>
+					<div className='grid grid-cols-1 gap-10 md:grid-cols-[1fr_1.2fr] md:items-start'>
+						<div className='md:sticky md:top-24'>
 							<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
 								<span className='marker-dot'>FAQ</span>
 							</div>

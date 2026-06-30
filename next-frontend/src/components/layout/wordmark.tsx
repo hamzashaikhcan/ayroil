@@ -26,9 +26,9 @@ export function Wordmark({
   const settings = useSettings();
 
   const px = size === "sm" ? "text-sm" : size === "lg" ? "text-2xl" : "text-lg";
-  const h = size === "sm" ? "h-5" : size === "lg" ? "h-8" : "h-6";
-  const heightPx = size === "sm" ? 20 : size === "lg" ? 32 : 24;
-  const badgeBox = size === "sm" ? "h-5 w-5" : size === "lg" ? "h-7 w-7" : "h-6 w-6";
+  const h = size === "sm" ? "h-5" : size === "lg" ? "h-12" : "h-9";
+  const heightPx = size === "sm" ? 20 : size === "lg" ? 48 : 36;
+  const badgeBox = size === "sm" ? "h-5 w-5" : size === "lg" ? "h-10 w-10" : "h-8 w-8";
 
   // Prefer the logo for the active surface.
   const logoUrl = theme === "dark" ? settings.whiteLogoUrl : settings.darkLogoUrl;

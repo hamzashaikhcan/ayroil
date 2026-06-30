@@ -59,12 +59,12 @@ export default async function AnalyticsPage(props: PageProps<"/analytics">) {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card table-card-shell">
         <div className="border-b border-line p-5">
           <div className="text-xs font-medium text-muted">Top products</div>
           <div className="mt-0.5 text-lg font-semibold tracking-tight text-ink">By revenue in range</div>
         </div>
-        <table className="w-full text-left text-sm">
+        <table className="w-full text-left text-sm table-cards">
           <thead className="border-b border-line bg-surface-2 text-xs font-medium uppercase tracking-wider text-muted">
             <tr>
               <th className="px-5 py-2.5 font-medium">Product</th>
@@ -77,9 +77,9 @@ export default async function AnalyticsPage(props: PageProps<"/analytics">) {
               <tr><td colSpan={3} className="px-5 py-12 text-center text-muted">No sales in this range.</td></tr>
             ) : top.map((p) => (
               <tr key={p.productName} className="border-b border-line last:border-b-0 row-hover">
-                <td className="px-5 py-3 font-medium text-ink">{p.productName}</td>
-                <td className="px-5 py-3 tabular-nums text-ink">{p.units}</td>
-                <td className="px-5 py-3 font-medium tabular-nums text-ink">{formatPrice(p.revenueCents)}</td>
+                <td className="px-5 py-3 font-medium text-ink" data-label="Product">{p.productName}</td>
+                <td className="px-5 py-3 tabular-nums text-ink" data-label="Units">{p.units}</td>
+                <td className="px-5 py-3 font-medium tabular-nums text-ink" data-label="Revenue">{formatPrice(p.revenueCents)}</td>
               </tr>
             ))}
           </tbody>

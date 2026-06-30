@@ -129,26 +129,28 @@ function CartRow({ cart }: { cart: ActiveCart }) {
         </div>
       </div>
 
-      <table className="w-full text-left text-sm">
-        <thead className="border-b border-line bg-surface-2 text-xs font-medium uppercase tracking-wider text-muted">
-          <tr>
-            <th className="px-5 py-2 font-medium">Product</th>
-            <th className="px-5 py-2 font-medium">Unit price</th>
-            <th className="px-5 py-2 font-medium">Qty</th>
-            <th className="px-5 py-2 font-medium text-right">Line total</th>
-          </tr>
-        </thead>
-        <tbody>
-          {cart.items.map((i) => (
-            <tr key={i.id} className="border-b border-line last:border-b-0">
-              <td className="px-5 py-2.5 text-ink">{i.productName}</td>
-              <td className="px-5 py-2.5 tabular-nums text-muted">{formatPrice(i.unitPriceCents)}</td>
-              <td className="px-5 py-2.5 tabular-nums text-ink">×{i.quantity}</td>
-              <td className="px-5 py-2.5 text-right font-medium tabular-nums text-ink">{formatPrice(i.lineTotalCents)}</td>
+      <div className="p-3 md:p-0">
+        <table className="w-full text-left text-sm table-cards">
+          <thead className="border-b border-line bg-surface-2 text-xs font-medium uppercase tracking-wider text-muted">
+            <tr>
+              <th className="px-5 py-2 font-medium">Product</th>
+              <th className="px-5 py-2 font-medium">Unit price</th>
+              <th className="px-5 py-2 font-medium">Qty</th>
+              <th className="px-5 py-2 font-medium text-right">Line total</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {cart.items.map((i) => (
+              <tr key={i.id} className="border-b border-line last:border-b-0">
+                <td className="px-5 py-2.5 text-ink" data-label="Product">{i.productName}</td>
+                <td className="px-5 py-2.5 tabular-nums text-muted" data-label="Unit price">{formatPrice(i.unitPriceCents)}</td>
+                <td className="px-5 py-2.5 tabular-nums text-ink" data-label="Qty">×{i.quantity}</td>
+                <td className="px-5 py-2.5 text-right font-medium tabular-nums text-ink" data-label="Line total">{formatPrice(i.lineTotalCents)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

@@ -21,9 +21,9 @@ export default async function ProductsPage() {
         }
       />
 
-      <div className="card">
+      <div className="card table-card-shell">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-sm table-cards">
             <thead className="border-b border-line bg-surface-2 text-xs font-medium uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-5 py-2.5 font-medium">Product</th>
@@ -39,14 +39,14 @@ export default async function ProductsPage() {
                 <tr><td colSpan={6} className="px-5 py-16 text-center text-muted">No products yet.</td></tr>
               ) : products.map((p) => (
                 <tr key={p.id} className="border-b border-line last:border-b-0 row-hover">
-                  <td className="px-5 py-3">
+                  <td className="px-5 py-3" data-label="Product">
                     <Link href={`/products/${p.id}`} className="font-medium text-ink hover:text-accent">{p.name}</Link>
                   </td>
-                  <td className="px-5 py-3 font-mono text-xs text-muted">{p.sku ?? "—"}</td>
-                  <td className="px-5 py-3 font-medium tabular-nums text-ink">{formatPrice(p.priceCents)}</td>
-                  <td className="px-5 py-3 tabular-nums text-ink">{p.stock}</td>
-                  <td className="px-5 py-3"><StatusPill value={p.active ? "active" : "draft"} /></td>
-                  <td className="px-5 py-3 text-right">
+                  <td className="px-5 py-3 font-mono text-xs text-muted" data-label="SKU">{p.sku ?? "—"}</td>
+                  <td className="px-5 py-3 font-medium tabular-nums text-ink" data-label="Price">{formatPrice(p.priceCents)}</td>
+                  <td className="px-5 py-3 tabular-nums text-ink" data-label="Stock">{p.stock}</td>
+                  <td className="px-5 py-3" data-label="Status"><StatusPill value={p.active ? "active" : "draft"} /></td>
+                  <td className="px-5 py-3 text-right" data-label="">
                     <Link href={`/products/${p.id}`} className="text-xs font-medium text-accent hover:text-accent-deep">Edit</Link>
                   </td>
                 </tr>

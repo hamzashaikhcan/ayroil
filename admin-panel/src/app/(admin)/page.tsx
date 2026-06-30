@@ -102,7 +102,7 @@ export default async function OverviewPage(props: PageProps<"/">) {
         </div>
       </div>
 
-      <div className="card">
+      <div className="card table-card-shell">
         <div className="flex items-center justify-between border-b border-line p-5">
           <div>
             <div className="text-xs font-medium text-muted">Recent activity</div>
@@ -117,7 +117,7 @@ export default async function OverviewPage(props: PageProps<"/">) {
           </Link>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-sm table-cards">
             <thead className="border-b border-line bg-surface-2 text-xs font-medium uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-5 py-2.5 font-medium">Order</th>
@@ -132,18 +132,18 @@ export default async function OverviewPage(props: PageProps<"/">) {
                 <tr><td colSpan={5} className="px-5 py-12 text-center text-muted">No orders yet.</td></tr>
               ) : overview.recentOrders.map((o) => (
                 <tr key={o.id} className="border-b border-line last:border-b-0 row-hover">
-                  <td className="px-5 py-3">
+                  <td className="px-5 py-3" data-label="Order">
                     <Link href={`/orders/${o.id}`} className="font-mono text-xs font-medium text-accent hover:text-accent-deep">
                       {o.number}
                     </Link>
                   </td>
-                  <td className="px-5 py-3">
+                  <td className="px-5 py-3" data-label="Customer">
                     <div className="font-medium text-ink">{o.customerName}</div>
                     <div className="text-xs text-muted">{o.email}</div>
                   </td>
-                  <td className="px-5 py-3"><StatusPill value={o.status} /></td>
-                  <td className="px-5 py-3 font-medium tabular-nums text-ink">{formatPrice(o.totalCents)}</td>
-                  <td className="px-5 py-3 text-muted tabular-nums">{new Date(o.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</td>
+                  <td className="px-5 py-3" data-label="Status"><StatusPill value={o.status} /></td>
+                  <td className="px-5 py-3 font-medium tabular-nums text-ink" data-label="Total">{formatPrice(o.totalCents)}</td>
+                  <td className="px-5 py-3 text-muted tabular-nums" data-label="Date">{new Date(o.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</td>
                 </tr>
               ))}
             </tbody>

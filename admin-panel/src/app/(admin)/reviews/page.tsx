@@ -18,9 +18,9 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
         actions={<ReviewFilters active={status} />}
       />
 
-      <div className="card">
+      <div className="card table-card-shell">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="w-full text-left text-sm table-cards">
             <thead className="border-b border-line bg-surface-2 text-xs font-medium uppercase tracking-wider text-muted">
               <tr>
                 <th className="px-5 py-2.5 font-medium">Review</th>
@@ -41,7 +41,7 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
               ) : (
                 reviews.map((review) => (
                   <tr key={review.id} className="border-b border-line last:border-b-0 align-top row-hover">
-                    <td className="max-w-md px-5 py-4">
+                    <td className="td-block max-w-md px-5 py-4" data-label="Review">
                       <StarRating rating={review.rating} />
                       <p className="mt-2 text-sm leading-relaxed text-ink">
                         {review.comment.trim() || "No written comment."}
@@ -55,7 +55,7 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
                         </Link>
                       ) : null}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4" data-label="Product">
                       {review.product ? (
                         <div>
                           <div className="font-medium text-ink">{review.product.name}</div>
@@ -65,20 +65,20 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
                         <span className="text-muted">Deleted product</span>
                       )}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4" data-label="Customer">
                       <div className="font-medium text-ink">{review.customerName}</div>
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4" data-label="Status">
                       <StatusPill value={review.visible ? "visible" : "hidden"} />
                     </td>
-                    <td className="px-5 py-4 text-muted tabular-nums">
+                    <td className="px-5 py-4 text-muted tabular-nums" data-label="Date">
                       {new Date(review.createdAt).toLocaleDateString(undefined, {
                         month: "short",
                         day: "numeric",
                         year: "numeric",
                       })}
                     </td>
-                    <td className="px-5 py-4">
+                    <td className="px-5 py-4" data-label="Actions">
                       <ReviewActions
                         id={review.id}
                         visible={review.visible}

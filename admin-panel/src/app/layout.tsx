@@ -35,7 +35,13 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-export const viewport: Viewport = { themeColor: "#ffffff" };
+export const viewport: Viewport = {
+  themeColor: "#ffffff",
+  // Disable pinch-zoom so the installed PWA feels like a native app.
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

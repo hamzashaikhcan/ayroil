@@ -11,6 +11,7 @@ type CommerceSlice = Pick<
   | "currencyCode"
   | "currencySymbol"
   | "currencyLocale"
+  | "freeShippingEnabled"
   | "freeShippingThresholdCents"
   | "standardShippingCents"
   | "estStandardDays"
@@ -27,6 +28,7 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
     currencyCode: initial.currencyCode,
     currencySymbol: initial.currencySymbol,
     currencyLocale: initial.currencyLocale,
+    freeShippingEnabled: initial.freeShippingEnabled,
     freeShippingThresholdCents: initial.freeShippingThresholdCents,
     standardShippingCents: initial.standardShippingCents,
     estStandardDays: initial.estStandardDays,
@@ -102,18 +104,27 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
       </Card>
 
       <Card title="Shipping" subtitle={`Enter prices in whole ${s.currencyCode}.`}>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <SwitchField
+          checked={s.freeShippingEnabled}
+          onChange={(checked) => patch("freeShippingEnabled", checked)}
+          label="Free shipping on all orders"
+          description="When on, every order ships free regardless of the threshold below, and a “Free shipping” badge is shown across the storefront."
+        />
+
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
           <MoneyField
             label="Free shipping over"
             value={s.freeShippingThresholdCents}
             onChange={(v) => patch("freeShippingThresholdCents", v)}
             symbol={s.currencySymbol}
+            disabled={s.freeShippingEnabled}
           />
           <MoneyField
             label="Standard shipping cost"
             value={s.standardShippingCents}
             onChange={(v) => patch("standardShippingCents", v)}
             symbol={s.currencySymbol}
+            disabled={s.freeShippingEnabled}
           />
           <Field
             label="Standard est. days"
@@ -122,6 +133,11 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
             placeholder="3–5"
           />
         </div>
+        {s.freeShippingEnabled ? (
+          <p className="mt-3 text-xs text-muted">
+            Free shipping is on — the threshold and standard cost are ignored while this is enabled.
+          </p>
+        ) : null}
       </Card>
 
       <Card title="Returns">
@@ -219,14 +235,16 @@ function MoneyField({
   value,
   onChange,
   symbol,
+  disabled,
 }: {
   label: string;
   value: number;
   onChange: (v: number) => void;
   symbol: string;
+  disabled?: boolean;
 }) {
   return (
-    <div>
+    <div className={disabled ? "opacity-50" : undefined}>
       <label className="text-xs font-medium text-muted">{label}</label>
       <div className="mt-1.5 flex h-9 items-center rounded-md border border-line bg-surface-2 px-3 text-sm focus-within:border-ink/30 focus-within:bg-surface">
         <span className="text-muted">{symbol}</span>
@@ -234,9 +252,10 @@ function MoneyField({
           type="number"
           step="0.01"
           min={0}
+          disabled={disabled}
           value={(value / 100).toString()}
           onChange={(e) => onChange(Math.round(Number(e.target.value || 0) * 100))}
-          className="ml-1 w-full bg-transparent text-sm text-ink focus:outline-none"
+          className="ml-1 w-full bg-transparent text-sm text-ink focus:outline-none disabled:cursor-not-allowed"
         />
       </div>
     </div>

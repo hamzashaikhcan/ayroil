@@ -1,12 +1,13 @@
 import { cn } from "@/lib/utils";
 
-type Tone = "neutral" | "accent" | "soft" | "outline";
+type Tone = "neutral" | "accent" | "soft" | "outline" | "recommend";
 
 const tones: Record<Tone, string> = {
   neutral: "bg-ink text-background",
   accent: "bg-accent text-accent-ink",
   soft: "bg-ink/5 text-ink",
   outline: "bg-transparent text-ink border border-line-strong",
+  recommend: "bg-amber-500 text-white",
 };
 
 export function Badge({ tone = "neutral", children, className }: { tone?: Tone; children: React.ReactNode; className?: string }) {

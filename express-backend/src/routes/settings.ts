@@ -67,6 +67,7 @@ const settingsSchema = z
     currencyCode: z.string().min(1).max(8),
     currencySymbol: z.string().min(1).max(8),
     currencyLocale: z.string().min(2).max(12),
+    freeShippingEnabled: z.boolean(),
     freeShippingThresholdCents: z.number().int().min(0),
     standardShippingCents: z.number().int().min(0),
     estStandardDays: z.string(),

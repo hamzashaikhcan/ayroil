@@ -99,6 +99,7 @@ const productSchema = z.object({
   stock: z.number().int().min(0).default(0),
   sku: z.string().max(64).optional().nullable(),
   active: z.boolean().default(true),
+  recommended: z.boolean().default(false),
   images: z.array(z.string()).default([]),
   highlights: z.array(z.string()).default([]),
   ingredients: z

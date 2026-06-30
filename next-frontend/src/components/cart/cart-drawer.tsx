@@ -52,7 +52,7 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
   const items = cart?.items ?? [];
   const subtotal = cart?.subtotalCents ?? 0;
   const freeAt = settings.freeShippingThresholdCents;
-  const toFree = Math.max(0, freeAt - subtotal);
+  const toFree = settings.freeShippingEnabled ? 0 : Math.max(0, freeAt - subtotal);
 
   return (
     <div className={`fixed inset-0 z-[90] ${open ? "" : "pointer-events-none"}`} aria-hidden={!open} inert={!open}>
@@ -72,7 +72,11 @@ export function CartDrawer({ open, onClose }: { open: boolean; onClose: () => vo
           </button>
         </div>
 
-        {toFree > 0 ? (
+        {settings.freeShippingEnabled ? (
+          <div className="border-b border-line bg-accent/30 px-5 py-3 text-xs text-ink">
+            Free shipping on all orders.
+          </div>
+        ) : toFree > 0 ? (
           <div className="border-b border-line bg-ink/[0.03] px-5 py-3 text-xs text-ink">
             Add <span className="font-mono">{formatPrice(toFree)}</span> for free shipping.
           </div>

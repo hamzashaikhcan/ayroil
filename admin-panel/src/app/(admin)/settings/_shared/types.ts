@@ -32,6 +32,7 @@ export type SettingsLike = {
   currencyCode: string;
   currencySymbol: string;
   currencyLocale: string;
+  freeShippingEnabled: boolean;
   freeShippingThresholdCents: number;
   standardShippingCents: number;
   estStandardDays: string;

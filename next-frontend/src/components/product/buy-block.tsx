@@ -32,7 +32,7 @@ export function BuyBlock({
   const projectedSubtotal = cartSubtotal + lineTotal;
   const freeAt = settings.freeShippingThresholdCents;
   const toFree = Math.max(0, freeAt - projectedSubtotal);
-  const hitFree = projectedSubtotal >= freeAt;
+  const hitFree = settings.freeShippingEnabled || projectedSubtotal >= freeAt;
 
   async function onAdd() {
     if (soldOut) return;

@@ -36,6 +36,7 @@ export type Settings = {
   currencyCode: string;
   currencySymbol: string;
   currencyLocale: string;
+  freeShippingEnabled: boolean;
   freeShippingThresholdCents: number;
   standardShippingCents: number;
   estStandardDays: string;
@@ -91,6 +92,7 @@ const FALLBACK: Settings = {
   currencyCode: SITE.currency.code,
   currencySymbol: SITE.currency.symbol,
   currencyLocale: SITE.currency.locale,
+  freeShippingEnabled: false,
   freeShippingThresholdCents: SITE.shipping.freeShippingThresholdCents,
   standardShippingCents: SITE.shipping.standardCostCents,
   estStandardDays: SITE.shipping.estStandardDays,

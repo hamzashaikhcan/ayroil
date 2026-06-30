@@ -38,6 +38,7 @@ type ProductLike = {
   stock: number;
   sku: string | null;
   active: boolean;
+  recommended: boolean;
   images: string[];
   highlights: string[];
   ingredients: { name: string; description: string }[];
@@ -56,6 +57,7 @@ const EMPTY: ProductLike = {
   stock: 0,
   sku: null,
   active: true,
+  recommended: false,
   images: [],
   highlights: [],
   ingredients: [],
@@ -219,6 +221,13 @@ export function ProductForm({
             onChange={(checked) => patch("active", checked)}
             label="Active"
             description="Visible on the storefront."
+          />
+          <SwitchField
+            checked={p.recommended}
+            onChange={(checked) => patch("recommended", checked)}
+            label="Recommended"
+            description="Highlights this product with a badge on the shop grid and product page."
+            className="mt-3"
           />
         </Card>
 

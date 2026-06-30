@@ -17,6 +17,7 @@ type Product = {
   stock: number;
   sku: string | null;
   active: boolean;
+  recommended: boolean;
   images: string[];
   highlights: string[];
   ingredients: { name: string; description: string }[];

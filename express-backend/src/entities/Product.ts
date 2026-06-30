@@ -46,6 +46,11 @@ export class Product {
   @Column({ type: "boolean", default: true })
   active!: boolean;
 
+  // Editorially flagged as a recommended pick — surfaced with a badge on the
+  // storefront shop grid and product detail page.
+  @Column({ type: "boolean", default: false })
+  recommended!: boolean;
+
   @Column({ type: "jsonb", default: () => "'[]'" })
   images!: string[];
 

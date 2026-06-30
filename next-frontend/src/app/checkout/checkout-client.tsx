@@ -112,7 +112,9 @@ export function CheckoutClient({
   const items = cart?.items ?? [];
   const subtotal = cart?.subtotalCents ?? 0;
   const shippingCents =
-    subtotal >= settings.freeShippingThresholdCents ? 0 : settings.standardShippingCents;
+    settings.freeShippingEnabled || subtotal >= settings.freeShippingThresholdCents
+      ? 0
+      : settings.standardShippingCents;
   const totalCents = subtotal + shippingCents;
 
   const selectedAddress = useMemo(

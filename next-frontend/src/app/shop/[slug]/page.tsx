@@ -95,7 +95,7 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
         shippingRate: {
           "@type": "MonetaryAmount",
           value:
-            product.priceCents >= settings.freeShippingThresholdCents
+            settings.freeShippingEnabled || product.priceCents >= settings.freeShippingThresholdCents
               ? "0.00"
               : (settings.standardShippingCents / 100).toFixed(2),
           currency: settings.currencyCode,
@@ -186,7 +186,8 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
                   slug={product.slug}
                   name={product.name}
                 />
-                <div className="pointer-events-none absolute left-3 top-3 z-10">
+                <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-2">
+                  {product.recommended ? <Badge tone="recommend">★ Recommended</Badge> : null}
                   <Badge tone={product.stock > 0 ? "accent" : "soft"}>{product.stock > 0 ? "In stock" : "Sold out"}</Badge>
                 </div>
               </div>

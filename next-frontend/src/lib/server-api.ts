@@ -57,6 +57,7 @@ export const FALLBACK_PRODUCT: Product = {
 	stock: 250,
 	sku: 'PO-001',
 	active: true,
+	recommended: true,
 	images: [],
 	highlights: [
 		'Engineered around one job',

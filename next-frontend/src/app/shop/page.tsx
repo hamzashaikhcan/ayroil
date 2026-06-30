@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { ProductThumb } from "@/components/product/product-thumb";
 import { fetchAllProducts } from "@/lib/server-api";
 import { fetchSettings } from "@/lib/settings";
@@ -69,12 +70,19 @@ export default async function ShopPage(props: PageProps<"/shop">) {
             <div className="grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((p) => (
                 <Link key={p.id} href={`/shop/${p.slug}`} className="group block">
-                  <ProductThumb
-                    image={p.images?.[0]}
-                    slug={p.slug}
-                    name={p.name}
-                    className="aspect-square transition-transform duration-500 group-hover:-translate-y-1"
-                  />
+                  <div className="relative">
+                    <ProductThumb
+                      image={p.images?.[0]}
+                      slug={p.slug}
+                      name={p.name}
+                      className="aspect-square transition-transform duration-500 group-hover:-translate-y-1"
+                    />
+                    {p.recommended ? (
+                      <div className="pointer-events-none absolute left-3 top-3 z-10">
+                        <Badge tone="recommend">★ Recommended</Badge>
+                      </div>
+                    ) : null}
+                  </div>
                   <div className="mt-3 flex items-start justify-between gap-4">
                     <div className="min-w-0">
                       <div className="font-display text-base text-ink truncate">{p.name}</div>

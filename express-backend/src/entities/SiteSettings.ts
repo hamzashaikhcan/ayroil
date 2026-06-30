@@ -90,6 +90,10 @@ export class SiteSettings {
   currencyLocale!: string;
 
   // Shipping
+  // When true, every order ships free regardless of the threshold below.
+  @Column({ type: "boolean", default: false })
+  freeShippingEnabled!: boolean;
+
   @Column({ type: "int", default: 5000 })
   freeShippingThresholdCents!: number;
 

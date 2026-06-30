@@ -7,7 +7,7 @@ const tones: Record<Tone, string> = {
   accent: "bg-accent text-accent-ink",
   soft: "bg-ink/5 text-ink",
   outline: "bg-transparent text-ink border border-line-strong",
-  recommend: "bg-amber-500 text-white",
+  recommend: "bg-ink/85 text-background backdrop-blur-sm",
 };
 
 export function Badge({ tone = "neutral", children, className }: { tone?: Tone; children: React.ReactNode; className?: string }) {

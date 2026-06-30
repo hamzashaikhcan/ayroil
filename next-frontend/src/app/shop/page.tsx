@@ -32,10 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function ShopPage(props: PageProps<"/shop">) {
   const sp = await props.searchParams;
   const q = typeof sp.q === "string" ? sp.q.trim() : "";
-  const [items, settings] = await Promise.all([
-    fetchAllProducts(q || undefined),
-    fetchSettings(),
-  ]);
+  const items = await fetchAllProducts(q || undefined);
 
   return (
     <>
@@ -80,10 +77,11 @@ export default async function ShopPage(props: PageProps<"/shop">) {
                       name={p.name}
                       className="aspect-square transition-transform duration-500 group-hover:-translate-y-1"
                     />
-                    {p.recommended || settings.freeShippingEnabled ? (
-                      <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-2">
-                        {p.recommended ? <Badge tone="recommend">★ Recommended</Badge> : null}
-                        {settings.freeShippingEnabled ? <Badge tone="neutral">Free shipping</Badge> : null}
+                    {p.recommended ? (
+                      <div className="pointer-events-none absolute left-3 top-3 z-10">
+                        <Badge tone="recommend">
+                          <span className="text-accent">★</span> Recommended
+                        </Badge>
                       </div>
                     ) : null}
                   </div>

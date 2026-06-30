@@ -18,6 +18,7 @@ import { analyticsRouter } from "./routes/analytics.js";
 import { uploadsRouter } from "./routes/uploads.js";
 import { settingsRouter } from "./routes/settings.js";
 import { searchRouter } from "./routes/search.js";
+import { pushRouter } from "./routes/push.js";
 
 async function main() {
   await AppDataSource.initialize();
@@ -53,6 +54,7 @@ async function main() {
   app.use("/uploads", uploadsRouter);
   app.use("/settings", settingsRouter);
   app.use("/search", searchRouter);
+  app.use("/push", pushRouter);
 
   app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error(err);

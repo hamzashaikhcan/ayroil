@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IconChevronRight } from "@/components/ui/icons";
 import { AdminSearch } from "./admin-search";
+import { NotificationsBell } from "@/components/pwa/notifications-bell";
 
 type Crumb = { href?: string; label: string };
 
@@ -67,6 +68,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
 
         <div className="flex items-center gap-2">
           <AdminSearch />
+          <NotificationsBell />
         </div>
       </div>
     </div>

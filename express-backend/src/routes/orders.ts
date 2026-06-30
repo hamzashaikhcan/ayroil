@@ -15,6 +15,7 @@ import { newOrderNumber } from "../lib/orderNumber.js";
 import { guestKeyFromRequest } from "../lib/guest.js";
 import { sendOrderConfirmationEmail, sendShippedOrderEmail, sendDeliveredReviewEmail } from "../lib/email.js";
 import { sendNewOrderSlackAlert } from "../lib/slack.js";
+import { sendNewOrderPush } from "../lib/push.js";
 import { reconcileStockForStatusChange, STOCK_RELEASED_STATUSES } from "../lib/orderStock.js";
 import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
@@ -124,6 +125,7 @@ ordersRouter.post("/checkout", async (req, res) => {
   if (settings) {
     void sendOrderConfirmationEmail(order, settings);
     void sendNewOrderSlackAlert(order, settings);
+    void sendNewOrderPush(order, settings);
   }
 
   res.status(201).json(order);

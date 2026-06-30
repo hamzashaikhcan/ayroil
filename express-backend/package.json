@@ -19,6 +19,7 @@
     "reflect-metadata": "^0.2.2",
     "resend": "^6.14.0",
     "typeorm": "^1.0.0",
+    "web-push": "^3.6.7",
     "zod": "^4.4.3"
   },
   "devDependencies": {
@@ -28,6 +29,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^26.0.0",
+    "@types/web-push": "^3.6.4",
     "nodemon": "^3.1.14",
     "tsc-alias": "^1.8.17",
     "tsx": "^4.22.4",

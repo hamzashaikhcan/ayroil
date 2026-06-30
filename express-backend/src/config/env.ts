@@ -54,4 +54,12 @@ export const ENV = {
     token: process.env.SLACK_TOKEN ?? "",
     alertChannel: process.env.SLACK_ALERT_CHANNEL ?? "",
   },
+
+  // Web Push (VAPID) — powers admin PWA new-order notifications. When the
+  // keys are absent, push is simply skipped (never blocks checkout).
+  webPush: {
+    publicKey: process.env.VAPID_PUBLIC_KEY ?? "",
+    privateKey: process.env.VAPID_PRIVATE_KEY ?? "",
+    subject: process.env.VAPID_SUBJECT ?? "mailto:admin@example.com",
+  },
 };

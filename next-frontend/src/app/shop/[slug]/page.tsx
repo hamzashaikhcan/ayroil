@@ -188,6 +188,7 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
                 />
                 <div className="pointer-events-none absolute left-3 top-3 z-10 flex flex-col items-start gap-2">
                   {product.recommended ? <Badge tone="recommend">★ Recommended</Badge> : null}
+                  {settings.freeShippingEnabled ? <Badge tone="neutral">Free shipping</Badge> : null}
                   <Badge tone={product.stock > 0 ? "accent" : "soft"}>{product.stock > 0 ? "In stock" : "Sold out"}</Badge>
                 </div>
               </div>

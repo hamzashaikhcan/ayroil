@@ -6,6 +6,7 @@ import { SITE } from "@consts";
 import { Providers } from "@/components/providers";
 import { SettingsProvider } from "@/components/providers/settings-context";
 import { Navbar } from "@/components/layout/navbar";
+import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Footer } from "@/components/layout/footer";
 import { fetchSettings } from "@/lib/settings";
 import { brandStyle } from "@/lib/brand-style";
@@ -156,6 +157,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         </noscript>
         <SettingsProvider value={settings}>
           <Providers>
+            <AnnouncementBar settings={settings} />
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer settings={settings} />

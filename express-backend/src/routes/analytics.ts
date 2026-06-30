@@ -6,12 +6,34 @@ import { Order } from "../entities/Order.js";
 import { OrderItem } from "../entities/OrderItem.js";
 import { User } from "../entities/User.js";
 import { Product } from "../entities/Product.js";
+import { Cart } from "../entities/Cart.js";
+import { Review } from "../entities/Review.js";
 import { bucketSize, resolveRange, type RangePreset } from "../lib/dateRange.js";
 import { requireAdmin } from "../middleware/auth.js";
 
 export const analyticsRouter: Router = Router();
 
 analyticsRouter.use(requireAdmin);
+
+/**
+ * Lightweight counts for the admin sidebar badges. Kept separate from
+ * /overview (which is range-scoped and heavier) so it can be fetched cheaply
+ * on every page render. "newOrders" is the actionable count of orders still
+ * awaiting fulfillment (status = pending); the rest are simple totals.
+ */
+analyticsRouter.get("/counts", async (_req, res) => {
+  const [newOrders, activeCarts, products, reviews] = await Promise.all([
+    AppDataSource.getRepository(Order).count({ where: { status: ORDER_STATUS.PENDING } }),
+    AppDataSource.getRepository(Cart)
+      .createQueryBuilder("cart")
+      .innerJoin("cart.items", "items")
+      .getCount(),
+    AppDataSource.getRepository(Product).count(),
+    AppDataSource.getRepository(Review).count(),
+  ]);
+
+  res.json({ newOrders, activeCarts, products, reviews });
+});
 
 // Cancelled/refunded orders never reserve stock or count as net revenue —
 // exclude them from every revenue/profit/units calculation below. They

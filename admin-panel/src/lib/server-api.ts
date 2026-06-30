@@ -82,6 +82,21 @@ function rangeQs(preset: RangePreset | undefined, from: string | undefined, to: 
   return params.toString();
 }
 
+export type SidebarCounts = {
+  newOrders: number;
+  activeCarts: number;
+  products: number;
+  reviews: number;
+};
+
+export async function fetchSidebarCounts(): Promise<SidebarCounts | null> {
+  try {
+    return await adminServerFetch<SidebarCounts>("/analytics/counts");
+  } catch {
+    return null;
+  }
+}
+
 export async function fetchOverview(preset?: RangePreset, from?: string, to?: string): Promise<OverviewResponse | null> {
   try {
     return await adminServerFetch<OverviewResponse>(`/analytics/overview?${rangeQs(preset, from, to)}`);

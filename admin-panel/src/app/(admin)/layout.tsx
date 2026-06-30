@@ -4,13 +4,17 @@ import { ROLES, SITE } from "@consts";
 import { AdminShell } from "@/components/layout/shell";
 import { CurrencyProvider } from "@/components/providers/currency-provider";
 import { fetchSettingsForAdmin } from "./settings/_shared/fetch-settings";
+import { fetchSidebarCounts } from "@/lib/server-api";
 import { setActiveCurrency } from "@/lib/utils";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session || session.user.role !== ROLES.ADMIN) redirect("/login");
 
-  const settings = await fetchSettingsForAdmin();
+  const [settings, counts] = await Promise.all([
+    fetchSettingsForAdmin(),
+    fetchSidebarCounts(),
+  ]);
   const currency = {
     code: settings?.currencyCode ?? SITE.currency.code,
     symbol: settings?.currencySymbol ?? SITE.currency.symbol,
@@ -29,6 +33,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         siteName={siteName}
         storefrontUrl={storefrontUrl}
         logoUrl={logoUrl}
+        counts={counts}
       >
         {children}
       </AdminShell>

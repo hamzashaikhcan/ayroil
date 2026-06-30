@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { signOut } from "next-auth/react";
 import { cn } from "@/lib/utils";
+import type { SidebarCounts } from "@/lib/server-api";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import {
   IconHome,
@@ -62,6 +63,7 @@ export function Sidebar({
   siteName,
   storefrontUrl,
   logoUrl,
+  counts,
   open,
   onClose,
 }: {
@@ -69,11 +71,21 @@ export function Sidebar({
   siteName: string;
   storefrontUrl: string;
   logoUrl?: string;
+  counts?: SidebarCounts | null;
   open: boolean;
   onClose: () => void;
 }) {
   const pathname = usePathname();
   const confirm = useConfirm();
+
+  // Maps a nav href to its badge count. Orders shows only NEW (pending)
+  // orders; the rest are simple totals. Undefined → no badge.
+  const countByHref: Record<string, number | undefined> = {
+    "/orders": counts?.newOrders,
+    "/carts": counts?.activeCarts,
+    "/products": counts?.products,
+    "/reviews": counts?.reviews,
+  };
 
   async function onSignOut() {
     const ok = await confirm({
@@ -150,6 +162,8 @@ export function Sidebar({
         <ul className="space-y-0.5">
           {NAV.map((n) => {
             const active = n.href === "/" ? pathname === "/" : pathname.startsWith(n.href);
+            const count = countByHref[n.href];
+            const hasCount = typeof count === "number" && count > 0;
             return (
               <li key={n.href}>
                 <Link
@@ -168,7 +182,14 @@ export function Sidebar({
                     )}
                   />
                   <span className="truncate">{n.label}</span>
-                  {active ? (
+                  {hasCount ? (
+                    <span
+                      className="ml-auto inline-flex h-5 min-w-5 flex-none items-center justify-center rounded-full bg-ink/[0.07] px-1.5 text-xs font-semibold tabular-nums text-ink-soft"
+                      title={n.href === "/orders" ? `${count} new ${count === 1 ? "order" : "orders"}` : undefined}
+                    >
+                      {count > 99 ? "99+" : count}
+                    </span>
+                  ) : active ? (
                     <span className="ml-auto h-1.5 w-1.5 rounded-full bg-accent" />
                   ) : null}
                 </Link>

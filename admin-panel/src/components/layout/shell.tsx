@@ -3,18 +3,21 @@
 import { useState } from "react";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
+import type { SidebarCounts } from "@/lib/server-api";
 
 export function AdminShell({
   email,
   siteName,
   storefrontUrl,
   logoUrl,
+  counts,
   children,
 }: {
   email: string;
   siteName: string;
   storefrontUrl: string;
   logoUrl?: string;
+  counts?: SidebarCounts | null;
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(false);
@@ -26,6 +29,7 @@ export function AdminShell({
         siteName={siteName}
         storefrontUrl={storefrontUrl}
         logoUrl={logoUrl}
+        counts={counts}
         open={open}
         onClose={() => setOpen(false)}
       />

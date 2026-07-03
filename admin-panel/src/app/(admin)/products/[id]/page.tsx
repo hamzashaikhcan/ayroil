@@ -18,6 +18,7 @@ type Product = {
   sku: string | null;
   active: boolean;
   recommended: boolean;
+  sortOrder: number | null;
   images: string[];
   highlights: string[];
   ingredients: { name: string; description: string }[];

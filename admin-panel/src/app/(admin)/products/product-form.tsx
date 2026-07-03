@@ -39,6 +39,7 @@ type ProductLike = {
   sku: string | null;
   active: boolean;
   recommended: boolean;
+  sortOrder: number | null;
   images: string[];
   highlights: string[];
   ingredients: { name: string; description: string }[];
@@ -58,6 +59,7 @@ const EMPTY: ProductLike = {
   sku: null,
   active: true,
   recommended: false,
+  sortOrder: null,
   images: [],
   highlights: [],
   ingredients: [],
@@ -231,6 +233,10 @@ export function ProductForm({
           />
         </Card>
 
+        <Card title="Display position" subtitle="Where this product appears in storefront listings.">
+          <PositionField value={p.sortOrder} onChange={(v) => patch("sortOrder", v)} />
+        </Card>
+
         {error ? (
           <div className="rounded-md border border-bad/30 bg-bad-soft px-3 py-2 text-xs text-bad">
             {error}
@@ -338,6 +344,32 @@ function NumberField({ label, value, onChange }: { label: string; value: number;
         onChange={(e) => onChange(Number(e.target.value || 0))}
         className="mt-1.5 h-9 w-full rounded-md border border-line bg-surface-2 px-3 text-sm text-ink focus:border-ink/30 focus:bg-surface focus:outline-none"
       />
+    </div>
+  );
+}
+
+function PositionField({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
+  return (
+    <div>
+      <label htmlFor="product-position" className="text-xs font-medium text-muted">
+        Position
+      </label>
+      <input
+        id="product-position"
+        type="number"
+        min={1}
+        step={1}
+        value={value ?? ""}
+        onChange={(e) => {
+          const n = Math.floor(Number(e.target.value));
+          onChange(e.target.value === "" || !Number.isFinite(n) || n < 1 ? null : n);
+        }}
+        placeholder="Automatic"
+        className="mt-1.5 h-9 w-full rounded-md border border-line bg-surface-2 px-3 text-sm tabular-nums text-ink placeholder:text-muted focus:border-ink/30 focus:bg-surface focus:outline-none"
+      />
+      <p className="mt-1.5 text-xs text-muted">
+        1 shows first, 2 second, and so on. Leave empty for automatic — positioned products come first, the rest follow newest-first.
+      </p>
     </div>
   );
 }

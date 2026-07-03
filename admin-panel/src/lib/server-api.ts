@@ -156,6 +156,7 @@ export async function fetchProducts(): Promise<Array<{
   stock: number;
   active: boolean;
   sku: string | null;
+  sortOrder: number | null;
   createdAt: string;
 }>> {
   try {

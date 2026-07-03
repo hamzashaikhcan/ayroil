@@ -51,6 +51,11 @@ export class Product {
   @Column({ type: "boolean", default: false })
   recommended!: boolean;
 
+  // Admin-controlled display position (1 = first). Null means "automatic":
+  // positioned products list first in ascending order, the rest follow newest-first.
+  @Column({ type: "int", nullable: true })
+  sortOrder!: number | null;
+
   @Column({ type: "jsonb", default: () => "'[]'" })
   images!: string[];
 

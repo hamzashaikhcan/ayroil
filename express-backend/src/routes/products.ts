@@ -19,7 +19,8 @@ productsRouter.get("/", async (req, res) => {
   const includeInactive = req.auth?.role === "admin" && req.query.all === "1";
   const qb = repo
     .createQueryBuilder("p")
-    .orderBy("p.createdAt", "DESC");
+    .orderBy("p.sortOrder", "ASC", "NULLS LAST")
+    .addOrderBy("p.createdAt", "DESC");
   if (!includeInactive) qb.andWhere("p.active = true");
   if (q) qb.andWhere("(p.name ILIKE :q OR p.slug ILIKE :q)", { q: `%${q}%` });
   const items = await qb.getMany();
@@ -100,6 +101,7 @@ const productSchema = z.object({
   sku: z.string().max(64).optional().nullable(),
   active: z.boolean().default(true),
   recommended: z.boolean().default(false),
+  sortOrder: z.number().int().min(1).optional().nullable(),
   images: z.array(z.string()).default([]),
   highlights: z.array(z.string()).default([]),
   ingredients: z

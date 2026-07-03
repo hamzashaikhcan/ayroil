@@ -26,6 +26,7 @@ export default async function ProductsPage() {
           <table className="w-full text-left text-sm table-cards">
             <thead className="border-b border-line bg-surface-2 text-xs font-medium uppercase tracking-wider text-muted">
               <tr>
+                <th className="px-5 py-2.5 font-medium">Position</th>
                 <th className="px-5 py-2.5 font-medium">Product</th>
                 <th className="px-5 py-2.5 font-medium">SKU</th>
                 <th className="px-5 py-2.5 font-medium">Price</th>
@@ -36,9 +37,10 @@ export default async function ProductsPage() {
             </thead>
             <tbody>
               {products.length === 0 ? (
-                <tr><td colSpan={6} className="px-5 py-16 text-center text-muted">No products yet.</td></tr>
+                <tr><td colSpan={7} className="px-5 py-16 text-center text-muted">No products yet.</td></tr>
               ) : products.map((p) => (
                 <tr key={p.id} className="border-b border-line last:border-b-0 row-hover">
+                  <td className="px-5 py-3 tabular-nums text-muted" data-label="Position">{p.sortOrder ?? "—"}</td>
                   <td className="px-5 py-3" data-label="Product">
                     <Link href={`/products/${p.id}`} className="font-medium text-ink hover:text-accent">{p.name}</Link>
                   </td>

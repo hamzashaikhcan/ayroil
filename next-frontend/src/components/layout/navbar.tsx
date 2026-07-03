@@ -54,10 +54,15 @@ export function Navbar() {
       <header className="sticky top-0 z-50 flex justify-center px-3 pt-3 sm:px-4 sm:pt-4">
         <nav
           className={cn(
-            "flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border px-2 py-1.5 transition-all duration-300 sm:gap-4 sm:px-3 sm:py-2",
-            scrolled
-              ? "border-line-strong bg-surface/95 backdrop-blur-md shadow-[0_8px_30px_-12px_rgba(0,0,0,0.18)]"
-              : "border-line bg-surface/80 backdrop-blur",
+            "flex w-full max-w-5xl items-center justify-between gap-2 rounded-full border px-2 py-1.5 sm:gap-4 sm:px-3 sm:py-2",
+            // Opaque while the menu is open so the dark backdrop doesn't
+            // bleed through the translucent pill and darken it; no transition
+            // so it snaps opaque the same frame the backdrop appears
+            menuIsOpen
+              ? "border-line-strong bg-surface"
+              : scrolled
+                ? "border-line-strong bg-surface/95 backdrop-blur-md shadow-[0_8px_30px_-12px_rgba(0,0,0,0.18)] transition-all duration-300"
+                : "border-line bg-surface/80 backdrop-blur transition-all duration-300",
           )}
         >
           <div className="flex min-w-0 items-center pl-1 sm:pl-2">
@@ -171,17 +176,11 @@ export function Navbar() {
             </form>
           </div>
         ) : null}
-      </header>
 
-      {/* Mobile menu sheet */}
-      {menuIsOpen ? (
-        <>
-          <div
-            className="fixed inset-0 z-40 bg-ink/30 backdrop-blur-sm md:hidden"
-            onClick={() => setOpenMenu(null)}
-            aria-hidden
-          />
-          <div className="fixed inset-x-3 top-15 z-40 md:hidden">
+        {/* Mobile menu sheet — anchored to the header so it stays below the
+            navbar even when the announcement bar offsets it */}
+        {menuIsOpen ? (
+          <div className="absolute inset-x-3 top-15 z-40 md:hidden">
             <div className="rounded-2xl border border-line-strong bg-surface p-3 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.3)]">
               {PRIMARY.map((item) => (
                 <Link
@@ -205,7 +204,15 @@ export function Navbar() {
               ) : null}
             </div>
           </div>
-        </>
+        ) : null}
+      </header>
+
+      {menuIsOpen ? (
+        <div
+          className="fixed inset-0 z-40 bg-ink/30 backdrop-blur-sm md:hidden"
+          onClick={() => setOpenMenu(null)}
+          aria-hidden
+        />
       ) : null}
 
       <CartDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />

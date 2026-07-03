@@ -38,7 +38,15 @@ BRAND CONTEXT — Ayroil hair oil. When the product is the Ayroil hair oil (or a
 Argan oil, Black seed oil, Rosemary oil, Sweet almond oil, Vitamin E, Amla, Reetha, Shikakai, Hyaluronic acid, Castor oil.
 Speak to what these ingredients are traditionally known for (e.g. rosemary and castor oil for stimulating growth and thickness, argan and almond for shine and softness, amla/reetha/shikakai as time-tested Ayurvedic hair cleansers and strengtheners, hyaluronic acid and vitamin E for scalp hydration and repair) — but never invent medical claims or promise cures.
 
-HIGHLIGHTS RULES: highlights are one of the first things a shopper reads on the product page, so treat them as a top-priority field, not an afterthought. Every highlight MUST be a RESULT the customer gets from using the product — what it does for their hair, skin, or life. For a hair oil that means things like "Reduces hair fall", "Fights dandruff at the root", "Strengthens and thickens hair", "Smooths frizz, adds shine", "Deeply nourishes the scalp". FORBIDDEN as highlights: packaging or container details (bottle, pump, cap, box), shipping, appearance of the product itself, or vague filler like "high quality" or "easy to use". If a candidate highlight would still be true with a different product inside the bottle, it is not a highlight. Keep each one a short, punchy phrase (roughly 3-8 words), each covering a DIFFERENT outcome, and make sure these SAME outcome benefits also appear (expanded with how the product delivers them) in the long description's Key Benefits section. Together the set should read like the 4-6 strongest reasons to buy.
+HIGHLIGHTS RULES: highlights are one of the first things a shopper reads on the product page, so treat them as a top-priority field, not an afterthought. Every highlight MUST name a concrete RESULT the customer gets from using the product. For a hair oil, draw the set from the strongest outcomes: reduces hair fall, promotes hair growth and thickness, fights dandruff, strengthens hair from the roots, deeply nourishes the scalp, smooths frizz and adds shine. At least 4 of the bullets must be hair outcomes like these.
+FORBIDDEN as highlights (these will be discarded):
+- Packaging or container details (bottle, pump, cap, box) or shipping.
+- The brand or product name as a bullet ("Ayroil Ayurvedic blend" sells nothing; say what the blend DOES).
+- Audience statements ("Suitable for men and women", "for all hair types") — these are FAQ material, not selling points.
+- Vague filler ("high quality", "easy to use", "premium formula").
+If a candidate highlight would still be true with a different product inside the bottle, or doesn't answer "what will this do for MY hair?", it is not a highlight. Keep each one a short, punchy phrase (roughly 3-8 words), each covering a DIFFERENT outcome, and make sure these SAME outcome benefits also appear (expanded with how the product delivers them) in the long description's Key Benefits section. Together the set should read like the 4-6 strongest reasons to buy.
+
+KEYWORDS RULES: keywords are the phrases a real shopper types into Google or a marketplace when they have the problem this product solves. Each must be a 2-5 word search phrase, a mix of: problem searches ("hair oil for hair fall", "oil for dandruff and itchy scalp", "hair oil for hair growth"), ingredient-plus-purpose searches ("rosemary oil for hair growth", "amla hair oil benefits"), and category searches ("ayurvedic hair oil", "natural hair growth oil"). NEVER include: the brand or product name (shoppers who know the name don't need keywords), bare single words ("hair oil", "shikakai"), or ingredient names alone without a purpose attached.
 
 Any photos you receive are for ANALYSIS ONLY, to understand the product. NEVER include images, [[IMAGE_n]] placeholders, or <img> tags anywhere in the copy — the long description must be pure written content.
 
@@ -49,9 +57,9 @@ Return ONLY a JSON object with exactly these keys, no markdown fences, no commen
   "tagline": string,            // one short, punchy line, under 70 characters
   "shortDescription": string,   // plain text, 1-2 sentences, no HTML
   "longDescription": string,    // HTML body for the product detail page. Allowed tags ONLY: h2, h3, p, ul, ol, li, strong, em, br. No images. Follow the LONG DESCRIPTION STRUCTURE above (hook, What Makes It Special, Key Benefits, Key Ingredients, How to Use, closing).
-  "highlights": string[],       // 4-6 short bullets, no leading bullet/dash character. See the HIGHLIGHTS RULES above — benefit-first, each a distinct selling point.
+  "highlights": string[],       // 4-6 short bullets, no leading bullet/dash character. EVERY bullet must be a result of USING the product (reduces hair fall, fights dandruff, adds shine). ABSOLUTELY NO packaging bullets: any bullet mentioning the bottle, pump, cap, box, or container is wrong and will be discarded. See the HIGHLIGHTS RULES above.
   "faqs": [{"q": string, "a": string}],  // 5-8 buyer questions. See the FAQ ANSWER RULES below — answers must be thorough, not one-liners.
-  "keywords": string[]          // 8-12 search terms a shopper might use to find this product (for the admin's own reference, not inserted into any visible copy)
+  "keywords": string[]          // 8-12 search phrases per the KEYWORDS RULES above: 2-5 words each, problem/purpose-driven ("hair oil for hair fall"), never the brand name, never bare single words or lone ingredient names
 }
 Always return every field, even when existing copy was supplied — improve on it rather than leaving it untouched.`;
 
@@ -113,7 +121,9 @@ export async function generateProductCopy(input: GenerateProductInput): Promise<
         // generous to avoid truncating the JSON output.
         max_completion_tokens: 6000,
         response_format: { type: "json_object" },
-        ...(IS_REASONING_MODEL ? { reasoning_effort: "low" } : { temperature: 0.7 }),
+        // "medium" (not "low"): low-effort nano runs kept half-ignoring the
+        // copywriting rules (packaging highlights, brand-name keywords).
+        ...(IS_REASONING_MODEL ? { reasoning_effort: "medium" } : { temperature: 0.7 }),
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
           { role: "user", content },
@@ -166,23 +176,39 @@ export async function generateProductCopy(input: GenerateProductInput): Promise<
     .filter((f) => f.q && f.a)
     .slice(0, 8);
 
+  // Highlights must sell what the product DOES. The model is told this twice,
+  // but small models still slip in packaging bullets ("premium pump bottle"),
+  // brand-name bullets ("Ayroil Ayurvedic blend"), and audience filler
+  // ("Suitable for all genders") — drop all of them outright.
+  const brandWord = name.split(/\s+/)[0]?.replace(/[^\p{L}\p{N}]/gu, "") ?? "";
+  const brandRe = brandWord.length > 2 ? new RegExp(`\\b${brandWord}\\b`, "i") : null;
+  const isJunkHighlight = (h: string) =>
+    /\b(bottle|pump|cap|box|jar|tube|container|carton|dispenser|packaging|label|seal)\b/i.test(h) ||
+    /^(suitable|perfect|ideal|great)\s+for\b/i.test(h) ||
+    (brandRe ? brandRe.test(h) : false);
+
   // response_format: json_object has no schema enforcement, and small models
   // occasionally return "highlights" as a newline/bullet-separated string
   // instead of an array — handle both shapes rather than silently dropping it.
   const highlights = (() => {
     const h = parsed.highlights;
-    if (Array.isArray(h)) return h.map((x) => str(x)).filter(Boolean).slice(0, 8);
+    if (Array.isArray(h)) return h.map((x) => str(x)).filter(Boolean);
     if (typeof h === "string") {
       return h
         .split(/\r?\n+/)
         .map((line) => line.replace(/^[-*•\d.\s]+/, "").trim())
-        .filter(Boolean)
-        .slice(0, 8);
+        .filter(Boolean);
     }
     return [];
-  })();
+  })()
+    .filter((h) => !isJunkHighlight(h))
+    .slice(0, 8);
 
-  const keywords = Array.isArray(parsed.keywords) ? parsed.keywords.map((k) => str(k)).filter(Boolean).slice(0, 15) : [];
+  // Keywords are search phrases, not the product's own name or bare ingredient
+  // words — drop brand-name entries and single-word terms the prompt forbids.
+  const keywords = (Array.isArray(parsed.keywords) ? parsed.keywords.map((k) => str(k)).filter(Boolean) : [])
+    .filter((k) => k.trim().split(/\s+/).length >= 2 && (brandRe ? !brandRe.test(k) : true))
+    .slice(0, 15);
 
   const data: GeneratedProduct = {
     tagline: str(parsed.tagline),

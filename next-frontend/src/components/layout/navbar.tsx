@@ -96,7 +96,8 @@ export function Navbar() {
                 : "border-line bg-surface/80 backdrop-blur transition-all duration-300",
           )}
         >
-          <div className="flex min-w-0 items-center pl-1 sm:pl-2">
+          {/* On mobile the wordmark yields its space to the search field */}
+          <div className={cn("min-w-0 items-center pl-1 sm:pl-2", searchOpen ? "hidden sm:flex" : "flex")}>
             <Wordmark />
           </div>
 
@@ -109,7 +110,7 @@ export function Navbar() {
               onKeyDown={(e) => {
                 if (e.key === "Escape") closeSearch();
               }}
-              className="flex min-w-0 flex-1 items-center gap-1 pr-0.5 sm:pr-1"
+              className="flex min-w-0 flex-1 items-center gap-1 pl-0.5 pr-0.5 sm:pl-0 sm:pr-1"
             >
               <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-full border border-line-strong bg-ink/5 px-3 transition-colors focus-within:border-ink focus-within:bg-surface sm:h-10">
                 <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden className="flex-none text-muted">
@@ -125,6 +126,7 @@ export function Navbar() {
                   }}
                   placeholder="Search the catalog…"
                   autoFocus
+                  enterKeyHint="search"
                   className="h-full w-full min-w-0 bg-transparent text-sm text-ink placeholder:text-muted focus:outline-none"
                 />
               </div>

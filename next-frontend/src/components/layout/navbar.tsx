@@ -7,7 +7,9 @@ import { useSession } from "next-auth/react";
 import { Wordmark } from "./wordmark";
 import { useCart } from "@/stores/cart-store";
 import { CartDrawer } from "@/components/cart/cart-drawer";
-import { cn } from "@/lib/utils";
+import { ProductThumb } from "@/components/product/product-thumb";
+import { api, type Product } from "@/lib/api";
+import { cn, formatPrice } from "@/lib/utils";
 import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
 
 const PRIMARY = [
@@ -25,12 +27,15 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [openMenu, setOpenMenu] = useState<{ path: string } | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [openSearch, setOpenSearch] = useState<{ path: string } | null>(null);
   const [searchQ, setSearchQ] = useState("");
+  const [suggestions, setSuggestions] = useState<Product[] | null>(null);
 
   const mounted = useSyncExternalStore(noopSubscribe, () => true, () => false);
   const totalUnits = mounted ? totalUnitsRaw : 0;
   const menuIsOpen = openMenu?.path === pathname;
+  // Keyed to the path so navigating (e.g. picking a suggestion) closes it
+  const searchOpen = openSearch?.path === pathname;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 8);
@@ -48,6 +53,32 @@ export function Navbar() {
       document.body.style.overflow = prev;
     };
   }, [menuIsOpen]);
+
+  // Debounced live suggestions while typing in the search field
+  useEffect(() => {
+    const q = searchQ.trim();
+    if (!searchOpen || q.length < 2) return;
+    let cancelled = false;
+    const t = setTimeout(() => {
+      api<Product[]>(`/products?q=${encodeURIComponent(q)}`)
+        .then((items) => {
+          if (!cancelled) setSuggestions(items.slice(0, 5));
+        })
+        .catch(() => {
+          if (!cancelled) setSuggestions(null);
+        });
+    }, 250);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [searchOpen, searchQ]);
+
+  const closeSearch = () => {
+    setOpenSearch(null);
+    setSearchQ("");
+    setSuggestions(null);
+  };
 
   return (
     <>
@@ -69,111 +100,193 @@ export function Navbar() {
             <Wordmark />
           </div>
 
-          <div className="hidden md:flex items-center gap-1">
-            {PRIMARY.map((item) => {
-              const active = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={cn(
-                    "rounded-full px-3.5 py-2 text-sm transition-colors",
-                    active ? "bg-ink text-background" : "text-ink hover:bg-ink/5",
-                  )}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="flex items-center gap-1 pr-0.5 sm:pr-1">
-            <button
-              type="button"
-              onClick={() => setSearchOpen((v) => !v)}
-              aria-label="Search"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line-strong bg-surface text-ink hover:bg-ink/5 sm:h-10 sm:w-10"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
-                <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.4" fill="none" />
-                <path d="M9 9l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-              </svg>
-            </button>
-
-            {AUTH_UI_ENABLED ? (
-              status === "authenticated" && session ? (
-                <Link
-                  href="/account"
-                  className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3 py-2 text-sm text-ink hover:bg-ink/5"
-                >
-                  {session.user.name?.split(" ")[0] ?? "Account"}
-                </Link>
-              ) : (
-                <Link
-                  href="/login"
-                  className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-2 text-sm text-ink hover:bg-ink/5"
-                >
-                  Sign in
-                </Link>
-              )
-            ) : null}
-
-            <button
-              type="button"
-              onClick={() => setDrawerOpen(true)}
-              aria-label={`Cart, ${totalUnits} item${totalUnits === 1 ? "" : "s"}`}
-              className="relative inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-2 text-sm font-medium text-accent-ink hover:bg-accent-deep sm:gap-2 sm:px-4"
-            >
-              <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className="sm:hidden">
-                <path d="M2 3h1.5l1 6.3a1 1 0 001 .85h5a1 1 0 001-.8L12.5 5H4" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
-                <circle cx="5.5" cy="12" r="0.75" fill="currentColor" />
-                <circle cx="10" cy="12" r="0.75" fill="currentColor" />
-              </svg>
-              <span className="hidden sm:inline" aria-hidden>Cart</span>
-              <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1.5 text-xs font-mono text-background" aria-hidden>
-                {totalUnits}
-              </span>
-            </button>
-
-            <button
-              type="button"
-              aria-label="Toggle menu"
-              aria-expanded={menuIsOpen}
-              onClick={() => setOpenMenu(menuIsOpen ? null : { path: pathname })}
-              className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full border border-line-strong bg-surface text-ink"
-            >
-              <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
-                {menuIsOpen ? (
-                  <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                ) : (
-                  <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                )}
-              </svg>
-            </button>
-          </div>
-        </nav>
-
-        {searchOpen ? (
-          <div className="absolute left-3 right-3 top-15 z-40 sm:left-1/2 sm:right-auto sm:top-17 sm:w-[min(640px,calc(100vw-2rem))] sm:-translate-x-1/2">
+          {searchOpen ? (
             <form
               action="/shop"
-              className="flex items-center gap-2 rounded-2xl border border-line-strong bg-surface p-2 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.25)]"
+              onSubmit={(e) => {
+                if (!searchQ.trim()) e.preventDefault();
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") closeSearch();
+              }}
+              className="flex min-w-0 flex-1 items-center gap-1 pr-0.5 sm:pr-1"
             >
-              <input
-                name="q"
-                value={searchQ}
-                onChange={(e) => setSearchQ(e.target.value)}
-                placeholder="Search the catalog…"
-                autoFocus
-                className="h-10 w-full rounded-md bg-transparent px-3 text-sm text-ink placeholder:text-muted focus:outline-none"
-              />
+              <div className="flex h-9 min-w-0 flex-1 items-center gap-2 rounded-full border border-line-strong bg-ink/5 px-3 transition-colors focus-within:border-ink focus-within:bg-surface sm:h-10">
+                <svg width="13" height="13" viewBox="0 0 14 14" aria-hidden className="flex-none text-muted">
+                  <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.4" fill="none" />
+                  <path d="M9 9l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
+                <input
+                  name="q"
+                  value={searchQ}
+                  onChange={(e) => {
+                    setSearchQ(e.target.value);
+                    if (e.target.value.trim().length < 2) setSuggestions(null);
+                  }}
+                  placeholder="Search the catalog…"
+                  autoFocus
+                  className="h-full w-full min-w-0 bg-transparent text-sm text-ink placeholder:text-muted focus:outline-none"
+                />
+              </div>
               <button
                 type="submit"
-                className="inline-flex h-10 items-center rounded-md bg-ink px-4 text-sm font-medium text-background"
+                aria-label="Search"
+                className="inline-flex h-9 w-9 flex-none items-center justify-center rounded-full bg-ink text-background hover:bg-ink/90 sm:h-10 sm:w-10"
               >
-                Search
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                  <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.4" fill="none" />
+                  <path d="M9 9l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                aria-label="Close search"
+                onClick={closeSearch}
+                className="inline-flex h-9 w-9 flex-none items-center justify-center rounded-full border border-line-strong bg-surface text-ink hover:bg-ink/5 sm:h-10 sm:w-10"
+              >
+                <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                  <path d="M3 3l8 8M11 3l-8 8" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                </svg>
               </button>
             </form>
+          ) : (
+            <>
+              <div className="hidden md:flex items-center gap-1">
+                {PRIMARY.map((item) => {
+                  const active = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      className={cn(
+                        "rounded-full px-3.5 py-2 text-sm transition-colors",
+                        active ? "bg-ink text-background" : "text-ink hover:bg-ink/5",
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-1 pr-0.5 sm:pr-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setOpenSearch({ path: pathname });
+                    setOpenMenu(null);
+                  }}
+                  aria-label="Search"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-line-strong bg-surface text-ink hover:bg-ink/5 sm:h-10 sm:w-10"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden>
+                    <circle cx="6" cy="6" r="4" stroke="currentColor" strokeWidth="1.4" fill="none" />
+                    <path d="M9 9l3 3" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                  </svg>
+                </button>
+
+                {AUTH_UI_ENABLED ? (
+                  status === "authenticated" && session ? (
+                    <Link
+                      href="/account"
+                      className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3 py-2 text-sm text-ink hover:bg-ink/5"
+                    >
+                      {session.user.name?.split(" ")[0] ?? "Account"}
+                    </Link>
+                  ) : (
+                    <Link
+                      href="/login"
+                      className="hidden sm:inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface px-3.5 py-2 text-sm text-ink hover:bg-ink/5"
+                    >
+                      Sign in
+                    </Link>
+                  )
+                ) : null}
+
+                <button
+                  type="button"
+                  onClick={() => setDrawerOpen(true)}
+                  aria-label={`Cart, ${totalUnits} item${totalUnits === 1 ? "" : "s"}`}
+                  className="relative inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-2 text-sm font-medium text-accent-ink hover:bg-accent-deep sm:gap-2 sm:px-4"
+                >
+                  <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden className="sm:hidden">
+                    <path d="M2 3h1.5l1 6.3a1 1 0 001 .85h5a1 1 0 001-.8L12.5 5H4" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" strokeLinejoin="round" />
+                    <circle cx="5.5" cy="12" r="0.75" fill="currentColor" />
+                    <circle cx="10" cy="12" r="0.75" fill="currentColor" />
+                  </svg>
+                  <span className="hidden sm:inline" aria-hidden>Cart</span>
+                  <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-ink px-1.5 text-xs font-mono text-background" aria-hidden>
+                    {totalUnits}
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  aria-label="Toggle menu"
+                  aria-expanded={menuIsOpen}
+                  onClick={() => setOpenMenu(menuIsOpen ? null : { path: pathname })}
+                  className="md:hidden inline-flex h-9 w-9 items-center justify-center rounded-full border border-line-strong bg-surface text-ink"
+                >
+                  <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden>
+                    {menuIsOpen ? (
+                      <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                    ) : (
+                      <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+                    )}
+                  </svg>
+                </button>
+              </div>
+            </>
+          )}
+        </nav>
+
+        {/* Live search suggestions, anchored under the pill */}
+        {searchOpen && suggestions ? (
+          <div className="absolute inset-x-0 top-15 z-40 flex justify-center px-3 sm:top-17 sm:px-4">
+            <div className="w-full max-w-5xl rounded-2xl border border-line-strong bg-surface p-2 shadow-[0_24px_80px_-24px_rgba(0,0,0,0.3)]">
+              {suggestions.length === 0 ? (
+                <p className="px-3 py-3 text-sm text-muted">
+                  No products found for “{searchQ.trim()}”.
+                </p>
+              ) : (
+                <>
+                  {suggestions.map((p) => (
+                    <Link
+                      key={p.id}
+                      href={`/shop/${p.slug}`}
+                      onClick={closeSearch}
+                      className="flex items-center gap-3 rounded-xl px-2 py-2 hover:bg-ink/5"
+                    >
+                      <ProductThumb
+                        image={p.images[0]}
+                        slug={p.slug}
+                        name={p.name}
+                        sizes="40px"
+                        className="h-10 w-10 flex-none rounded-lg"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-medium text-ink">{p.name}</span>
+                        {p.tagline ? (
+                          <span className="block truncate text-xs text-muted">{p.tagline}</span>
+                        ) : null}
+                      </span>
+                      <span className="flex-none font-mono text-sm text-ink">
+                        {formatPrice(p.priceCents)}
+                      </span>
+                    </Link>
+                  ))}
+                  <div className="mt-1 border-t border-line pt-1">
+                    <Link
+                      href={`/shop?q=${encodeURIComponent(searchQ.trim())}`}
+                      onClick={closeSearch}
+                      className="block rounded-xl px-3 py-2.5 text-sm font-medium text-ink hover:bg-ink/5"
+                    >
+                      See all results →
+                    </Link>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         ) : null}
 

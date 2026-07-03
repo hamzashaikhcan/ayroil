@@ -36,7 +36,7 @@ export default async function ShopPage(props: PageProps<"/shop">) {
 
   return (
     <>
-      <section className="border-b border-line bg-surface">
+      <section className="border-b border-line bg-background">
         <Container className="py-12 md:py-20">
           <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted">
             <span className="marker-dot">

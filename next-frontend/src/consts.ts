@@ -9,6 +9,8 @@
  * Swap product/brand values here; do not duplicate them per-app.
  */
 
+export const HERO_2_IMAGE =
+	'https://res.cloudinary.com/dm2cefx8m/image/upload/v1783113909/Hero2_pvpfmj.webp';
 export const SITE = {
   siteName: "Product Two",
   slogan: "One product. Built with intent.",

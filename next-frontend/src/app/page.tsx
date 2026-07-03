@@ -8,6 +8,7 @@ import { ProductThumb } from '@/components/product/product-thumb';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
 import { fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
 import { fetchSettings } from '@/lib/settings';
+import { HERO_2_IMAGE } from '@/consts';
 
 const HOME_TITLE =
 	'Ayroil Herbal Hair Oil — Nourishing Care for Hair Fall & Dandruff';
@@ -286,7 +287,7 @@ export default async function HomePage() {
 					<div className='grid grid-cols-1 gap-12 md:grid-cols-2 md:items-center'>
 						<div className='relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-surface'>
 							<Image
-								src='https://res.cloudinary.com/dm2cefx8m/image/upload/v1783113909/Hero2_pvpfmj.webp'
+								src={HERO_2_IMAGE}
 								alt='Heavy, heat-extracted hair oil leaving a greasy residue'
 								fill
 								sizes='(max-width: 768px) 100vw, 50vw'

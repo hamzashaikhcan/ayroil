@@ -144,7 +144,7 @@ export function ProductForm({
             <Field label="Name" value={p.name} onChange={(v) => patch("name", v)} required />
             <Field label="Slug" value={p.slug} onChange={(v) => patch("slug", v)} required placeholder="product-one" />
             <Field label="Tagline" value={p.tagline ?? ""} onChange={(v) => patch("tagline", v || null)} className="md:col-span-2" placeholder="One short, sharp line" />
-            <TextField label="Short description" value={p.shortDescription} onChange={(v) => patch("shortDescription", v)} className="md:col-span-2" required />
+            <MetaDescriptionField value={p.shortDescription} onChange={(v) => patch("shortDescription", v)} className="md:col-span-2" />
             <div className="md:col-span-2">
               <label className="text-xs font-medium text-muted">Long description</label>
               <div className="mt-1.5">
@@ -298,17 +298,44 @@ function Field({ label, value, onChange, required, className, placeholder }: { l
   );
 }
 
-function TextField({ label, value, onChange, required, className, rows = 3 }: { label: string; value: string; onChange: (v: string) => void; required?: boolean; className?: string; rows?: number }) {
+const META_DESC_MIN = 70;
+const META_DESC_MAX = 155;
+
+/**
+ * Short description doubles as the storefront meta description, so the field
+ * signals the 70-155 character window: red outside it, green inside, neutral
+ * while empty.
+ */
+function MetaDescriptionField({ value, onChange, className }: { value: string; onChange: (v: string) => void; className?: string }) {
+  const len = value.trim().length;
+  const state = len === 0 ? "empty" : len >= META_DESC_MIN && len <= META_DESC_MAX ? "ok" : "err";
+  const border =
+    state === "ok"
+      ? "border-good focus:border-good"
+      : state === "err"
+        ? "border-bad focus:border-bad"
+        : "border-line focus:border-ink/30";
   return (
     <div className={className}>
-      <label className="text-xs font-medium text-muted">{label}</label>
+      <div className="flex items-center justify-between">
+        <label htmlFor="product-short-description" className="text-xs font-medium text-muted">
+          Short description
+        </label>
+        <span className={`text-xs tabular-nums ${state === "ok" ? "text-good" : state === "err" ? "text-bad" : "text-muted"}`}>
+          {len}/{META_DESC_MAX}
+        </span>
+      </div>
       <textarea
+        id="product-short-description"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        required={required}
-        rows={rows}
-        className="mt-1.5 w-full rounded-md border border-line bg-surface-2 px-3 py-2 text-sm text-ink focus:border-ink/30 focus:bg-surface focus:outline-none"
+        required
+        rows={3}
+        className={`mt-1.5 w-full rounded-md border ${border} bg-surface-2 px-3 py-2 text-sm text-ink focus:bg-surface focus:outline-none`}
       />
+      <p className="mt-1.5 text-xs text-muted">
+        Also used as the page&apos;s meta description in search results. Aim for {META_DESC_MIN}-{META_DESC_MAX} characters.
+      </p>
     </div>
   );
 }

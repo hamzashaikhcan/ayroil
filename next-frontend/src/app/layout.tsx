@@ -8,6 +8,7 @@ import { SettingsProvider } from "@/components/providers/settings-context";
 import { Navbar } from "@/components/layout/navbar";
 import { AnnouncementBar } from "@/components/layout/announcement-bar";
 import { Footer } from "@/components/layout/footer";
+import { WhatsAppButton } from "@/components/layout/whatsapp-button";
 import { fetchSettings } from "@/lib/settings";
 import { brandStyle } from "@/lib/brand-style";
 import { setActiveCurrency } from "@/lib/utils";
@@ -169,6 +170,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <Navbar />
             <main className="flex-1">{children}</main>
             <Footer settings={settings} />
+            <WhatsAppButton />
           </Providers>
         </SettingsProvider>
       </body>

@@ -116,3 +116,11 @@
     margin: 2em 0;
   }
 }
+
+/* When the product sticky buy bar is pinned (see StickyBuyBar), lift the
+   WhatsApp FAB above it so it never covers the Buy now CTA. The bar spans up
+   to max-w-5xl, so it reaches the FAB's corner on anything narrower than a
+   wide desktop; lifting whenever the bar is visible keeps every width safe. */
+body[data-sticky-buy-bar] .whatsapp-fab {
+  bottom: 6rem;
+}

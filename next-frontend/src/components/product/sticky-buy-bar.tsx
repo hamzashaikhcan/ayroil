@@ -46,6 +46,17 @@ export function StickyBuyBar({
     return () => observer.disconnect();
   }, [sentinelId]);
 
+  // Flag bar visibility on <body> so other fixed elements (e.g. the WhatsApp
+  // FAB) can move out of its way on small screens. See globals.css.
+  useEffect(() => {
+    if (visible) {
+      document.body.setAttribute("data-sticky-buy-bar", "");
+    } else {
+      document.body.removeAttribute("data-sticky-buy-bar");
+    }
+    return () => document.body.removeAttribute("data-sticky-buy-bar");
+  }, [visible]);
+
   async function onAdd() {
     if (soldOut) return;
     setPending(true);

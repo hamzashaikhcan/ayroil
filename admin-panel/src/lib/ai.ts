@@ -100,65 +100,82 @@ export async function generateProductCopy(input: GenerateProductInput): Promise<
   ];
   for (const url of images) content.push({ type: "image_url", image_url: { url } });
 
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 120_000);
-
   // Azure v1 chat-completions URL: <endpoint>/chat/completions?api-version=… (the
   // endpoint already ends in /openai/v1). Auth is the resource api-key.
   const endpoint = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, "")}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}`;
 
-  let res: Response;
-  try {
-    res = await fetch(endpoint, {
-      method: "POST",
-      signal: controller.signal,
-      headers: {
-        "content-type": "application/json",
-        "api-key": AZURE_OPENAI_API_KEY,
-      },
-      body: JSON.stringify({
-        model: AZURE_OPENAI_DEPLOYMENT,
-        // Reasoning models budget reasoning tokens against this too, so keep it
-        // generous to avoid truncating the JSON output.
-        max_completion_tokens: 6000,
-        response_format: { type: "json_object" },
-        // "medium" (not "low"): low-effort nano runs kept half-ignoring the
-        // copywriting rules (packaging highlights, brand-name keywords).
-        ...(IS_REASONING_MODEL ? { reasoning_effort: "medium" } : { temperature: 0.7 }),
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content },
-        ],
-      }),
-    });
-  } catch (err) {
-    return {
-      ok: false,
-      error:
-        err instanceof Error && err.name === "AbortError"
-          ? "Azure OpenAI took too long to respond. Please try again."
-          : "Could not reach Azure OpenAI. Check your connection and try again.",
-    };
-  } finally {
-    clearTimeout(timeout);
-  }
+  async function callAzure(): Promise<{ raw: string } | { raw?: undefined; error: string; retryable: boolean }> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 120_000);
 
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
-    let message = `Azure OpenAI error ${res.status}`;
+    let res: Response;
     try {
-      const j = JSON.parse(text) as { error?: { message?: string } };
-      if (j.error?.message) message = j.error.message;
-    } catch {
-      /* keep default */
+      res = await fetch(endpoint, {
+        method: "POST",
+        signal: controller.signal,
+        headers: {
+          "content-type": "application/json",
+          "api-key": AZURE_OPENAI_API_KEY!,
+        },
+        body: JSON.stringify({
+          model: AZURE_OPENAI_DEPLOYMENT,
+          // Reasoning models spend their (invisible) reasoning tokens against
+          // this cap too — at medium effort that can be many thousands before
+          // a single output token, and running out yields a 200 with EMPTY
+          // content. Keep this far above what the JSON itself needs.
+          max_completion_tokens: 20_000,
+          response_format: { type: "json_object" },
+          // "medium" (not "low"): low-effort nano runs kept half-ignoring the
+          // copywriting rules (packaging highlights, brand-name keywords).
+          ...(IS_REASONING_MODEL ? { reasoning_effort: "medium" } : { temperature: 0.7 }),
+          messages: [
+            { role: "system", content: SYSTEM_PROMPT },
+            { role: "user", content },
+          ],
+        }),
+      });
+    } catch (err) {
+      return err instanceof Error && err.name === "AbortError"
+        ? { error: "Azure OpenAI took too long to respond. Please try again.", retryable: false }
+        : { error: "Could not reach Azure OpenAI. Check your connection and try again.", retryable: true };
+    } finally {
+      clearTimeout(timeout);
     }
-    return { ok: false, error: message };
+
+    if (!res.ok) {
+      const text = await res.text().catch(() => "");
+      let message = `Azure OpenAI error ${res.status}`;
+      try {
+        const j = JSON.parse(text) as { error?: { message?: string } };
+        if (j.error?.message) message = j.error.message;
+      } catch {
+        /* keep default */
+      }
+      // 429/5xx are transient; 4xx config errors are not worth a retry.
+      return { error: message, retryable: res.status === 429 || res.status >= 500 };
+    }
+
+    const json = (await res.json().catch(() => null)) as {
+      choices?: Array<{ message?: { content?: string }; finish_reason?: string }>;
+    } | null;
+    const choice = json?.choices?.[0];
+    const raw = choice?.message?.content;
+    if (!raw) {
+      return choice?.finish_reason === "length"
+        ? { error: "The AI ran out of output tokens before finishing. Please try again.", retryable: true }
+        : { error: "Azure OpenAI returned an empty response. Please try again.", retryable: true };
+    }
+    return { raw };
   }
 
-  const json = (await res.json().catch(() => null)) as { choices?: Array<{ message?: { content?: string } }> } | null;
-  const raw = json?.choices?.[0]?.message?.content;
-  if (!raw) {
-    return { ok: false, error: "Azure OpenAI returned an empty response. Please try again." };
+  // Empty responses and transient failures happen often enough on small
+  // deployments that one automatic retry saves the admin a manual click.
+  let raw: string;
+  {
+    let attempt = await callAzure();
+    if (attempt.raw === undefined && attempt.retryable) attempt = await callAzure();
+    if (attempt.raw === undefined) return { ok: false, error: attempt.error };
+    raw = attempt.raw;
   }
 
   let parsed: Record<string, unknown>;

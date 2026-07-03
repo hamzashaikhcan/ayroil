@@ -55,7 +55,7 @@ FAQ ANSWER RULES: cover the real hesitations a buyer has right before checkout â
 Return ONLY a JSON object with exactly these keys, no markdown fences, no commentary:
 {
   "tagline": string,            // one short, punchy line, under 70 characters
-  "shortDescription": string,   // plain text, 1-2 sentences, no HTML
+  "shortDescription": string,   // plain text, no HTML. Doubles as the page's meta description, so it MUST be 70-155 characters total (count them): one benefit-led sentence or two short ones that make a searcher click. Never under 70, never over 155.
   "longDescription": string,    // HTML body for the product detail page. Allowed tags ONLY: h2, h3, p, ul, ol, li, strong, em, br. No images. Follow the LONG DESCRIPTION STRUCTURE above (hook, What Makes It Special, Key Benefits, Key Ingredients, How to Use, closing).
   "highlights": string[],       // 4-6 short bullets, no leading bullet/dash character. EVERY bullet must be a result of USING the product (reduces hair fall, fights dandruff, adds shine). ABSOLUTELY NO packaging bullets: any bullet mentioning the bottle, pump, cap, box, or container is wrong and will be discarded. See the HIGHLIGHTS RULES above.
   "faqs": [{"q": string, "a": string}],  // 5-8 buyer questions. See the FAQ ANSWER RULES below â€” answers must be thorough, not one-liners.
@@ -210,9 +210,19 @@ export async function generateProductCopy(input: GenerateProductInput): Promise<
     .filter((k) => k.trim().split(/\s+/).length >= 2 && (brandRe ? !brandRe.test(k) : true))
     .slice(0, 15);
 
+  // The short description is used as the meta description; search engines
+  // truncate around 155 chars, so hard-cap it at a word boundary if the model
+  // overshoots the prompt's 70-155 rule.
+  const shortDescription = (() => {
+    const s = str(parsed.shortDescription);
+    if (s.length <= 155) return s;
+    const cut = s.slice(0, 155);
+    return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:]$/, "") + ".";
+  })();
+
   const data: GeneratedProduct = {
     tagline: str(parsed.tagline),
-    shortDescription: str(parsed.shortDescription),
+    shortDescription,
     // Strip any [[IMAGE_n]] placeholders the model emits despite the analysis-only rule.
     longDescription: str(parsed.longDescription).replace(/\[\[IMAGE_\d+\]\]/g, "").trim(),
     highlights,

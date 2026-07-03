@@ -15,20 +15,21 @@ export async function generateMetadata(props: PageProps<"/shop/[slug]">): Promis
   const product = (await fetchProductBySlug(slug)) ?? (slug === FALLBACK_PRODUCT.slug ? FALLBACK_PRODUCT : null);
   if (!product) return {};
   const ogImage = product.images?.[0];
+  const title = product.metaTitle || product.name;
   return {
-    title: product.name,
+    title,
     description: product.shortDescription,
     alternates: { canonical: `/shop/${product.slug}` },
     openGraph: {
       type: "website",
-      title: product.name,
+      title,
       description: product.shortDescription,
       url: `/shop/${product.slug}`,
       images: ogImage ? [{ url: ogImage }] : undefined,
     },
     twitter: {
       card: "summary_large_image",
-      title: product.name,
+      title,
       description: product.shortDescription,
       images: ogImage ? [ogImage] : undefined,
     },

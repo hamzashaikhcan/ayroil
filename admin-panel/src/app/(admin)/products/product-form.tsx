@@ -30,6 +30,7 @@ type ProductLike = {
   slug: string;
   name: string;
   tagline: string | null;
+  metaTitle: string | null;
   shortDescription: string;
   longDescription: string;
   priceCents: number;
@@ -50,6 +51,7 @@ const EMPTY: ProductLike = {
   slug: "",
   name: "",
   tagline: null,
+  metaTitle: null,
   shortDescription: "",
   longDescription: "",
   priceCents: 0,
@@ -92,6 +94,7 @@ export function ProductForm({
     setP((prev) => ({
       ...prev,
       tagline: data.tagline,
+      metaTitle: data.metaTitle || prev.metaTitle,
       shortDescription: data.shortDescription,
       longDescription: data.longDescription,
       highlights: data.highlights,
@@ -144,7 +147,28 @@ export function ProductForm({
             <Field label="Name" value={p.name} onChange={(v) => patch("name", v)} required />
             <Field label="Slug" value={p.slug} onChange={(v) => patch("slug", v)} required placeholder="product-one" />
             <Field label="Tagline" value={p.tagline ?? ""} onChange={(v) => patch("tagline", v || null)} className="md:col-span-2" placeholder="One short, sharp line" />
-            <MetaDescriptionField value={p.shortDescription} onChange={(v) => patch("shortDescription", v)} className="md:col-span-2" />
+            <MetaTextField
+              id="product-meta-title"
+              label="Meta title"
+              value={p.metaTitle ?? ""}
+              onChange={(v) => patch("metaTitle", v || null)}
+              min={META_TITLE_MIN}
+              max={META_TITLE_MAX}
+              help="Page title in search results. The brand name is appended automatically."
+              className="md:col-span-2"
+            />
+            <MetaTextField
+              id="product-meta-description"
+              label="Meta description"
+              value={p.shortDescription}
+              onChange={(v) => patch("shortDescription", v)}
+              min={META_DESC_MIN}
+              max={META_DESC_MAX}
+              rows={3}
+              required
+              help="Shown under the title in search results and as the short copy on product cards."
+              className="md:col-span-2"
+            />
             <div className="md:col-span-2">
               <label className="text-xs font-medium text-muted">Long description</label>
               <div className="mt-1.5">
@@ -298,44 +322,81 @@ function Field({ label, value, onChange, required, className, placeholder }: { l
   );
 }
 
+const META_TITLE_MIN = 40;
+const META_TITLE_MAX = 65;
 const META_DESC_MIN = 70;
 const META_DESC_MAX = 155;
 
 /**
- * Short description doubles as the storefront meta description, so the field
- * signals the 70-155 character window: red outside it, green inside, neutral
- * while empty.
+ * SEO text field with a character-window signal: red border outside min-max,
+ * green inside, neutral while empty. Renders a textarea when `rows` is given,
+ * a single-line input otherwise; the live count sits at the bottom right.
  */
-function MetaDescriptionField({ value, onChange, className }: { value: string; onChange: (v: string) => void; className?: string }) {
+function MetaTextField({
+  id,
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  help,
+  rows,
+  required,
+  className,
+}: {
+  id: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  min: number;
+  max: number;
+  help: string;
+  rows?: number;
+  required?: boolean;
+  className?: string;
+}) {
   const len = value.trim().length;
-  const state = len === 0 ? "empty" : len >= META_DESC_MIN && len <= META_DESC_MAX ? "ok" : "err";
+  const state = len === 0 ? "empty" : len >= min && len <= max ? "ok" : "err";
   const border =
     state === "ok"
       ? "border-good focus:border-good"
       : state === "err"
         ? "border-bad focus:border-bad"
         : "border-line focus:border-ink/30";
+  const box = `mt-1.5 w-full rounded-md border ${border} bg-surface-2 px-3 text-sm text-ink focus:bg-surface focus:outline-none`;
   return (
     <div className={className}>
-      <div className="flex items-center justify-between">
-        <label htmlFor="product-short-description" className="text-xs font-medium text-muted">
-          Short description
-        </label>
-        <span className={`text-xs tabular-nums ${state === "ok" ? "text-good" : state === "err" ? "text-bad" : "text-muted"}`}>
-          {len}/{META_DESC_MAX}
+      <label htmlFor={id} className="text-xs font-medium text-muted">
+        {label}
+      </label>
+      {rows ? (
+        <textarea
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          required={required}
+          rows={rows}
+          className={`${box} py-2`}
+        />
+      ) : (
+        <input
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          required={required}
+          className={`${box} h-9`}
+        />
+      )}
+      <div className="mt-1.5 flex items-start justify-between gap-3">
+        <p className="text-xs text-muted">
+          {help} Aim for {min}-{max} characters.
+        </p>
+        <span
+          className={`shrink-0 text-xs tabular-nums ${state === "ok" ? "text-good" : state === "err" ? "text-bad" : "text-muted"}`}
+        >
+          {len}/{max}
         </span>
       </div>
-      <textarea
-        id="product-short-description"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        required
-        rows={3}
-        className={`mt-1.5 w-full rounded-md border ${border} bg-surface-2 px-3 py-2 text-sm text-ink focus:bg-surface focus:outline-none`}
-      />
-      <p className="mt-1.5 text-xs text-muted">
-        Also used as the page&apos;s meta description in search results. Aim for {META_DESC_MIN}-{META_DESC_MAX} characters.
-      </p>
     </div>
   );
 }

@@ -8,6 +8,7 @@ export type GenerateProductInput = {
 
 export type GeneratedProduct = {
   tagline: string;
+  metaTitle: string;
   shortDescription: string;
   longDescription: string;
   highlights: string[];

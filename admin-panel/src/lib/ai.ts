@@ -55,6 +55,7 @@ FAQ ANSWER RULES: cover the real hesitations a buyer has right before checkout â
 Return ONLY a JSON object with exactly these keys, no markdown fences, no commentary:
 {
   "tagline": string,            // one short, punchy line, under 70 characters
+  "metaTitle": string,          // SEO page title for search results: 40-65 characters total (count them), benefit-led and naming what the product is (e.g. "Natural Hair Growth Oil for Hair Fall and Dandruff"). Do NOT include the brand name, the store appends it automatically. Never under 40, never over 65.
   "shortDescription": string,   // plain text, no HTML. Doubles as the page's meta description, so it MUST be 70-155 characters total (count them): one benefit-led sentence or two short ones that make a searcher click. Never under 70, never over 155.
   "longDescription": string,    // HTML body for the product detail page. Allowed tags ONLY: h2, h3, p, ul, ol, li, strong, em, br. No images. Follow the LONG DESCRIPTION STRUCTURE above (hook, What Makes It Special, Key Benefits, Key Ingredients, How to Use, closing).
   "highlights": string[],       // 4-6 short bullets, no leading bullet/dash character. EVERY bullet must be a result of USING the product (reduces hair fall, fights dandruff, adds shine). ABSOLUTELY NO packaging bullets: any bullet mentioning the bottle, pump, cap, box, or container is wrong and will be discarded. See the HIGHLIGHTS RULES above.
@@ -210,18 +211,19 @@ export async function generateProductCopy(input: GenerateProductInput): Promise<
     .filter((k) => k.trim().split(/\s+/).length >= 2 && (brandRe ? !brandRe.test(k) : true))
     .slice(0, 15);
 
-  // The short description is used as the meta description; search engines
-  // truncate around 155 chars, so hard-cap it at a word boundary if the model
-  // overshoots the prompt's 70-155 rule.
-  const shortDescription = (() => {
-    const s = str(parsed.shortDescription);
-    if (s.length <= 155) return s;
-    const cut = s.slice(0, 155);
-    return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:]$/, "") + ".";
-  })();
+  // Meta fields feed search snippets, which truncate hard â€” cap overshoots at
+  // a word boundary (155 chars for the description, 65 for the title).
+  const clampMeta = (s: string, max: number, terminal: string) => {
+    if (s.length <= max) return s;
+    const cut = s.slice(0, max);
+    return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:.]$/, "") + terminal;
+  };
+  const shortDescription = clampMeta(str(parsed.shortDescription), 155, ".");
+  const metaTitle = clampMeta(str(parsed.metaTitle), 65, "");
 
   const data: GeneratedProduct = {
     tagline: str(parsed.tagline),
+    metaTitle,
     shortDescription,
     // Strip any [[IMAGE_n]] placeholders the model emits despite the analysis-only rule.
     longDescription: str(parsed.longDescription).replace(/\[\[IMAGE_\d+\]\]/g, "").trim(),

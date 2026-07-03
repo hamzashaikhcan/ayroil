@@ -92,6 +92,7 @@ const productSchema = z.object({
   slug: z.string().min(2).max(160),
   name: z.string().min(1).max(200),
   tagline: z.string().max(240).optional().nullable(),
+  metaTitle: z.string().max(160).optional().nullable(),
   shortDescription: z.string().min(1),
   longDescription: z.string().min(1),
   priceCents: z.number().int().min(0),

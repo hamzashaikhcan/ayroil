@@ -215,8 +215,14 @@ export function AiProductWidget({
                   </Field>
                 ) : null}
 
+                {result.metaTitle ? (
+                  <Field label="Meta title">
+                    <Preview>{result.metaTitle}</Preview>
+                  </Field>
+                ) : null}
+
                 {result.shortDescription ? (
-                  <Field label="Short description">
+                  <Field label="Meta description">
                     <Preview>{result.shortDescription}</Preview>
                   </Field>
                 ) : null}

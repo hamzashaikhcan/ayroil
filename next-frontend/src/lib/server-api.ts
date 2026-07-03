@@ -47,6 +47,7 @@ export const FALLBACK_PRODUCT: Product = {
 	slug: 'product-one',
 	name: 'Product One',
 	tagline: 'Built with intent.',
+	metaTitle: null,
 	shortDescription:
 		'Our first product — engineered around a single problem and one quiet promise.',
 	longDescription:

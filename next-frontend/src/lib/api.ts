@@ -31,6 +31,7 @@ export type Product = {
   slug: string;
   name: string;
   tagline: string | null;
+  metaTitle: string | null;
   shortDescription: string;
   longDescription: string;
   priceCents: number;

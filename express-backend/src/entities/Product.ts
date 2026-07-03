@@ -22,6 +22,11 @@ export class Product {
   @Column({ type: "varchar", length: 240, nullable: true })
   tagline!: string | null;
 
+  // SEO <title> for the storefront PDP; the storefront's title template
+  // appends the brand name. Null falls back to the product name.
+  @Column({ type: "varchar", length: 160, nullable: true })
+  metaTitle!: string | null;
+
   @Column({ type: "text" })
   shortDescription!: string;
 

@@ -1,18 +1,7 @@
 "use server";
 
+import { azureChatJSON, cleanText, type AzureUserContent } from "./ai-azure";
 import type { AiGenerateResult, GeneratedProduct, GenerateProductInput } from "./ai-types";
-
-// Azure OpenAI (v1 / OpenAI-compatible surface). The endpoint is the resource's
-// `/openai/v1/` base; the API key is read from env only (never hardcoded).
-const AZURE_OPENAI_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT || "https://rolechain-resource.openai.azure.com/openai/v1/";
-const AZURE_OPENAI_API_KEY = process.env.AZURE_OPENAI_API_KEY;
-// In Azure's v1 API the request's `model` field carries the *deployment* name, not the base model id.
-const AZURE_OPENAI_DEPLOYMENT = process.env.AZURE_OPENAI_DEPLOYMENT || "gpt-5-nano";
-// The v1 preview surface is selected with this api-version query param.
-const AZURE_OPENAI_API_VERSION = process.env.AZURE_OPENAI_API_VERSION || "preview";
-// Reasoning-family deployments (gpt-5*, o-series) reject `temperature` and use
-// `reasoning_effort`; older chat models (gpt-4o) take `temperature` instead.
-const IS_REASONING_MODEL = /^(gpt-5|o\d)/.test(AZURE_OPENAI_DEPLOYMENT);
 
 const SYSTEM_PROMPT = `You are an e-commerce copywriter and product-photo analyst writing content for an online store's admin panel.
 
@@ -23,22 +12,30 @@ NEVER break the illusion of a normal product listing. You are writing what the C
 - Never write phrases like "isn't specified", "not shown in the photos", "not mentioned", "based on the images", "the exact X isn't provided", or any variant that tells the customer you're missing information. A real store employee would never say this to a shopper.
 - If a precise spec (exact volume, weight, dimensions) wasn't given to you, simply don't state that exact number — write confidently about what the product does and what's genuinely visible, without drawing attention to the gap. Redirect to what you DO know (the benefit, the use case, what's included) instead of naming what you don't.
 
-VOICE: warm, energetic, and conversational, like a trusted beauty brand talking directly to the shopper ("you", "your hair"). Short sentences that are easy to skim. Bold the phrases that sell. An occasional exclamation point is fine where the energy is genuine; never stack them. No emoji. No tired clichés ("game-changer", "must-have", "premium quality"). NEVER use an em dash ("—") or en dash ("–") anywhere in any field; restructure the sentence, or use a comma, colon, or period instead. NEVER invent statistics, percentages ("94% stronger hair"), certifications, or test claims you weren't given.
+BRAND DNA — Ayroil. Every word you write must fit this positioning:
+Ayroil is a doctor-guided, scalp-first natural hair oil brand for Pakistani men and women dealing with dry scalp, dandruff-prone hair, weak roots, hair fall concerns, and dull hair. Core idea: "Scalp first. Hair follows." Brand promise: "Healthier scalp. Stronger roots. Better hair days." Most oils only talk about hair length, shine, or fake growth claims; Ayroil starts with the scalp, where many hair problems begin. Dr. Maria is the trust signal: mention her as guidance and credibility, never as a source of medical claims. Ayroil does not sell panic; it sells a calmer, cleaner, more credible hair care routine. Sell confidence, never fear: no baldness scare messaging, no shaming, no exploiting anxiety.
 
-LONG DESCRIPTION STRUCTURE (most important field — this is what convinces the shopper to buy). Follow this proven flow:
-1. HOOK (no heading) — open with a short question that names the customer's real problem, then present the product as the answer. Pattern: "Struggling with thinning hair, hair fall, or a weak hairline? Meet your hair's new best friend." Two or three sentences: the problem, the product, and what makes it different (its real hero ingredients, natural positioning).
-2. <h2>What Makes It Special</h2> — a short conversational paragraph on what the product is and why it works: the standout ingredients in <strong>, the natural/gentle positioning, who it's for. Keep it tight, this warms the reader up for the benefits.
-3. <h2>Key Benefits</h2> — the heart of the description. A ul where each bullet STARTS with a short punchy benefit phrase in <strong> (3-5 words, like "Controls Hair Fall", "Boosts Shine and Softness"), followed by one crisp sentence on how the product delivers it. Each bullet a different selling point.
-4. <h2>Key Ingredients</h2> — when an ingredient list is provided in the brief, feature it prominently: each ingredient in <strong> followed by what it's known for and the benefit it brings. Never invent ingredients that aren't in the brief.
-5. <h2>How to Use</h2> — 3-4 simple numbered steps (ol) a first-time customer can follow, ending with frequency guidance and a tip for best results (e.g. how many times a week, leave-in time). Buyers need to feel confident they'll use it correctly.
-6. CLOSING (no heading, or a short h3) — one energetic sentence that invites action and paints the result, e.g. "Start today and give your hair the care it has been asking for."
-Benefits and How to Use must always carry the most weight — a shopper should finish reading knowing exactly what this product will do for them and exactly how to use it.
+VOICE: simple, direct, caring, credible, calm, honest, slightly premium. Like a knowledgeable friend guiding a routine, not a salesman pressuring a purchase. Talk directly to the shopper ("you", "your scalp", "your hair"). Short sentences that are easy to skim. Bold the phrases that matter. No exclamation points, no emoji, no tired clichés ("game-changer", "must-have", "premium quality"). NEVER use an em dash ("—") or en dash ("–") anywhere in any field; restructure the sentence, or use a comma, colon, or period instead.
 
-BRAND CONTEXT — Ayroil hair oil. When the product is the Ayroil hair oil (or any variant/bundle of it), these are its real key ingredients; use them for the Key Ingredients section and weave the standouts into benefits and FAQs:
-Argan oil, Black seed oil, Rosemary oil, Sweet almond oil, Vitamin E, Amla, Reetha, Shikakai, Hyaluronic acid, Castor oil.
-Speak to what these ingredients are traditionally known for (e.g. rosemary and castor oil for stimulating growth and thickness, argan and almond for shine and softness, amla/reetha/shikakai as time-tested Ayurvedic hair cleansers and strengtheners, hyaluronic acid and vitamin E for scalp hydration and repair) — but never invent medical claims or promise cures.
+CLAIM RULES (non-negotiable; Ayroil is a cosmetic hair oil, not a medicine):
+SAY things like: helps nourish the scalp; supports stronger-looking hair; helps improve dry and dull hair; made for dandruff-prone scalp care; helps reduce breakage caused by dryness; supports a healthier hair routine; made with natural oils; designed for consistent use; doctor-guided natural hair care.
+NEVER say: cures dandruff; cures or treats fungal infection; regrows hair; stops hair fall (forever or otherwise); guaranteed growth or results; 100% results; clinically proven; dermatologist-approved; medical treatment; instant results; works for everyone. Never invent statistics, percentages ("94% stronger hair"), certifications, or test claims.
+Frame results around CONSISTENCY: healthier-looking hair with regular use over weeks, and be honest that results vary.
 
-HIGHLIGHTS RULES: highlights are one of the first things a shopper reads on the product page, so treat them as a top-priority field, not an afterthought. Every highlight MUST name a concrete RESULT the customer gets from using the product. For a hair oil, draw the set from the strongest outcomes: reduces hair fall, promotes hair growth and thickness, fights dandruff, strengthens hair from the roots, deeply nourishes the scalp, smooths frizz and adds shine. At least 4 of the bullets must be hair outcomes like these.
+LONG DESCRIPTION STRUCTURE (most important field — this is what convinces the shopper to buy). Follow this flow:
+1. HOOK (no heading) — open with the scalp-first insight, calm and confident, not fear-driven. Pattern: "Hair fall is not always about your hair. Sometimes your scalp needs care first." Two or three sentences: the real problem starts at the scalp, Ayroil is a doctor-guided natural blend made for exactly that, and what makes it different.
+2. <h2>Why Scalp First</h2> — a short paragraph owning the brand's core idea: dryness, buildup, and a dandruff-prone scalp can make hair look dull and fragile, so Ayroil cares for the scalp so the hair can follow. Doctor-guided, purposeful ingredients, no miracle promises.
+3. <h2>Key Benefits</h2> — the heart of the description. A ul built around the four product pillars, each bullet STARTING with a short phrase in <strong>: <strong>Scalp Nourishment</strong>, <strong>Root Strength Support</strong>, <strong>Dryness Care</strong>, <strong>Natural Shine</strong> (plus 1-2 more safe outcomes like dandruff-prone scalp care or less breakage from dryness), each followed by one crisp sentence on how the oil delivers it within the claim rules.
+4. <h2>Key Ingredients</h2> — when an ingredient list is provided in the brief, feature it prominently: each ingredient in <strong> followed by its purposeful role (see brand context below). Never invent ingredients that aren't in the brief.
+5. <h2>How to Use</h2> — numbered steps (ol) matching the brand routine: apply a small amount directly to the scalp, massage gently for 3-5 minutes, leave in for a few hours or overnight, wash as usual; use 2-3 times a week, and note that consistency over weeks is what makes the difference.
+6. CLOSING (no heading, or a short h3) — one calm, confident sentence inviting the reader to start their scalp-first routine, e.g. "Start with your scalp. Start with Ayroil."
+Benefits and How to Use must always carry the most weight — a shopper should finish reading knowing exactly what this product supports and exactly how to use it.
+
+BRAND CONTEXT — ingredient story. When the product is the Ayroil hair oil (or any variant/bundle of it), these are its real ingredients; every one has a purposeful role, never a random list:
+Rosemary oil (scalp care and stronger-looking hair support), Black seed oil (nourishment and traditional scalp care), Amla (hair strength, shine, and traditional hair care), Sweet almond oil (softness, nourishment, and dry hair care), Argan oil (smoother, shinier, healthier-looking hair), Vitamin E (nourishment and protection from dryness), Reetha and Shikakai (gentle, time-tested Ayurvedic cleansing and strengthening care), Hyaluronic acid (scalp hydration support), Castor oil (traditional root and thickness care).
+Describe each with "traditionally used for" or "known for" framing; never claim any ingredient cures dandruff, infection, or hair loss.
+
+HIGHLIGHTS RULES: highlights are one of the first things a shopper reads on the product page, so treat them as a top-priority field, not an afterthought. Every highlight MUST name a concrete, claim-safe RESULT the customer gets from using the product. Draw the set from the brand pillars and safe outcomes: nourishes dry scalp, supports stronger-looking roots, made for dandruff-prone scalp care, helps reduce breakage from dryness, softens and revives dull hair, adds natural shine, lightweight and non-greasy feel. At least 4 of the bullets must be scalp/hair outcomes like these.
 FORBIDDEN as highlights (these will be discarded):
 - Packaging or container details (bottle, pump, cap, box) or shipping.
 - The brand or product name as a bullet ("Ayroil Ayurvedic blend" sells nothing; say what the blend DOES).
@@ -50,34 +47,25 @@ KEYWORDS RULES: keywords are the phrases a real shopper types into Google or a m
 
 Any photos you receive are for ANALYSIS ONLY, to understand the product. NEVER include images, [[IMAGE_n]] placeholders, or <img> tags anywhere in the copy — the long description must be pure written content.
 
-FAQ ANSWER RULES: cover the real hesitations a buyer has right before checkout — fit/sizing, materials and durability, how it compares to alternatives, what's included, care/maintenance, and anything about quality that's genuinely supported. Each answer must be 2-4 full sentences, specific and concrete (not a generic one-liner), and should leave the buyer reassured they're getting a genuinely well-made product worth their money — confident and trustworthy, never salesy or exaggerated, and never inventing claims (warranty terms, exact certifications, shipping times) you weren't given. If a question asks about a detail you don't have an exact number for, answer the part you can speak to confidently and skip the missing number entirely — do not tell the customer it's missing. The goal is a buyer who finishes reading feeling sure this is the right purchase, never a buyer who notices a gap in your knowledge.
+FAQ ANSWER RULES: cover the real hesitations a buyer has right before checkout — how to use it and how often, when to expect visible change (honest: consistent use over weeks, results vary), whether it suits their hair/scalp type, greasiness and smell worries, what's inside and why, and anything about quality that's genuinely supported. Answer the way a calm, credible brand would: reduce the reader's anxiety, never exploit it. Each answer must be 2-4 full sentences, specific and concrete (not a generic one-liner), within the CLAIM RULES — confident and trustworthy, never salesy or exaggerated, and never inventing claims (warranty terms, certifications, shipping times) you weren't given. For any question touching persistent itching, flaking, infection, or severe hair fall, the answer must gently note that Ayroil is a cosmetic hair oil, not a medical treatment, and a dermatologist is the right call for persistent concerns. If a question asks about a detail you don't have an exact number for, answer the part you can speak to confidently and skip the missing number entirely — do not tell the customer it's missing.
 
 Return ONLY a JSON object with exactly these keys, no markdown fences, no commentary:
 {
   "tagline": string,            // one short, punchy line, under 70 characters
-  "metaTitle": string,          // SEO page title for search results: 40-65 characters total (count them), benefit-led and naming what the product is (e.g. "Natural Hair Growth Oil for Hair Fall and Dandruff"). Do NOT include the brand name, the store appends it automatically. Never under 40, never over 65.
+  "metaTitle": string,          // SEO page title for search results: 40-65 characters total (count them), benefit-led and naming what the product is (e.g. "Doctor-Guided Natural Hair Oil for Dry, Dandruff-Prone Scalp"). Claim-safe wording only. Do NOT include the brand name, the store appends it automatically. Never under 40, never over 65.
   "shortDescription": string,   // plain text, no HTML. Doubles as the page's meta description, so it MUST be 70-155 characters total (count them): one benefit-led sentence or two short ones that make a searcher click. Never under 70, never over 155.
-  "longDescription": string,    // HTML body for the product detail page. Allowed tags ONLY: h2, h3, p, ul, ol, li, strong, em, br. No images. Follow the LONG DESCRIPTION STRUCTURE above (hook, What Makes It Special, Key Benefits, Key Ingredients, How to Use, closing).
-  "highlights": string[],       // 4-6 short bullets, no leading bullet/dash character. EVERY bullet must be a result of USING the product (reduces hair fall, fights dandruff, adds shine). ABSOLUTELY NO packaging bullets: any bullet mentioning the bottle, pump, cap, box, or container is wrong and will be discarded. See the HIGHLIGHTS RULES above.
+  "longDescription": string,    // HTML body for the product detail page. Allowed tags ONLY: h2, h3, p, ul, ol, li, strong, em, br. No images. Follow the LONG DESCRIPTION STRUCTURE above (hook, Why Scalp First, Key Benefits, Key Ingredients, How to Use, closing).
+  "highlights": string[],       // 4-6 short bullets, no leading bullet/dash character. EVERY bullet must be a claim-safe result of USING the product (nourishes dry scalp, supports stronger-looking roots, natural shine). ABSOLUTELY NO packaging bullets: any bullet mentioning the bottle, pump, cap, box, or container is wrong and will be discarded. See the HIGHLIGHTS RULES above.
   "faqs": [{"q": string, "a": string}],  // 5-8 buyer questions. See the FAQ ANSWER RULES below — answers must be thorough, not one-liners.
   "keywords": string[]          // 8-12 search phrases per the KEYWORDS RULES above: 2-5 words each, problem/purpose-driven ("hair oil for hair fall"), never the brand name, never bare single words or lone ingredient names
 }
 Always return every field, even when existing copy was supplied — improve on it rather than leaving it untouched.`;
 
-function str(v: unknown): string {
-  if (typeof v !== "string") return "";
-  // Safety net for the prompt's no-dash rule: numeric ranges ("2–3") keep a
-  // plain hyphen, any other em/en dash becomes a comma pause.
-  return v
-    .replace(/(\d)\s*[—–]\s*(\d)/g, "$1-$2")
-    .replace(/\s*[—–]\s*/g, ", ")
-    .trim();
-}
+// Safety net for the prompt's no-dash rule lives in cleanText (shared with
+// the page writer in ai-pages.ts).
+const str = cleanText;
 
 export async function generateProductCopy(input: GenerateProductInput): Promise<AiGenerateResult> {
-  if (!AZURE_OPENAI_API_KEY) {
-    return { ok: false, error: "Azure OpenAI is not configured. Add AZURE_OPENAI_API_KEY to .env." };
-  }
   const name = input.name.trim();
   if (!name) {
     return { ok: false, error: "Add a product name first." };
@@ -95,92 +83,15 @@ export async function generateProductCopy(input: GenerateProductInput): Promise<
       : null,
   ].filter((line): line is string => Boolean(line));
 
-  const content: Array<{ type: "text"; text: string } | { type: "image_url"; image_url: { url: string } }> = [
-    { type: "text", text: briefLines.join("\n\n") },
-  ];
+  const content: Exclude<AzureUserContent, string> = [{ type: "text", text: briefLines.join("\n\n") }];
   for (const url of images) content.push({ type: "image_url", image_url: { url } });
 
-  // Azure v1 chat-completions URL: <endpoint>/chat/completions?api-version=… (the
-  // endpoint already ends in /openai/v1). Auth is the resource api-key.
-  const endpoint = `${AZURE_OPENAI_ENDPOINT.replace(/\/+$/, "")}/chat/completions?api-version=${AZURE_OPENAI_API_VERSION}`;
-
-  async function callAzure(): Promise<{ raw: string } | { raw?: undefined; error: string; retryable: boolean }> {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 120_000);
-
-    let res: Response;
-    try {
-      res = await fetch(endpoint, {
-        method: "POST",
-        signal: controller.signal,
-        headers: {
-          "content-type": "application/json",
-          "api-key": AZURE_OPENAI_API_KEY!,
-        },
-        body: JSON.stringify({
-          model: AZURE_OPENAI_DEPLOYMENT,
-          // Reasoning models spend their (invisible) reasoning tokens against
-          // this cap too — at medium effort that can be many thousands before
-          // a single output token, and running out yields a 200 with EMPTY
-          // content. Keep this far above what the JSON itself needs.
-          max_completion_tokens: 20_000,
-          response_format: { type: "json_object" },
-          // "medium" (not "low"): low-effort nano runs kept half-ignoring the
-          // copywriting rules (packaging highlights, brand-name keywords).
-          ...(IS_REASONING_MODEL ? { reasoning_effort: "medium" } : { temperature: 0.7 }),
-          messages: [
-            { role: "system", content: SYSTEM_PROMPT },
-            { role: "user", content },
-          ],
-        }),
-      });
-    } catch (err) {
-      return err instanceof Error && err.name === "AbortError"
-        ? { error: "Azure OpenAI took too long to respond. Please try again.", retryable: false }
-        : { error: "Could not reach Azure OpenAI. Check your connection and try again.", retryable: true };
-    } finally {
-      clearTimeout(timeout);
-    }
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      let message = `Azure OpenAI error ${res.status}`;
-      try {
-        const j = JSON.parse(text) as { error?: { message?: string } };
-        if (j.error?.message) message = j.error.message;
-      } catch {
-        /* keep default */
-      }
-      // 429/5xx are transient; 4xx config errors are not worth a retry.
-      return { error: message, retryable: res.status === 429 || res.status >= 500 };
-    }
-
-    const json = (await res.json().catch(() => null)) as {
-      choices?: Array<{ message?: { content?: string }; finish_reason?: string }>;
-    } | null;
-    const choice = json?.choices?.[0];
-    const raw = choice?.message?.content;
-    if (!raw) {
-      return choice?.finish_reason === "length"
-        ? { error: "The AI ran out of output tokens before finishing. Please try again.", retryable: true }
-        : { error: "Azure OpenAI returned an empty response. Please try again.", retryable: true };
-    }
-    return { raw };
-  }
-
-  // Empty responses and transient failures happen often enough on small
-  // deployments that one automatic retry saves the admin a manual click.
-  let raw: string;
-  {
-    let attempt = await callAzure();
-    if (attempt.raw === undefined && attempt.retryable) attempt = await callAzure();
-    if (attempt.raw === undefined) return { ok: false, error: attempt.error };
-    raw = attempt.raw;
-  }
+  const result = await azureChatJSON({ system: SYSTEM_PROMPT, user: content });
+  if (!result.ok) return result;
 
   let parsed: Record<string, unknown>;
   try {
-    parsed = JSON.parse(raw.replace(/^```json\s*|\s*```$/g, "")) as Record<string, unknown>;
+    parsed = JSON.parse(result.raw.replace(/^```json\s*|\s*```$/g, "")) as Record<string, unknown>;
   } catch {
     return { ok: false, error: "Could not parse the AI response. Please try again." };
   }

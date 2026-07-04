@@ -1,6 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import dynamic from "next/dynamic";
+import { generatePageCopy, type AiPageKind } from "@/lib/ai-pages";
+import { AiWriteButton } from "./ai-write-button";
 import { Card, Field } from "./fields";
 import { StickySaveBar } from "./save-bar";
 import { useSettingsSave } from "./use-settings-save";
@@ -19,8 +22,10 @@ const RichEditor = dynamic(
 );
 
 /**
- * Reusable rich-text settings sub-page form. Used by Benefits, Terms, and
- * Privacy — anywhere the admin edits one title + one HTML body.
+ * Reusable rich-text settings sub-page form. Used by Benefits, Terms, Privacy,
+ * Shipping, and Returns — anywhere the admin edits one title + one HTML body.
+ * Pass `aiPage` to offer a "Write with AI" draft generated from the live store
+ * facts (shipping days, return window, contact email, products).
  */
 export function RichTextPageForm<T extends keyof SettingsLike, B extends keyof SettingsLike>({
   initial,
@@ -31,6 +36,7 @@ export function RichTextPageForm<T extends keyof SettingsLike, B extends keyof S
   titleHint,
   bodyHint,
   placeholder,
+  aiPage,
 }: {
   initial: SettingsLike;
   titleKey: T;
@@ -40,6 +46,7 @@ export function RichTextPageForm<T extends keyof SettingsLike, B extends keyof S
   titleHint?: string;
   bodyHint?: string;
   placeholder?: string;
+  aiPage?: Exclude<AiPageKind, "faqs">;
 }) {
   type Slice = Pick<SettingsLike, T | B>;
   const slice = {
@@ -47,7 +54,30 @@ export function RichTextPageForm<T extends keyof SettingsLike, B extends keyof S
     [bodyKey]: initial[bodyKey],
   } as Slice;
 
-  const { s, patch, pending, saved, error, onSubmit } = useSettingsSave<Slice>(slice);
+  const { s, setS, patch, pending, saved, error, onSubmit } = useSettingsSave<Slice>(slice);
+  const [aiPending, setAiPending] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+  // RichEditor only reads its initial value once — remount it when AI applies.
+  const [editorKey, setEditorKey] = useState(0);
+
+  async function writeWithAi() {
+    if (!aiPage) return;
+    setAiPending(true);
+    setAiError(null);
+    try {
+      const res = await generatePageCopy(aiPage);
+      if (!res.ok) {
+        setAiError(res.error);
+        return;
+      }
+      setS((prev) => ({ ...prev, [titleKey]: res.data.title, [bodyKey]: res.data.body }));
+      setEditorKey((k) => k + 1);
+    } catch {
+      setAiError("Generation failed. Please try again.");
+    } finally {
+      setAiPending(false);
+    }
+  }
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
@@ -60,12 +90,20 @@ export function RichTextPageForm<T extends keyof SettingsLike, B extends keyof S
         <div className="mt-4">
           <label className="text-xs font-medium text-muted">{bodyLabel}</label>
           <div className="mt-1.5">
-            <RichEditor
-              value={String(s[bodyKey] ?? "")}
-              onChange={(html) => patch(bodyKey, html as Slice[B])}
-              placeholder={placeholder}
-            />
+            {aiPending ? (
+              <div className="flex h-40 w-full items-center justify-center rounded-md border border-line bg-surface-2 text-sm text-muted">
+                Writing the page section by section from your store facts… this can take a minute or two.
+              </div>
+            ) : (
+              <RichEditor
+                key={editorKey}
+                value={String(s[bodyKey] ?? "")}
+                onChange={(html) => patch(bodyKey, html as Slice[B])}
+                placeholder={placeholder}
+              />
+            )}
           </div>
+          {aiError ? <p className="mt-1.5 text-xs text-bad">{aiError}</p> : null}
           {bodyHint ? (
             <p className="mt-1.5 text-xs text-muted">{bodyHint}</p>
           ) : null}
@@ -73,6 +111,8 @@ export function RichTextPageForm<T extends keyof SettingsLike, B extends keyof S
       </Card>
 
       <StickySaveBar pending={pending} saved={saved} error={error} />
+      {aiPage ? <AiWriteButton pending={aiPending} onClick={writeWithAi} /> : null}
     </form>
   );
 }
+

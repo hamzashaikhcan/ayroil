@@ -21,6 +21,7 @@ export default async function TermsSettingsPage() {
           titleHint="Title is the H1; body is the full terms content."
           bodyHint="Rich text · headings, lists, links. Rendered as sanitized HTML on the storefront /terms page."
           placeholder="1. Orders — All orders are subject to acceptance and availability…"
+          aiPage="terms"
         />
       ) : (
         <BackendUnreachable />

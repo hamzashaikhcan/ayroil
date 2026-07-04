@@ -21,6 +21,7 @@ export default async function ShippingPolicySettingsPage() {
           titleHint="Title is the H1; body is the full shipping policy content."
           bodyHint="Rich text — headings, lists, links. Rendered as sanitized HTML on the storefront /shipping page."
           placeholder="Standard shipping arrives in 3-5 business days. Orders over $50 ship free…"
+          aiPage="shipping"
         />
       ) : (
         <BackendUnreachable />

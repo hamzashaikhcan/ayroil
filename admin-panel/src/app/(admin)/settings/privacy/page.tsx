@@ -21,6 +21,7 @@ export default async function PrivacySettingsPage() {
           titleHint="Title is the H1; body is the full privacy policy content."
           bodyHint="Rich text · headings, lists, links. Rendered as sanitized HTML on the storefront /privacy page."
           placeholder="What we collect — Account information you provide, order history, and basic analytics…"
+          aiPage="privacy"
         />
       ) : (
         <BackendUnreachable />

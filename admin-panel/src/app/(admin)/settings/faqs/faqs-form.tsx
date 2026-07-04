@@ -1,6 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { useConfirm } from "@/components/ui/confirm-dialog";
+import { generatePageCopy } from "@/lib/ai-pages";
+import { AiWriteButton } from "../_shared/ai-write-button";
 import { Card } from "../_shared/fields";
 import { StickySaveBar } from "../_shared/save-bar";
 import { useSettingsSave } from "../_shared/use-settings-save";
@@ -9,9 +13,39 @@ import type { SettingsLike } from "../_shared/types";
 type FaqsSlice = Pick<SettingsLike, "faqs">;
 
 export function FaqsForm({ initial }: { initial: SettingsLike }) {
+  const confirm = useConfirm();
   const { s, setS, pending, saved, error, onSubmit } = useSettingsSave<FaqsSlice>({
     faqs: initial.faqs ?? [],
   });
+  const [aiPending, setAiPending] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  async function writeWithAi() {
+    if (s.faqs.length > 0) {
+      const ok = await confirm({
+        title: "Replace the current FAQs?",
+        description:
+          "The AI will write a fresh set of 10-12 FAQs from your live store facts (shipping, returns, product). The FAQs currently in this list will be replaced. Nothing is saved until you press Save.",
+        targetName: `${s.faqs.length} existing FAQ${s.faqs.length === 1 ? "" : "s"}`,
+        confirmLabel: "Replace FAQs",
+      });
+      if (!ok) return;
+    }
+    setAiPending(true);
+    setAiError(null);
+    try {
+      const res = await generatePageCopy("faqs");
+      if (!res.ok) {
+        setAiError(res.error);
+        return;
+      }
+      setS((prev) => ({ ...prev, faqs: res.data.faqs }));
+    } catch {
+      setAiError("Generation failed. Please try again.");
+    } finally {
+      setAiPending(false);
+    }
+  }
 
   function addFaq() {
     setS((prev) => ({ ...prev, faqs: [...prev.faqs, { q: "", a: "" }] }));
@@ -103,9 +137,11 @@ export function FaqsForm({ initial }: { initial: SettingsLike }) {
             </Button>
           </div>
         ) : null}
+        {aiError ? <p className="mt-2 text-xs text-bad">{aiError}</p> : null}
       </Card>
 
       <StickySaveBar pending={pending} saved={saved} error={error} />
+      <AiWriteButton pending={aiPending} onClick={writeWithAi} />
     </form>
   );
 }

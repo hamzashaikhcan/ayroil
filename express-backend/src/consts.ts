@@ -10,32 +10,31 @@
  */
 
 export const SITE = {
-  siteName: "Product Two",
-  slogan: "One product. Built with intent.",
+  siteName: "Ayroil",
+  slogan: "Scalp first. Hair follows.",
   shortDescription:
-    "A single-product brand. The shop only ever lists what we choose to make — one thing at a time.",
+    "A doctor-guided, scalp-first natural hair oil for dry, dandruff-prone scalp, weak roots, and hair fall concerns. Guided by Dr. Maria.",
   longDescription:
-    "Product One designs, manufactures, and ships a single product line at a time. No catalogs, no variants, no fluff — just the one thing we believe in, built and shipped in-house.",
+    "Ayroil was created for people who are tired of confusing hair care routines, heavy oils, and exaggerated claims. We wanted a cleaner, simpler way to care for the scalp using natural oils known for nourishment, comfort, and hair strength support. Our belief is simple: when the scalp is cared for properly, hair has a better chance to look and feel healthier. That is why Ayroil is built around scalp-first care, guided by Dr. Maria.",
 
   iconUrl: "/brand/icon.svg",
   whiteLogoUrl: "/brand/logo-white.svg",
   darkLogoUrl: "/brand/logo-dark.svg",
   ogImageUrl: "/brand/og.png",
 
-  domain: "productone.example",
+  domain: "ayroil.pk",
   storefrontUrl: "http://localhost:3000",
   adminUrl: "http://localhost:3001",
   apiUrl: "http://localhost:4000",
 
-  supportEmail: "support@productone.example",
-  salesEmail: "hello@productone.example",
-  phone: "+1 (212) 555-0142",
-  address: "318 Foundry St, Brooklyn, NY",
+  supportEmail: "ayroil.pk@gmail.com",
+  salesEmail: "ayroil.pk@gmail.com",
+  phone: "+92 309 1238888",
+  address: "",
 
   social: {
-    instagram: "https://instagram.com/productone",
-    x: "https://x.com/productone",
-    youtube: "https://youtube.com/@productone",
+    instagram: "https://instagram.com/ayroil",
+    facebook: "https://facebook.com/ayroil",
   },
 
   brand: {
@@ -49,13 +48,13 @@ export const SITE = {
   },
 
   currency: {
-    code: "USD",
-    symbol: "$",
-    locale: "en-US",
+    code: "PKR",
+    symbol: "Rs",
+    locale: "en-PK",
   },
 
   legal: {
-    companyName: "Product One LLC",
+    companyName: "Ayroil",
     foundedYear: 2024,
     taxId: "00-0000000",
   },
@@ -63,11 +62,11 @@ export const SITE = {
   shipping: {
     freeShippingThresholdCents: 5000,
     standardCostCents: 600,
-    estStandardDays: "3–5",
+    estStandardDays: "3-4",
   },
 
   returns: {
-    windowDays: 30,
+    windowDays: 7,
     policyUrl: "/policies/returns",
   },
 } as const;

@@ -21,6 +21,7 @@ export default async function ReturnsPolicySettingsPage() {
           titleHint="Title is the H1; body is the full returns policy content."
           bodyHint="Rich text — headings, lists, links. Rendered as sanitized HTML on the storefront /returns page."
           placeholder="You have 30 days from delivery to start a return…"
+          aiPage="returns"
         />
       ) : (
         <BackendUnreachable />

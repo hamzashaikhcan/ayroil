@@ -14,6 +14,7 @@ export function BenefitsForm({ initial }: { initial: SettingsLike }) {
       titleHint="Title is the H1 on /benefits; body is the long-form copy."
       bodyHint="Rich text · headings, lists, links. Rendered as sanitized HTML on the storefront /benefits page."
       placeholder="Tell your customers about the brand, the product, the team…"
+      aiPage="benefits"
     />
   );
 }

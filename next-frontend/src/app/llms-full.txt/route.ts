@@ -4,12 +4,17 @@ import { fetchSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
 
-/** Convert stored page HTML into readable plain text, preserving line structure. */
+/**
+ * Convert stored page HTML into readable markdown-ish text: paragraphs and
+ * lists separated by blank lines, inner headings demoted to h3 so they nest
+ * under the document's h2 sections.
+ */
 function htmlToText(html: string): string {
   return html
-    .replace(/<\/(h1|h2|h3|h4|p|li|ol|ul)>/gi, "\n")
-    .replace(/<(li)[^>]*>/gi, "- ")
-    .replace(/<(h2|h3)[^>]*>/gi, "\n## ")
+    .replace(/<(h1|h2|h3|h4)[^>]*>/gi, "\n\n### ")
+    .replace(/<\/(h1|h2|h3|h4|p|ol|ul)>/gi, "\n\n")
+    .replace(/<li[^>]*>/gi, "\n- ")
+    .replace(/<\/li>/gi, "")
     .replace(/<br\s*\/?>/gi, "\n")
     .replace(/<[^>]+>/g, "")
     .replace(/&amp;/g, "&")
@@ -17,6 +22,7 @@ function htmlToText(html: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#39;|&apos;/g, "'")
     .replace(/[ \t]+/g, " ")
+    .replace(/\n[ \t]+/g, "\n")
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 }
@@ -98,7 +104,8 @@ export async function GET() {
     "",
   );
 
-  return new Response(sections.filter((s) => s !== null).join("\n"), {
+  const doc = sections.join("\n").replace(/\n{3,}/g, "\n\n").trim() + "\n";
+  return new Response(doc, {
     headers: {
       "content-type": "text/plain; charset=utf-8",
       "cache-control": "public, max-age=3600",

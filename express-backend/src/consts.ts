@@ -13,7 +13,7 @@ export const SITE = {
   siteName: "Ayroil",
   slogan: "Scalp first. Hair follows.",
   shortDescription:
-    "A doctor-guided, scalp-first natural hair oil for dry, dandruff-prone scalp, weak roots, and hair fall concerns. Guided by Dr. Maria.",
+    "A scalp-first natural hair oil for dry, dandruff-prone scalp, weak roots, and hair fall concerns. Formulated under the guidance of Dr. Maria.",
   longDescription:
     "Ayroil was created for people who are tired of confusing hair care routines, heavy oils, and exaggerated claims. We wanted a cleaner, simpler way to care for the scalp using natural oils known for nourishment, comfort, and hair strength support. Our belief is simple: when the scalp is cared for properly, hair has a better chance to look and feel healthier. That is why Ayroil is built around scalp-first care, guided by Dr. Maria.",
 

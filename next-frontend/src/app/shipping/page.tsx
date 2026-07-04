@@ -5,8 +5,11 @@ import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
-  const title = settings.shippingPolicyTitle || "Shipping";
-  const description = "Shipping policy and delivery times.";
+  const title = `Shipping Policy: Delivery Across Pakistan in ${settings.estStandardDays} Days`;
+  const shipLine = settings.freeShippingEnabled
+    ? "order processing, free delivery on every order"
+    : `delivery charges, free shipping over ${settings.currencySymbol} ${Math.round(settings.freeShippingThresholdCents / 100).toLocaleString("en-US")}`;
+  const description = `${settings.siteName} delivers across Pakistan in ${settings.estStandardDays} days. See ${shipLine}, and what to do if a parcel is late or damaged.`;
   return {
     title,
     description,

@@ -116,3 +116,4 @@ ormconfig.local.json
 # ──────────────────────────────────────────────────────────
 uploads/
 public/uploads/
+docs/

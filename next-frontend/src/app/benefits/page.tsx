@@ -5,21 +5,22 @@ import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
-  const title = settings.benefitsTitle || "Benefits";
+  const title = "Hair Oil Benefits: Scalp Care, Stronger Roots & Shine";
+  const description = `How ${settings.siteName}'s doctor-guided, scalp-first natural hair oil helps nourish dry, dandruff-prone scalp, support stronger roots, and revive natural shine.`;
   return {
     title,
-    description: settings.shortDescription,
+    description,
     alternates: { canonical: "/benefits" },
     openGraph: {
       title: `${title} · ${settings.siteName}`,
-      description: settings.shortDescription,
+      description,
       url: "/benefits",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
       title: `${title} · ${settings.siteName}`,
-      description: settings.shortDescription,
+      description,
     },
   };
 }

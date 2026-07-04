@@ -4,20 +4,22 @@ import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
+  const title = "Hair Oil FAQs: How to Use, Results, Shipping & Returns";
+  const description = `Answers about using ${settings.siteName} hair oil, when to expect results, delivery in ${settings.estStandardDays} days, our ${settings.returnsWindowDays}-day returns, and how to reach us.`;
   return {
-    title: "FAQ",
-    description: `Common questions about ${settings.siteName} — product, shipping, returns, and ordering.`,
+    title,
+    description,
     alternates: { canonical: "/faq" },
     openGraph: {
-      title: `FAQ · ${settings.siteName}`,
-      description: `Answers to the most common questions about ${settings.siteName}.`,
+      title: `${title} · ${settings.siteName}`,
+      description,
       url: "/faq",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `FAQ · ${settings.siteName}`,
-      description: `Answers to the most common questions about ${settings.siteName}.`,
+      title: `${title} · ${settings.siteName}`,
+      description,
     },
   };
 }

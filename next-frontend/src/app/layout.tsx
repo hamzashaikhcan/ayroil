@@ -27,10 +27,12 @@ export async function generateMetadata(): Promise<Metadata> {
   const proto = h.get("x-forwarded-proto") ?? "https";
   const base = `${proto}://${host}`;
   const ogImages = settings.ogImageUrl ? [{ url: settings.ogImageUrl }] : undefined;
+  // Home <title>: keyword-rich and ~60 chars; inner pages get the template suffix instead.
+  const homeTitle = `${settings.siteName}: Scalp-First Natural Hair Oil, Guided by Dr. Maria`;
 
   return {
     metadataBase: new URL(base),
-    title: { default: `${settings.siteName} — ${settings.slogan}`, template: `%s · ${settings.siteName}` },
+    title: { default: homeTitle, template: `%s · ${settings.siteName}` },
     description: settings.shortDescription,
     applicationName: settings.siteName,
     alternates: { canonical: "/" },
@@ -49,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
     openGraph: {
       type: "website",
       siteName: settings.siteName,
-      title: `${settings.siteName} — ${settings.slogan}`,
+      title: homeTitle,
       description: settings.shortDescription,
       url: "/",
       locale: "en_US",
@@ -57,7 +59,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${settings.siteName} — ${settings.slogan}`,
+      title: homeTitle,
       description: settings.shortDescription,
       images: settings.ogImageUrl ? [settings.ogImageUrl] : undefined,
     },

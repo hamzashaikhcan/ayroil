@@ -10,20 +10,21 @@ import { formatPrice } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
-  const description = "Browse everything we currently make. One product line at a time.";
+  const title = "Shop Natural Hair Oil for Scalp Care & Stronger Roots";
+  const description = `Shop ${settings.siteName}'s doctor-guided natural hair oil for dry, dandruff-prone scalp and weak roots. Delivered across Pakistan in ${settings.estStandardDays} days, ${settings.returnsWindowDays}-day returns.`;
   return {
-    title: "Shop",
+    title,
     description,
     alternates: { canonical: "/shop" },
     openGraph: {
-      title: `Shop · ${settings.siteName}`,
+      title: `${title} · ${settings.siteName}`,
       description,
       url: "/shop",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `Shop · ${settings.siteName}`,
+      title: `${title} · ${settings.siteName}`,
       description,
     },
   };

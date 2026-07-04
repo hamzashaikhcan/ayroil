@@ -52,7 +52,7 @@ export function Footer({ settings }: { settings: Settings }) {
 						<p className='mt-4 max-w-xs text-sm leading-relaxed text-muted'>
 							{settings.shortDescription}
 						</p>
-						<div className='mt-6 space-y-1.5 font-mono text-xs uppercase tracking-[0.15em] text-muted'>
+						<div className='mt-6 space-y-1.5 font-mono text-xs tracking-wide text-muted'>
 							{settings.address ? <div>{settings.address}</div> : null}
 							{settings.supportEmail ? (
 								<div className='break-all'>{settings.supportEmail}</div>
@@ -97,7 +97,7 @@ export function Footer({ settings }: { settings: Settings }) {
 				</div>
 				<div className='mt-12 flex flex-col items-start justify-between gap-4 border-t border-line pt-6 md:flex-row md:items-center md:mt-14'>
 					<div className='font-mono text-xs uppercase tracking-[0.2em] text-muted'>
-						© {new Date().getFullYear()}{' '}
+						©{new Date().getFullYear()}{' '}
 						{settings.companyName || settings.siteName} · All rights reserved
 					</div>
 					<div className='flex items-center gap-4 text-xs text-muted'>

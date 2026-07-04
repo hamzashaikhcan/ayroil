@@ -5,8 +5,8 @@ import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
-  const title = settings.returnsPolicyTitle || "Returns";
-  const description = "Returns and refunds policy.";
+  const title = `Returns & Refunds: Easy ${settings.returnsWindowDays}-Day Returns on Every Order`;
+  const description = `Shop ${settings.siteName} risk free: ${settings.returnsWindowDays} days from delivery to return your order, damaged or wrong items always covered, and simple refunds by email.`;
   return {
     title,
     description,

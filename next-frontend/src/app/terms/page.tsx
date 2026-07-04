@@ -5,8 +5,8 @@ import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
-  const title = settings.termsTitle || "Terms";
-  const description = "Terms of service";
+  const title = "Terms of Service: Orders, Payment, Delivery & Returns";
+  const description = `The terms for shopping with ${settings.siteName}: how orders and payment work, delivery in ${settings.estStandardDays} days, ${settings.returnsWindowDays}-day returns, and your rights as a customer.`;
   return {
     title,
     description,

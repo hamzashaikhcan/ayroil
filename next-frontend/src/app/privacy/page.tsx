@@ -5,8 +5,8 @@ import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
-  const title = settings.privacyTitle || "Privacy";
-  const description = "Privacy policy";
+  const title = "Privacy Policy: How We Collect, Use & Protect Your Data";
+  const description = `How ${settings.siteName} collects, uses, and protects your information: orders, delivery details, cookies, and your rights. We never sell your data.`;
   return {
     title,
     description,

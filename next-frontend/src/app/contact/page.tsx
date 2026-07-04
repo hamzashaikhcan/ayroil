@@ -4,20 +4,22 @@ import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
+  const title = "Contact Us: Order Help, Returns & Product Questions";
+  const description = `Reach the ${settings.siteName} team by email or WhatsApp for order help, delivery updates, ${settings.returnsWindowDays}-day returns, and hair oil questions. We reply to every message.`;
   return {
-    title: "Contact",
-    description: `Get in touch with ${settings.siteName}. We reply to every email.`,
+    title,
+    description,
     alternates: { canonical: "/contact" },
     openGraph: {
-      title: `Contact · ${settings.siteName}`,
-      description: `Get in touch with ${settings.siteName}.`,
+      title: `${title} · ${settings.siteName}`,
+      description,
       url: "/contact",
       type: "website",
     },
     twitter: {
       card: "summary_large_image",
-      title: `Contact · ${settings.siteName}`,
-      description: `Get in touch with ${settings.siteName}.`,
+      title: `${title} · ${settings.siteName}`,
+      description,
     },
   };
 }

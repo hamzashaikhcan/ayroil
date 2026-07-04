@@ -21,6 +21,17 @@ const COLS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/contact", label: "Contact" },
     ],
   },
+  {
+    title: "Guides",
+    links: [
+      { href: "/how-to-use-ayroil-hair-oil", label: "How to use Ayroil" },
+      { href: "/ayroil-ingredients", label: "Ingredients" },
+      { href: "/hair-oil-for-dry-scalp", label: "Dry scalp guide" },
+      { href: "/best-hair-oil-for-dandruff-prone-scalp-pakistan", label: "Dandruff-prone care" },
+      { href: "/argan-oil-black-seed-oil-rosemary-oil-benefits", label: "Key oil benefits" },
+      { href: "/doctor-guided-hair-oil-pakistan", label: "Doctor-guided oil" },
+    ],
+  },
 ];
 
 type SocialKey = keyof Settings["social"];
@@ -46,7 +57,7 @@ export function Footer({ settings }: { settings: Settings }) {
   return (
 		<footer className='mt-16 border-t border-line bg-surface md:mt-24'>
 			<Container className='py-10 md:py-16'>
-				<div className='grid grid-cols-2 gap-8 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr] md:gap-12'>
+				<div className='grid grid-cols-2 gap-8 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-12'>
 					<div className='col-span-2 md:col-span-1'>
 						<Wordmark size='lg' />
 						<p className='mt-4 max-w-xs text-sm leading-relaxed text-muted'>

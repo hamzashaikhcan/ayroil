@@ -85,7 +85,7 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
           : "https://schema.org/OutOfStock",
       hasMerchantReturnPolicy: {
         "@type": "MerchantReturnPolicy",
-        applicableCountry: "US",
+        applicableCountry: "PK",
         returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
         merchantReturnDays: settings.returnsWindowDays,
         returnMethod: "https://schema.org/ReturnByMail",
@@ -103,7 +103,7 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
         },
         shippingDestination: {
           "@type": "DefinedRegion",
-          addressCountry: "US",
+          addressCountry: "PK",
         },
         deliveryTime: {
           "@type": "ShippingDeliveryTime",

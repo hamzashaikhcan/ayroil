@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { CheckoutClient } from "./checkout-client";
 import { auth } from "@/auth";
@@ -67,7 +68,7 @@ export default async function CheckoutPage() {
                 ? "No account needed. We will email your order confirmation. Want to save your details for next time? "
                 : "No account needed. We will email your order confirmation."}
             {!session && AUTH_UI_ENABLED ? (
-              <a href="/login" className="text-ink underline underline-offset-4">Sign in</a>
+              <Link href="/login" className="text-ink underline underline-offset-4">Sign in</Link>
             ) : null}
           </p>
         </div>

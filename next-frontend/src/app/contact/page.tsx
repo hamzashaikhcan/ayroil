@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { fetchSettings } from "@/lib/settings";
 
@@ -89,17 +90,17 @@ export default async function ContactPage() {
               </h2>
               <p className="mt-3 text-sm leading-relaxed text-muted">
                 Before you write to us, check the{" "}
-                <a href="/faq" className="text-ink underline underline-offset-4">
+                <Link href="/faq" className="text-ink underline underline-offset-4">
                   FAQ
-                </a>{" "}
+                </Link>{" "}
                 — the answer is often there. For shipping and returns, see our{" "}
-                <a href="/shipping" className="text-ink underline underline-offset-4">
+                <Link href="/shipping" className="text-ink underline underline-offset-4">
                   shipping policy
-                </a>{" "}
+                </Link>{" "}
                 and{" "}
-                <a href="/returns" className="text-ink underline underline-offset-4">
+                <Link href="/returns" className="text-ink underline underline-offset-4">
                   returns policy
-                </a>
+                </Link>
                 .
               </p>
             </div>

@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { ANSWER_PAGES } from "@/content/answer-pages";
 import { fetchAllProducts } from "@/lib/server-api";
 import { fetchSettings } from "@/lib/settings";
 
@@ -50,6 +51,10 @@ export async function GET() {
     `- [Shipping policy](${base}/shipping): delivery time, charges, and delivery help`,
     `- [Returns & refunds](${base}/returns): the ${settings.returnsWindowDays}-day return process`,
     `- [Contact](${base}/contact): how to reach the team`,
+    "",
+    "## Guides",
+    "",
+    ...ANSWER_PAGES.map((p) => `- [${p.question}](${base}/${p.slug})`),
     "",
     "## Optional",
     "",

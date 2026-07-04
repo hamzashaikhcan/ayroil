@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { headers } from "next/headers";
+import { ANSWER_PAGES } from "@/content/answer-pages";
 import { fetchAllProducts } from "@/lib/server-api";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
@@ -30,5 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticRoutes, ...productRoutes];
+  const answerRoutes: MetadataRoute.Sitemap = ANSWER_PAGES.map((p) => ({
+    url: `${base}/${p.slug}`,
+    lastModified: now,
+    changeFrequency: "monthly",
+    priority: 0.7,
+  }));
+
+  return [...staticRoutes, ...productRoutes, ...answerRoutes];
 }

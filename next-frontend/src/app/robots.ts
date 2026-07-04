@@ -12,10 +12,14 @@ const PRIVATE_PATHS = [
   "/api/",
 ];
 
+// Main search engine crawlers, named explicitly so search access is never
+// collateral damage if the wildcard rule ever tightens.
+const SEARCH_CRAWLERS = ["Googlebot", "Bingbot"];
+
 // AI assistant and answer-engine crawlers, allowed explicitly so the brand
-// can be cited by ChatGPT, Claude, Gemini, Perplexity, and friends. The `*`
-// rule already permits them; naming them protects that access if the
-// wildcard rule ever tightens.
+// can be cited by ChatGPT, Claude, Gemini, Perplexity, and friends.
+// OAI-SearchBot surfaces sites in ChatGPT search; PerplexityBot does the
+// same for Perplexity — blocking either removes the site from those answers.
 const AI_CRAWLERS = [
   "GPTBot",
   "OAI-SearchBot",
@@ -45,6 +49,11 @@ export default async function robots(): Promise<MetadataRoute.Robots> {
     rules: [
       {
         userAgent: "*",
+        allow: "/",
+        disallow: PRIVATE_PATHS,
+      },
+      {
+        userAgent: SEARCH_CRAWLERS,
         allow: "/",
         disallow: PRIVATE_PATHS,
       },

@@ -147,7 +147,7 @@ export function OrderActions({
           >
             {sendingShipped ? "Sending…" : "Send shipped email"}
           </Button>
-          <Button onClick={onDelete} variant="ghost" size="md" className="!text-bad hover:bg-bad-soft">
+          <Button onClick={onDelete} variant="danger" size="md">
             Delete
           </Button>
         </div>

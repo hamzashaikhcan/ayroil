@@ -2,7 +2,7 @@ import Link from "next/link";
 import { fetchProducts, fetchReviews } from "@/lib/server-api";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusPill } from "@/components/ui/status-pill";
-import { AddReviewDialog } from "./add-review-dialog";
+import { AddReviewDialog, EditReviewDialog } from "./add-review-dialog";
 import { ReviewActions } from "./review-actions";
 
 export default async function ReviewsPage(props: PageProps<"/reviews">) {
@@ -85,11 +85,24 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
                       })}
                     </td>
                     <td className="px-5 py-4" data-label="Actions">
-                      <ReviewActions
-                        id={review.id}
-                        visible={review.visible}
-                        label={`${review.customerName} · ${review.product?.name ?? "deleted product"}`}
-                      />
+                      <div className="flex flex-wrap items-center gap-2">
+                        <EditReviewDialog
+                          review={{
+                            id: review.id,
+                            rating: review.rating,
+                            comment: review.comment,
+                            customerName: review.customerName,
+                            visible: review.visible,
+                            createdAt: review.createdAt,
+                            productName: review.product?.name ?? "Deleted product",
+                          }}
+                        />
+                        <ReviewActions
+                          id={review.id}
+                          visible={review.visible}
+                          label={`${review.customerName} · ${review.product?.name ?? "deleted product"}`}
+                        />
+                      </div>
                     </td>
                   </tr>
                 ))

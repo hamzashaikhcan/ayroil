@@ -83,7 +83,11 @@ reviewsRouter.post("/", async (req, res) => {
 });
 
 const updateReviewSchema = z.object({
-  visible: z.boolean(),
+  visible: z.boolean().optional(),
+  rating: z.number().int().min(1).max(5).optional(),
+  comment: z.string().max(4000).optional(),
+  customerName: z.string().min(1).max(120).optional(),
+  createdAt: z.coerce.date().optional(),
 });
 
 reviewsRouter.patch("/:id", async (req, res) => {
@@ -94,7 +98,12 @@ reviewsRouter.patch("/:id", async (req, res) => {
   const review = await repo.findOne({ where: { id: String(req.params.id) } });
   if (!review) return res.status(404).json({ error: "Not found" });
 
-  review.visible = parsed.data.visible;
+  const { visible, rating, comment, customerName, createdAt } = parsed.data;
+  if (visible !== undefined) review.visible = visible;
+  if (rating !== undefined) review.rating = rating;
+  if (comment !== undefined) review.comment = comment;
+  if (customerName !== undefined) review.customerName = customerName;
+  if (createdAt !== undefined) review.createdAt = createdAt;
   const saved = await repo.save(review);
   res.json(saved);
 });

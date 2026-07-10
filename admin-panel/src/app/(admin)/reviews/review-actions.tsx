@@ -73,7 +73,7 @@ export function ReviewActions({
           Show
         </Button>
       )}
-      <Button onClick={onDelete} disabled={pending} variant="secondary" size="sm" className="text-bad hover:bg-bad-soft">
+      <Button onClick={onDelete} disabled={pending} variant="danger" size="sm">
         Delete
       </Button>
     </div>

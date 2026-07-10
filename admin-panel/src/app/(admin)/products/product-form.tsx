@@ -272,7 +272,7 @@ export function ProductForm({
             {pending ? "Saving…" : mode === "create" ? "Create product" : "Save changes"}
           </Button>
           {mode === "edit" ? (
-            <Button type="button" onClick={onDelete} variant="secondary" size="md" className="mt-2 w-full text-bad hover:bg-bad-soft">
+            <Button type="button" onClick={onDelete} variant="danger" size="md" className="mt-2 w-full">
               Delete product
             </Button>
           ) : null}

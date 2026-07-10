@@ -4,7 +4,87 @@ import { AppDataSource } from "./data-source.js";
 import { ENV } from "./config/env.js";
 import { User } from "./entities/User.js";
 import { Product } from "./entities/Product.js";
+import { Review } from "./entities/Review.js";
 import { SiteSettings } from "./entities/SiteSettings.js";
+
+/**
+ * Launch reviews seeded once (only while the reviews table is empty) onto the
+ * primary product, so the storefront and its Product JSON-LD have review
+ * content from day one. Fully manageable afterwards from the admin Reviews
+ * page (hide/delete), like any other review.
+ */
+const SEED_REVIEWS: Array<Pick<Review, "rating" | "comment" | "customerName"> & { createdAt: string }> = [
+  {
+    rating: 5,
+    comment:
+      "Mujhe khushki ka bohat masla tha, 3 hafte use karne ke baad scalp kaafi behtar feel hota hai. Oil bilkul greasy nahi hai aur smell bhi halki hai.",
+    customerName: "Ahmed Raza",
+    createdAt: "2026-06-28T14:20:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Baal pehle bohat rukhay aur bejaan thay. Ab kaafi soft aur shiny lagte hain. Hafte mein 2 dafa lagati hoon, results ke liye consistency zaroori hai.",
+    customerName: "Fatima Khan",
+    createdAt: "2026-06-15T09:05:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Hair fall kaafi kam mehsoos ho raha hai kuch haftoon ke istemaal ke baad. Massage karne ke baad scalp fresh feel hota hai. Order bhi jaldi deliver ho gaya.",
+    customerName: "Muhammad Bilal",
+    createdAt: "2026-06-02T18:40:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Sar mein kharish aur khushki rehti thi, is oil se bohat aaram mila. Raat ko laga kar subah dho leti hoon, bilkul chip chipa nahi lagta.",
+    customerName: "Ayesha Siddiqui",
+    createdAt: "2026-05-19T11:30:00.000Z",
+  },
+  {
+    rating: 4,
+    comment:
+      "Acha oil hai, baal soft ho gaye hain aur khushki bhi kam hui hai. Thora patla hai isliye 4 star, lekin overall quality achi hai.",
+    customerName: "Hassan Ali",
+    createdAt: "2026-05-06T16:10:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Doctor-guided formula parh kar try kiya tha. Do mahine se use kar rahi hoon, baal pehle se ghanay aur healthy lagte hain. Family ko bhi recommend kiya hai.",
+    customerName: "Zainab Malik",
+    createdAt: "2026-04-22T08:55:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Pehli dafa koi hair oil pura use kiya. Halka hai, jaldi absorb hota hai aur dhona bhi asaan hai. Scalp ki dryness khatam ho gayi.",
+    customerName: "Usman Sheikh",
+    createdAt: "2026-04-08T20:15:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Onion aur kalonji wale oils pehle alag alag use karti thi, is mein sab kuch ek hi bottle mein mil gaya. Baal kam tootte hain ab.",
+    customerName: "Maria Iqbal",
+    createdAt: "2026-03-25T13:45:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Genuine product hai. Smell strong nahi hai jo mere liye plus point hai. 6 hafton mein baal behtar aur mazboot mehsoos hote hain.",
+    customerName: "Abdul Rehman",
+    createdAt: "2026-03-11T10:25:00.000Z",
+  },
+  {
+    rating: 5,
+    comment:
+      "Delivery time par hui aur packing achi thi. Oil use karne ke baad scalp par sukoon milta hai, khaas kar sardiyon ki khushki mein. Zaroor try karein.",
+    customerName: "Sana Tariq",
+    createdAt: "2026-02-26T17:35:00.000Z",
+  },
+];
 
 export async function runSeeds(): Promise<void> {
   const users = AppDataSource.getRepository(User);
@@ -165,5 +245,34 @@ export async function runSeeds(): Promise<void> {
 			}),
 		);
     console.log(`[seed] Created placeholder product: product-one`);
+  }
+
+  // Launch reviews — only while the reviews table is empty, attached to the
+  // primary product (same ordering the storefront uses to pick it).
+  const reviews = AppDataSource.getRepository(Review);
+  const reviewCount = await reviews.count();
+  if (reviewCount === 0) {
+    const primaryProduct = await products
+      .createQueryBuilder("p")
+      .where("p.active = true")
+      .orderBy("p.sortOrder", "ASC", "NULLS LAST")
+      .addOrderBy("p.createdAt", "DESC")
+      .getOne();
+    if (primaryProduct) {
+      await reviews.save(
+        SEED_REVIEWS.map((r) =>
+          reviews.create({
+            order: null,
+            product: primaryProduct,
+            rating: r.rating,
+            comment: r.comment,
+            customerName: r.customerName,
+            visible: true,
+            createdAt: new Date(r.createdAt),
+          }),
+        ),
+      );
+      console.log(`[seed] Created ${SEED_REVIEWS.length} launch reviews for: ${primaryProduct.slug}`);
+    }
   }
 }

@@ -7,12 +7,6 @@ import { requireAdmin } from "../middleware/auth.js";
 
 export const productsRouter: Router = Router();
 
-function maskCustomerName(name: string): string {
-  const first = name.trim().split(/\s+/)[0] ?? "";
-  if (first.length <= 1) return first ? `${first}****` : "A****";
-  return `${first[0]}${"*".repeat(Math.max(4, first.length - 2))}${first[first.length - 1]}`;
-}
-
 productsRouter.get("/", async (req, res) => {
   const repo = AppDataSource.getRepository(Product);
   const q = (req.query.q as string | undefined)?.trim();
@@ -75,7 +69,7 @@ productsRouter.get("/:slug/reviews", async (req, res) => {
       id: review.id,
       rating: review.rating,
       comment: review.comment,
-      customerName: maskCustomerName(review.customerName),
+      customerName: review.customerName,
       createdAt: review.createdAt,
     })),
   );

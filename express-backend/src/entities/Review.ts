@@ -12,10 +12,11 @@ import { Order } from "./Order.js";
 import { Product } from "./Product.js";
 
 /**
- * One review per order, submitted via the single-use tokenized review link
- * sent when an order is marked DELIVERED (see Order.reviewToken). `product`
- * is the first line item's product at submission time — kept nullable/SET
- * NULL since the product can be deleted later, for future display use.
+ * Customer reviews come from the single-use tokenized review link sent when
+ * an order is marked DELIVERED (see Order.reviewToken) — at most one per
+ * order. Admins can also create reviews directly from the admin panel; those
+ * have no order (`order` is null). `product` is kept nullable/SET NULL since
+ * the product can be deleted later, for future display use.
  */
 @Entity({ name: "reviews" })
 export class Review {
@@ -23,9 +24,9 @@ export class Review {
   id!: string;
 
   @Index({ unique: true })
-  @OneToOne(() => Order, { onDelete: "CASCADE" })
+  @OneToOne(() => Order, { nullable: true, onDelete: "CASCADE" })
   @JoinColumn()
-  order!: Order;
+  order!: Order | null;
 
   @ManyToOne(() => Product, { nullable: true, onDelete: "SET NULL" })
   product!: Product | null;

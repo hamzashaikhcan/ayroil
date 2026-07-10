@@ -118,15 +118,17 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
         },
       },
     },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: PRODUCT_RATING.value,
-      bestRating: PRODUCT_RATING.best,
-      reviewCount: reviewCount || PRODUCT_RATING.fallbackReviewCount,
-    },
+    aggregateRating: reviewCount
+      ? {
+          "@type": "AggregateRating",
+          ratingValue: PRODUCT_RATING.value,
+          bestRating: PRODUCT_RATING.best,
+          reviewCount,
+        }
+      : undefined,
     review: reviews.slice(0, 10).map((review) => ({
       "@type": "Review",
-      author: { "@type": "Person", name: maskName(review.customerName) },
+      author: { "@type": "Person", name: review.customerName },
       datePublished: review.createdAt,
       reviewBody: review.comment || undefined,
       reviewRating: {
@@ -307,7 +309,7 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
                 <article key={review.id} className="rounded-2xl border border-line bg-surface p-6">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <div className="font-display text-lg text-ink">{maskName(review.customerName)}</div>
+                      <div className="font-display text-lg text-ink">{review.customerName}</div>
                       <div className="mt-1 text-xs text-muted">
                         {new Date(review.createdAt).toLocaleDateString("en-US", {
                           month: "short",
@@ -354,12 +356,6 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
       ) : null}
     </>
   );
-}
-
-function maskName(name: string): string {
-  const first = name.trim().split(/\s+/)[0] ?? "";
-  if (first.length <= 1) return first ? `${first}****` : "A****";
-  return `${first[0]}${"*".repeat(Math.max(4, first.length - 2))}${first[first.length - 1]}`;
 }
 
 function StarRating({ rating, size = "sm" }: { rating: number; size?: "sm" | "lg" }) {

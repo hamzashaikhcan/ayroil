@@ -30,7 +30,7 @@ export function SwitchField({
       />
       <span
         aria-hidden
-        className="relative mt-0.5 inline-flex h-6 w-11 flex-none rounded-full border border-line-strong bg-surface transition-colors after:absolute after:left-0.5 after:top-0.5 after:h-5 after:w-5 after:rounded-full after:bg-muted-soft after:shadow-sm after:transition-transform peer-checked:border-accent peer-checked:bg-accent peer-checked:after:translate-x-5 peer-checked:after:bg-white"
+        className="relative mt-0.5 inline-flex h-6 w-11 flex-none rounded-full border border-line-strong bg-surface transition-colors after:absolute after:left-0.5 after:top-px after:h-5 after:w-5 after:rounded-full after:bg-muted-soft after:shadow-sm after:transition-transform peer-checked:border-ink peer-checked:bg-ink peer-checked:after:translate-x-5 peer-checked:after:bg-white"
       />
     </label>
   );

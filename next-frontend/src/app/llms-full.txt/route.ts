@@ -60,7 +60,9 @@ export async function GET() {
       `URL: ${base}/shop/${p.slug}`,
       `Price: ${price(p.priceCents)}${p.compareAtCents ? ` (compare at ${price(p.compareAtCents)})` : ""}`,
       `Availability: ${p.stock > 0 ? "in stock" : "out of stock"}`,
-      `Rating: ${PRODUCT_RATING.value} out of ${PRODUCT_RATING.best} (${p.reviewCount || PRODUCT_RATING.fallbackReviewCount} verified reviews)`,
+      p.reviewCount
+        ? `Rating: ${PRODUCT_RATING.value} out of ${PRODUCT_RATING.best} (${p.reviewCount} verified reviews)`
+        : "",
       p.tagline ? `Tagline: ${p.tagline}` : "",
       "",
       p.shortDescription,

@@ -1,13 +1,14 @@
 import Link from "next/link";
-import { fetchReviews } from "@/lib/server-api";
+import { fetchProducts, fetchReviews } from "@/lib/server-api";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusPill } from "@/components/ui/status-pill";
+import { AddReviewDialog } from "./add-review-dialog";
 import { ReviewActions } from "./review-actions";
 
 export default async function ReviewsPage(props: PageProps<"/reviews">) {
   const sp = await props.searchParams;
   const status = parseStatus(typeof sp.status === "string" ? sp.status : "all");
-  const reviews = await fetchReviews(status);
+  const [reviews, products] = await Promise.all([fetchReviews(status), fetchProducts()]);
   const pendingCount = status === "hidden" ? reviews.length : reviews.filter((r) => !r.visible).length;
 
   return (
@@ -15,7 +16,12 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
       <PageHeader
         title="Reviews"
         subtitle={`${reviews.length} ${status === "all" ? "total" : status} reviews · ${pendingCount} pending approval`}
-        actions={<ReviewFilters active={status} />}
+        actions={
+          <div className="flex items-center gap-2">
+            <ReviewFilters active={status} />
+            <AddReviewDialog products={products.map((p) => ({ id: p.id, name: p.name, slug: p.slug }))} />
+          </div>
+        }
       />
 
       <div className="card table-card-shell">

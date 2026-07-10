@@ -93,12 +93,14 @@ export default async function HomePage() {
 					? 'https://schema.org/InStock'
 					: 'https://schema.org/OutOfStock',
 		},
-		aggregateRating: {
-			'@type': 'AggregateRating',
-			ratingValue: PRODUCT_RATING.value,
-			bestRating: PRODUCT_RATING.best,
-			reviewCount: product.reviewCount || PRODUCT_RATING.fallbackReviewCount,
-		},
+		aggregateRating: product.reviewCount
+			? {
+					'@type': 'AggregateRating',
+					ratingValue: PRODUCT_RATING.value,
+					bestRating: PRODUCT_RATING.best,
+					reviewCount: product.reviewCount,
+				}
+			: undefined,
 	};
 
 	return (

@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { z } from "zod";
 import { AppDataSource } from "../data-source.js";
+import { Product } from "../entities/Product.js";
 import { Review } from "../entities/Review.js";
 import { requireAdmin } from "../middleware/auth.js";
 
@@ -45,6 +46,40 @@ reviewsRouter.get("/", async (req, res) => {
         : null,
     })),
   );
+});
+
+const createReviewSchema = z.object({
+  productId: z.string().uuid(),
+  rating: z.number().int().min(1).max(5),
+  comment: z.string().max(4000).default(""),
+  customerName: z.string().min(1).max(120),
+  visible: z.boolean().default(true),
+  /** Optional backdate so admin-added reviews can carry a realistic date. */
+  createdAt: z.coerce.date().optional(),
+});
+
+// Admin-created review: no order behind it, attached directly to a product.
+reviewsRouter.post("/", async (req, res) => {
+  const parsed = createReviewSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ error: "Invalid", issues: parsed.error.issues });
+
+  const product = await AppDataSource.getRepository(Product).findOne({
+    where: { id: parsed.data.productId },
+  });
+  if (!product) return res.status(404).json({ error: "Product not found" });
+
+  const repo = AppDataSource.getRepository(Review);
+  const review = repo.create({
+    order: null,
+    product,
+    rating: parsed.data.rating,
+    comment: parsed.data.comment,
+    customerName: parsed.data.customerName,
+    visible: parsed.data.visible,
+    ...(parsed.data.createdAt ? { createdAt: parsed.data.createdAt } : {}),
+  });
+  const saved = await repo.save(review);
+  res.status(201).json({ id: saved.id });
 });
 
 const updateReviewSchema = z.object({

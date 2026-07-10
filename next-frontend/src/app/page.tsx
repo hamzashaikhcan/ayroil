@@ -8,7 +8,7 @@ import { ProductThumb } from '@/components/product/product-thumb';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
 import { fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
 import { fetchSettings } from '@/lib/settings';
-import { HERO_2_IMAGE } from '@/consts';
+import { HERO_2_IMAGE, PRODUCT_RATING } from '@/consts';
 
 const HOME_TITLE =
 	'Ayroil Herbal Hair Oil — Nourishing Care for Hair Fall & Dandruff';
@@ -92,6 +92,12 @@ export default async function HomePage() {
 				product.stock > 0
 					? 'https://schema.org/InStock'
 					: 'https://schema.org/OutOfStock',
+		},
+		aggregateRating: {
+			'@type': 'AggregateRating',
+			ratingValue: PRODUCT_RATING.value,
+			bestRating: PRODUCT_RATING.best,
+			reviewCount: product.reviewCount || PRODUCT_RATING.fallbackReviewCount,
 		},
 	};
 

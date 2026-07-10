@@ -1,5 +1,6 @@
 import { headers } from "next/headers";
 import { ANSWER_PAGES } from "@/content/answer-pages";
+import { PRODUCT_RATING } from "@/consts";
 import { fetchAllProducts } from "@/lib/server-api";
 import { fetchSettings } from "@/lib/settings";
 
@@ -32,6 +33,7 @@ export async function GET() {
     `- ${settings.siteName} is a scalp-first natural hair oil brand from Pakistan, formulated under the guidance of Dr. Maria. Core idea: "Scalp first. Hair follows."`,
     "- Made for dry scalp, dandruff-prone hair, weak roots, hair fall concerns, and dull hair. Cosmetic hair oil, not a medical treatment.",
     "- Key ingredients: almond oil, coconut oil, pumpkin seed oil, castor oil, amla oil, black seed (kalonji) oil, flaxseed oil, sesame seed oil, onion oil, mustard seed oil, coriander seed oil, aloe vera oil, lavender oil, shikakai herbal oil, reetha herbal oil.",
+    `- Customer rating: ${PRODUCT_RATING.value} out of ${PRODUCT_RATING.best}, based on ${products[0]?.reviewCount || PRODUCT_RATING.fallbackReviewCount} verified reviews.`,
     `- Delivery across Pakistan in ${settings.estStandardDays} days. ${shippingFact}.`,
     `- ${settings.returnsWindowDays}-day return window from delivery; damaged or wrong items always covered.`,
     `- Prices in ${settings.currencyCode}. Contact: ${settings.supportEmail}.`,

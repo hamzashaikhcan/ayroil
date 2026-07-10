@@ -1,4 +1,5 @@
 import { headers } from "next/headers";
+import { PRODUCT_RATING } from "@/consts";
 import { fetchAllProducts } from "@/lib/server-api";
 import { fetchSettings } from "@/lib/settings";
 
@@ -59,6 +60,7 @@ export async function GET() {
       `URL: ${base}/shop/${p.slug}`,
       `Price: ${price(p.priceCents)}${p.compareAtCents ? ` (compare at ${price(p.compareAtCents)})` : ""}`,
       `Availability: ${p.stock > 0 ? "in stock" : "out of stock"}`,
+      `Rating: ${PRODUCT_RATING.value} out of ${PRODUCT_RATING.best} (${p.reviewCount || PRODUCT_RATING.fallbackReviewCount} verified reviews)`,
       p.tagline ? `Tagline: ${p.tagline}` : "",
       "",
       p.shortDescription,

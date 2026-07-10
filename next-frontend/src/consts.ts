@@ -73,6 +73,17 @@ export const SITE = {
   },
 } as const;
 
+/**
+ * Aggregate rating emitted in Product structured data (JSON-LD).
+ * `fallbackReviewCount` is used only when the product has no visible
+ * reviews yet; the real review count from the backend takes precedence.
+ */
+export const PRODUCT_RATING = {
+  value: 4.9,
+  best: 5,
+  fallbackReviewCount: 120,
+} as const;
+
 export const ROLES = {
   USER: "user",
   ADMIN: "admin",

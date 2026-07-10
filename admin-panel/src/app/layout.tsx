@@ -46,7 +46,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${inter.variable} ${mono.variable} h-full antialiased`}>
-      <body className="min-h-full bg-background text-ink">
+      {/* suppressHydrationWarning: browser extensions (e.g. ColorZilla's
+          cz-shortcut-listen) inject attributes on <body> before React
+          hydrates, which is out of our control and safe to ignore. */}
+      <body className="min-h-full bg-background text-ink" suppressHydrationWarning>
         <ServiceWorkerRegister />
         <Providers>{children}</Providers>
       </body>

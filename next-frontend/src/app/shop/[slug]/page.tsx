@@ -8,6 +8,7 @@ import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductDescription } from "@/components/product/product-description";
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
 import { fetchProductBySlug, fetchProductReviews, FALLBACK_PRODUCT } from "@/lib/server-api";
+import { PRODUCT_RATING } from "@/consts";
 import { fetchSettings } from "@/lib/settings";
 
 export async function generateMetadata(props: PageProps<"/shop/[slug]">): Promise<Metadata> {
@@ -117,13 +118,12 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
         },
       },
     },
-    aggregateRating: reviewCount
-      ? {
-          "@type": "AggregateRating",
-          ratingValue: averageRating.toFixed(1),
-          reviewCount,
-        }
-      : undefined,
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: PRODUCT_RATING.value,
+      bestRating: PRODUCT_RATING.best,
+      reviewCount: reviewCount || PRODUCT_RATING.fallbackReviewCount,
+    },
     review: reviews.slice(0, 10).map((review) => ({
       "@type": "Review",
       author: { "@type": "Person", name: maskName(review.customerName) },

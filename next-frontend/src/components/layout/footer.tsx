@@ -28,7 +28,7 @@ const COLS: { title: string; links: { href: string; label: string }[] }[] = [
       { href: "/ayroil-ingredients", label: "Ingredients" },
       { href: "/hair-oil-for-dry-scalp", label: "Dry scalp guide" },
       { href: "/best-hair-oil-for-dandruff-prone-scalp-pakistan", label: "Dandruff-prone care" },
-      { href: "/argan-oil-black-seed-oil-rosemary-oil-benefits", label: "Key oil benefits" },
+      { href: "/onion-oil-black-seed-oil-pumpkin-seed-oil-benefits", label: "Key oil benefits" },
       { href: "/doctor-guided-hair-oil-pakistan", label: "Doctor-guided oil" },
     ],
   },

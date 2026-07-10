@@ -23,6 +23,18 @@ const nextConfig: NextConfig = {
     ],
   },
 
+  async redirects() {
+    return [
+      // The formula changed (argan and rosemary removed); the guide now lives
+      // at the new-ingredient slug. Permanent so search engines transfer it.
+      {
+        source: "/argan-oil-black-seed-oil-rosemary-oil-benefits",
+        destination: "/onion-oil-black-seed-oil-pumpkin-seed-oil-benefits",
+        permanent: true,
+      },
+    ];
+  },
+
   async headers() {
     return [
       {

@@ -34,7 +34,7 @@ export const ANSWER_PAGES: AnswerPage[] = [
       "What to look for in a hair oil when your scalp is dandruff-prone: lightweight scalp-first formulas, purposeful ingredients, and honest routines that work in Pakistan.",
     question: "Which hair oil is best for a dandruff-prone scalp in Pakistan?",
     answer:
-      "For a dandruff-prone scalp, choose a lightweight, scalp-first oil built on ingredients traditionally used for scalp care, such as rosemary, black seed, amla, and reetha, and use it consistently 2 to 3 times a week. Ayroil is a doctor-guided cosmetic hair oil made in Pakistan for exactly these routines: it supports scalp comfort and nourishment. It is not a medicine and does not treat fungal infection, severe dandruff, or scalp disease.",
+      "For a dandruff-prone scalp, choose a lightweight, scalp-first oil built on ingredients traditionally used for scalp care, such as black seed, amla, coriander seed, and reetha, and use it consistently 2 to 3 times a week. Ayroil is a doctor-guided cosmetic hair oil made in Pakistan for exactly these routines: it supports scalp comfort and nourishment. It is not a medicine and does not treat fungal infection, severe dandruff, or scalp disease.",
     sections: [
       {
         heading: "What to look for",
@@ -44,7 +44,7 @@ export const ANSWER_PAGES: AnswerPage[] = [
         list: [
           "A scalp-first formula meant to be massaged into the scalp, not just coated on lengths",
           "A lightweight, non-greasy texture you will actually use twice a week",
-          "Ingredients traditionally used for scalp care: rosemary, black seed, amla, reetha, shikakai",
+          "Ingredients traditionally used for scalp care: black seed, amla, coriander seed, reetha, shikakai",
           "Honest wording: 'supports' and 'helps', never 'cures' or 'guaranteed'",
           "A clear how-to-use routine on the label or product page",
         ],
@@ -58,7 +58,7 @@ export const ANSWER_PAGES: AnswerPage[] = [
       {
         heading: "How Ayroil fits this routine",
         paragraphs: [
-          "Ayroil was formulated under the guidance of Dr. Maria around a single idea: scalp first, hair follows. Its blend combines rosemary, black seed, amla, reetha, and shikakai with argan, sweet almond, castor, vitamin E, and hyaluronic acid, each chosen for a purpose, from traditional scalp care to softness and shine. Used 2 to 3 times a week, it supports scalp comfort for dandruff-prone routines without a heavy, greasy feel.",
+          "Ayroil was formulated under the guidance of Dr. Maria around a single idea: scalp first, hair follows. Its blend combines black seed, amla, onion, reetha, and shikakai with almond, coconut, castor, sesame, flaxseed, pumpkin seed, mustard seed, coriander seed, aloe vera, and lavender, each chosen for a purpose, from traditional scalp care to softness and shine. Used 2 to 3 times a week, it supports scalp comfort for dandruff-prone routines without a heavy, greasy feel.",
         ],
       },
       {
@@ -94,7 +94,7 @@ export const ANSWER_PAGES: AnswerPage[] = [
       "Why scalps get dry, which oil ingredients help with dryness, and a simple weekly oiling routine that supports scalp comfort and softer, healthier-looking hair.",
     question: "What is a good hair oil for a dry scalp?",
     answer:
-      "A good dry-scalp oil is lightweight, non-greasy, and built around nourishing ingredients such as sweet almond oil, vitamin E, black seed oil, and hyaluronic acid for scalp hydration support. Applied to the scalp 2 to 3 times a week with a gentle massage, it helps a dry, tight-feeling scalp feel comfortable and supports softer, healthier-looking hair. Ayroil combines these ingredients in one scalp-first blend.",
+      "A good dry-scalp oil is lightweight, non-greasy, and built around nourishing ingredients such as almond oil, coconut oil, black seed oil, and aloe vera oil for scalp comfort and hydration support. Applied to the scalp 2 to 3 times a week with a gentle massage, it helps a dry, tight-feeling scalp feel comfortable and supports softer, healthier-looking hair. Ayroil combines these ingredients in one scalp-first blend.",
     sections: [
       {
         heading: "Why scalps get dry",
@@ -105,11 +105,11 @@ export const ANSWER_PAGES: AnswerPage[] = [
       {
         heading: "Ingredients that help with dryness",
         list: [
-          "Sweet almond oil: softness, nourishment, and dry hair care",
-          "Vitamin E: nourishment and protection from dryness",
-          "Hyaluronic acid: scalp hydration support",
+          "Almond oil: softness, nourishment, and dry hair care",
+          "Coconut oil: deep nourishment and traditional conditioning",
+          "Aloe vera oil: scalp soothing and hydration support",
           "Black seed oil: deep nourishment, known in traditional scalp care",
-          "Argan oil: smoother, shinier, healthier-looking lengths",
+          "Flaxseed oil: smoothness and frizz care for dry, dull lengths",
         ],
       },
       {
@@ -207,32 +207,37 @@ export const ANSWER_PAGES: AnswerPage[] = [
   },
   {
     slug: "ayroil-ingredients",
-    metaTitle: "Ayroil Ingredients: All 10 Oils and What They Do",
+    metaTitle: "Ayroil Ingredients: All 15 Oils and What They Do",
     metaDescription:
-      "The full Ayroil ingredient list: rosemary, black seed, amla, sweet almond, argan, vitamin E, reetha, shikakai, hyaluronic acid, and castor oil, with each one's role.",
+      "The full Ayroil ingredient list: 15 purposeful oils, from almond, coconut, and amla to onion, black seed, and shikakai, with each one's role explained.",
     question: "What are the ingredients in Ayroil hair oil?",
     answer:
-      "Ayroil contains ten purposeful ingredients: rosemary oil, black seed oil, amla, sweet almond oil, argan oil, vitamin E, reetha, shikakai, hyaluronic acid, and castor oil. Each has a defined role, from traditional scalp care to softness, shine, and scalp hydration support. Ayroil is a cosmetic blend formulated under the guidance of Dr. Maria; no ingredient is claimed to cure any condition.",
+      "Ayroil contains fifteen purposeful oils: almond, coconut, pumpkin seed, castor, amla, black seed (kalonji), flaxseed, sesame seed, onion, mustard seed, coriander seed, aloe vera, lavender, shikakai herbal, and reetha herbal oil. Each has a defined role, from traditional scalp care to softness, shine, and root support. Ayroil is a cosmetic blend formulated under the guidance of Dr. Maria; no ingredient is claimed to cure any condition.",
     sections: [
       {
         heading: "The full ingredient list and each one's role",
         list: [
-          "Rosemary oil: traditionally used for scalp care and stronger-looking hair support",
-          "Black seed oil: nourishment and traditional scalp care",
-          "Amla: hair strength, shine, and traditional hair care",
-          "Sweet almond oil: softness, nourishment, and dry hair care",
-          "Argan oil: smoother, shinier, healthier-looking hair",
-          "Vitamin E: nourishment and protection from dryness",
-          "Reetha: gentle, time-tested Ayurvedic cleansing care",
-          "Shikakai: traditional Ayurvedic strengthening care",
-          "Hyaluronic acid: scalp hydration support",
+          "Almond oil: softness, nourishment, and dry hair care",
+          "Coconut oil: deep nourishment and traditional conditioning for softer, shinier hair",
+          "Pumpkin seed oil: known for root and stronger-looking hair support",
           "Castor oil: traditional root and thickness care",
+          "Amla oil: hair strength, shine, and traditional hair care",
+          "Black seed (kalonji) oil: nourishment and traditional scalp care",
+          "Flaxseed oil: smoothness and frizz care for dry, dull lengths",
+          "Sesame seed oil: traditional warm-massage nourishment for the scalp",
+          "Onion oil: traditionally used in hair fall-prone routines for stronger-looking roots",
+          "Mustard seed oil: traditional deep nourishment for scalp and roots",
+          "Coriander seed oil: traditionally used for a refreshed, comfortable scalp",
+          "Aloe vera oil: scalp soothing and hydration support",
+          "Lavender oil: calming scalp comfort and a light natural scent",
+          "Shikakai herbal oil: traditional Ayurvedic strengthening care",
+          "Reetha herbal oil: gentle, time-tested Ayurvedic cleansing care",
         ],
       },
       {
         heading: "Why a purposeful blend instead of one hero oil",
         paragraphs: [
-          "Single-oil products do one job. A scalp-first routine asks for several: scalp comfort, dryness care, root support, and a finish that is soft and shiny rather than greasy. Ayroil combines Ayurvedic classics like amla, reetha, and shikakai with rosemary, argan, and modern additions like hyaluronic acid so one bottle covers the whole routine.",
+          "Single-oil products do one job. A scalp-first routine asks for several: scalp comfort, dryness care, root support, and a finish that is soft and shiny rather than greasy. Ayroil combines Ayurvedic classics like amla, reetha, and shikakai with everyday nourishers like almond, coconut, and sesame, and root-focused oils like onion, castor, and pumpkin seed, so one bottle covers the whole routine.",
         ],
       },
       {
@@ -245,11 +250,11 @@ export const ANSWER_PAGES: AnswerPage[] = [
     faqs: [
       {
         q: "Are Ayroil's ingredients natural?",
-        a: "Ayroil is built on natural oils and botanicals: rosemary, black seed, amla, sweet almond, argan, reetha, shikakai, and castor oil, alongside vitamin E and hyaluronic acid for nourishment and scalp hydration support. Every ingredient is chosen for a specific role in the blend.",
+        a: "Ayroil is built on natural oils and botanicals: almond, coconut, pumpkin seed, castor, amla, black seed (kalonji), flaxseed, sesame seed, onion, mustard seed, coriander seed, aloe vera, lavender, shikakai, and reetha. Every ingredient is chosen for a specific role in the blend.",
       },
       {
         q: "Which Ayroil ingredients are best for dandruff-prone routines?",
-        a: "Rosemary, black seed, reetha, and shikakai are the ingredients traditionally associated with scalp care in the blend. Together with a consistent 2 to 3 times a week massage routine, they support scalp comfort for dandruff-prone hair.",
+        a: "Black seed, coriander seed, reetha, and shikakai are the ingredients traditionally associated with scalp care in the blend. Together with a consistent 2 to 3 times a week massage routine, they support scalp comfort for dandruff-prone hair.",
       },
       {
         q: "Can I use Ayroil on a sensitive scalp?",
@@ -262,18 +267,18 @@ export const ANSWER_PAGES: AnswerPage[] = [
     ],
   },
   {
-    slug: "argan-oil-black-seed-oil-rosemary-oil-benefits",
-    metaTitle: "Argan, Black Seed and Rosemary Oil Benefits for Hair",
+    slug: "onion-oil-black-seed-oil-pumpkin-seed-oil-benefits",
+    metaTitle: "Onion, Black Seed and Pumpkin Seed Oil Benefits for Hair",
     metaDescription:
-      "What argan oil, black seed oil, and rosemary oil are each traditionally known for in hair care, and why combining them in one scalp-first blend works well.",
-    question: "What are the benefits of argan oil, black seed oil, and rosemary oil for hair?",
+      "What onion oil, black seed oil, and pumpkin seed oil are traditionally known for in hair care, and why combining them in one scalp-first blend works well.",
+    question: "What are the benefits of onion oil, black seed oil, and pumpkin seed oil for hair?",
     answer:
-      "Rosemary oil is traditionally used for scalp care and stronger-looking hair. Black seed oil is known in traditional scalp care for deep nourishment. Argan oil is known for smoother, shinier, healthier-looking lengths. Each covers a different part of hair care, which is why Ayroil blends all three with seven more purposeful ingredients in one scalp-first oil.",
+      "Onion oil is traditionally used in hair fall-prone routines for stronger-looking roots. Black seed oil is known in traditional scalp care for deep nourishment. Pumpkin seed oil is known for root and stronger-looking hair support. Each covers a different part of hair care, which is why Ayroil blends all three with twelve more purposeful oils in one scalp-first blend.",
     sections: [
       {
-        heading: "Rosemary oil",
+        heading: "Onion oil",
         paragraphs: [
-          "Rosemary is one of the most popular ingredients in modern hair care, traditionally used for scalp care and stronger-looking hair support. It suits routines built around scalp massage, where the oil is worked into the scalp rather than coated on lengths.",
+          "Onion oil is one of the most searched-for hair oils in Pakistan, traditionally used in hair fall-prone routines for stronger-looking roots. It suits routines built around scalp massage, where the oil is worked into the scalp rather than coated on lengths.",
         ],
       },
       {
@@ -283,22 +288,22 @@ export const ANSWER_PAGES: AnswerPage[] = [
         ],
       },
       {
-        heading: "Argan oil",
+        heading: "Pumpkin seed oil",
         paragraphs: [
-          "Argan is the finishing ingredient: known for smoother, shinier, healthier-looking hair. It helps dull, dry lengths look revived without the heavy feel of thicker oils.",
+          "Pumpkin seed oil is a modern favorite in root-focused hair care, known for supporting stronger-looking hair. It is light enough to massage into the scalp without the heavy feel of thicker oils.",
         ],
       },
       {
         heading: "Why they work better together",
         paragraphs: [
-          "One oil cares for the scalp, one nourishes deeply, one finishes the lengths. Used alone, each leaves a gap. Ayroil combines rosemary, black seed, and argan with amla, reetha, shikakai, sweet almond, castor, vitamin E, and hyaluronic acid, so a single 2 to 3 times a week routine covers scalp comfort, dryness care, root support, and shine. No oil, alone or blended, cures scalp conditions; consult a dermatologist for persistent concerns.",
+          "One oil supports the roots, one nourishes the scalp deeply, one backs up stronger-looking hair. Used alone, each leaves a gap. Ayroil combines onion, black seed, and pumpkin seed with amla, reetha, shikakai, almond, coconut, castor, flaxseed, sesame seed, mustard seed, coriander seed, aloe vera, and lavender, so a single 2 to 3 times a week routine covers scalp comfort, dryness care, root support, and shine. No oil, alone or blended, cures scalp conditions; consult a dermatologist for persistent concerns.",
         ],
       },
     ],
     faqs: [
       {
-        q: "Is rosemary oil alone enough for hair care?",
-        a: "Rosemary covers the scalp-care side of a routine, but it does little for dry lengths or shine. A blend that adds nourishing and finishing oils, like black seed, almond, and argan, covers the full routine in one step.",
+        q: "Is onion oil alone enough for hair care?",
+        a: "Onion oil covers the root-support side of a routine, but it does little for dry lengths, softness, or shine. A blend that adds nourishing and finishing oils, like black seed, almond, and coconut, covers the full routine in one step.",
       },
       {
         q: "Can I use these oils every day?",
@@ -306,7 +311,7 @@ export const ANSWER_PAGES: AnswerPage[] = [
       },
       {
         q: "Which of these oils is best for a dry scalp?",
-        a: "Black seed oil is the strongest fit for dry-scalp nourishment among the three, and it works even better alongside sweet almond oil, vitamin E, and hyaluronic acid, which support softness and scalp hydration. All of these are in the Ayroil blend.",
+        a: "Black seed oil is the strongest fit for dry-scalp nourishment among the three, and it works even better alongside almond oil, coconut oil, and aloe vera oil, which support softness and scalp comfort. All of these are in the Ayroil blend.",
       },
       {
         q: "Do these oils regrow hair?",
@@ -338,7 +343,7 @@ export const ANSWER_PAGES: AnswerPage[] = [
       {
         heading: "The Ayroil approach",
         paragraphs: [
-          "Ayroil is built on one idea: scalp first, hair follows. The blend of ten purposeful ingredients, from rosemary and black seed to amla, reetha, and shikakai, targets the scalp, and the routine is simple: a small amount massaged in 2 to 3 times a week, left in for a few hours or overnight. Formulated under the guidance of Dr. Maria, sold as what it honestly is: a cosmetic hair oil.",
+          "Ayroil is built on one idea: scalp first, hair follows. The blend of fifteen purposeful oils, from onion and black seed to amla, reetha, and shikakai, targets the scalp, and the routine is simple: a small amount massaged in 2 to 3 times a week, left in for a few hours or overnight. Formulated under the guidance of Dr. Maria, sold as what it honestly is: a cosmetic hair oil.",
         ],
       },
     ],

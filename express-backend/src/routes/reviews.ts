@@ -11,20 +11,26 @@ reviewsRouter.use(requireAdmin);
 
 reviewsRouter.get("/", async (req, res) => {
   const status = String(req.query.status ?? "all");
+  const page = Math.max(1, Number(req.query.page) || 1);
+  const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 20));
   const repo = AppDataSource.getRepository(Review);
   const qb = repo
     .createQueryBuilder("r")
     .leftJoinAndSelect("r.product", "p")
     .leftJoinAndSelect("r.order", "o")
     .orderBy("r.createdAt", "DESC")
-    .take(200);
+    .skip((page - 1) * limit)
+    .take(limit);
 
   if (status === "visible") qb.andWhere("r.visible = true");
   if (status === "hidden") qb.andWhere("r.visible = false");
 
-  const reviews = await qb.getMany();
-  res.json(
-    reviews.map((review) => ({
+  const [reviews, total] = await qb.getManyAndCount();
+  res.json({
+    total,
+    page,
+    pageCount: Math.max(1, Math.ceil(total / limit)),
+    items: reviews.map((review) => ({
       id: review.id,
       rating: review.rating,
       comment: review.comment,
@@ -45,7 +51,7 @@ reviewsRouter.get("/", async (req, res) => {
           }
         : null,
     })),
-  );
+  });
 });
 
 const createReviewSchema = z.object({

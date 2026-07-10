@@ -8,14 +8,15 @@ import { ReviewActions } from "./review-actions";
 export default async function ReviewsPage(props: PageProps<"/reviews">) {
   const sp = await props.searchParams;
   const status = parseStatus(typeof sp.status === "string" ? sp.status : "all");
-  const [reviews, products] = await Promise.all([fetchReviews(status), fetchProducts()]);
-  const pendingCount = status === "hidden" ? reviews.length : reviews.filter((r) => !r.visible).length;
+  const requestedPage = Math.max(1, Number(typeof sp.page === "string" ? sp.page : "1") || 1);
+  const [list, products] = await Promise.all([fetchReviews(status, requestedPage), fetchProducts()]);
+  const { items: reviews, total, page, pageCount } = list;
 
   return (
     <div className="space-y-5">
       <PageHeader
         title="Reviews"
-        subtitle={`${reviews.length} ${status === "all" ? "total" : status} reviews · ${pendingCount} pending approval`}
+        subtitle={`${total} ${status === "all" ? "total" : status} ${total === 1 ? "review" : "reviews"}${pageCount > 1 ? ` · page ${page} of ${pageCount}` : ""}`}
         actions={
           <div className="flex items-center gap-2">
             <ReviewFilters active={status} />
@@ -110,6 +111,47 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
             </tbody>
           </table>
         </div>
+        {pageCount > 1 ? <Pagination status={status} page={page} pageCount={pageCount} total={total} /> : null}
+      </div>
+    </div>
+  );
+}
+
+function Pagination({
+  status,
+  page,
+  pageCount,
+  total,
+}: {
+  status: "all" | "visible" | "hidden";
+  page: number;
+  pageCount: number;
+  total: number;
+}) {
+  const href = (p: number) => `/reviews?${status === "all" ? "" : `status=${status}&`}page=${p}`;
+  const pagerLink = "rounded-md border border-line bg-surface px-3 py-1.5 text-xs font-medium text-ink hover:bg-surface-2";
+  const pagerDisabled = "rounded-md border border-line bg-surface px-3 py-1.5 text-xs font-medium text-muted opacity-50";
+
+  return (
+    <div className="flex items-center justify-between gap-4 border-t border-line px-5 py-3">
+      <span className="text-xs text-muted">
+        Page {page} of {pageCount} · {total} {total === 1 ? "review" : "reviews"}
+      </span>
+      <div className="flex items-center gap-2">
+        {page > 1 ? (
+          <Link href={href(page - 1)} className={pagerLink}>
+            Previous
+          </Link>
+        ) : (
+          <span className={pagerDisabled}>Previous</span>
+        )}
+        {page < pageCount ? (
+          <Link href={href(page + 1)} className={pagerLink}>
+            Next
+          </Link>
+        ) : (
+          <span className={pagerDisabled}>Next</span>
+        )}
       </div>
     </div>
   );

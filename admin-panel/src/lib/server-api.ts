@@ -140,11 +140,21 @@ export type AdminReview = {
   order: { id: string; number: string } | null;
 };
 
-export async function fetchReviews(status: "all" | "visible" | "hidden" = "all"): Promise<AdminReview[]> {
+export type AdminReviewList = {
+  total: number;
+  page: number;
+  pageCount: number;
+  items: AdminReview[];
+};
+
+export async function fetchReviews(
+  status: "all" | "visible" | "hidden" = "all",
+  page = 1,
+): Promise<AdminReviewList> {
   try {
-    return await adminServerFetch<AdminReview[]>(`/reviews?status=${status}`);
+    return await adminServerFetch<AdminReviewList>(`/reviews?status=${status}&page=${page}`);
   } catch {
-    return [];
+    return { total: 0, page: 1, pageCount: 1, items: [] };
   }
 }
 

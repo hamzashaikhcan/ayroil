@@ -170,7 +170,7 @@ export function ProductForm({
               className="md:col-span-2"
             />
             <div className="md:col-span-2">
-              <label className="text-xs font-medium text-muted">Long description</label>
+              <label className="block text-xs font-medium text-muted">Long description</label>
               <div className="mt-1.5">
                 <RichEditor
                   key={aiKey}
@@ -310,7 +310,7 @@ function Card({ title, subtitle, children }: { title: string; subtitle?: string;
 function Field({ label, value, onChange, required, className, placeholder }: { label: string; value: string; onChange: (v: string) => void; required?: boolean; className?: string; placeholder?: string }) {
   return (
     <div className={className}>
-      <label className="text-xs font-medium text-muted">{label}</label>
+      <label className="block text-xs font-medium text-muted">{label}</label>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -366,7 +366,7 @@ function MetaTextField({
   const box = `mt-1.5 w-full rounded-md border ${border} bg-surface-2 px-3 text-sm text-ink focus:bg-surface focus:outline-none`;
   return (
     <div className={className}>
-      <label htmlFor={id} className="text-xs font-medium text-muted">
+      <label htmlFor={id} className="block text-xs font-medium text-muted">
         {label}
       </label>
       {rows ? (
@@ -405,7 +405,7 @@ function CentsField({ label, value, onChange }: { label: string; value: number; 
   const { symbol } = getActiveCurrency();
   return (
     <div>
-      <label className="text-xs font-medium text-muted">{label}</label>
+      <label className="block text-xs font-medium text-muted">{label}</label>
       <div className="mt-1.5 flex h-9 items-center rounded-md border border-line bg-surface-2 px-3 text-sm focus-within:border-ink/30 focus-within:bg-surface">
         <span className="text-muted">{symbol}</span>
         <input
@@ -424,7 +424,7 @@ function CentsField({ label, value, onChange }: { label: string; value: number; 
 function NumberField({ label, value, onChange }: { label: string; value: number; onChange: (v: number) => void }) {
   return (
     <div>
-      <label className="text-xs font-medium text-muted">{label}</label>
+      <label className="block text-xs font-medium text-muted">{label}</label>
       <input
         type="number"
         min={0}
@@ -439,7 +439,7 @@ function NumberField({ label, value, onChange }: { label: string; value: number;
 function PositionField({ value, onChange }: { value: number | null; onChange: (v: number | null) => void }) {
   return (
     <div>
-      <label htmlFor="product-position" className="text-xs font-medium text-muted">
+      <label htmlFor="product-position" className="block text-xs font-medium text-muted">
         Position
       </label>
       <input
@@ -514,7 +514,7 @@ function FaqsField({
       {value.map((f, i) => (
         <div key={i} className="rounded-md border border-line bg-surface-2 p-3">
           <div className="flex items-center justify-between gap-2">
-            <label className="text-xs font-medium text-muted">Question {i + 1}</label>
+            <label className="block text-xs font-medium text-muted">Question {i + 1}</label>
             <button
               type="button"
               onClick={() => remove(i)}
@@ -593,14 +593,16 @@ function SkuField({
 
   return (
     <div className={className}>
-      <div className="flex items-center justify-between">
-        <label htmlFor="product-sku" className="text-xs font-medium text-muted">
+      {/* h-4 pins this row to a bare label's line height so the input below
+          lines up with sibling fields whose label has no action button. */}
+      <div className="flex h-4 items-center justify-between">
+        <label htmlFor="product-sku" className="block text-xs font-medium text-muted">
           SKU
         </label>
         <button
           type="button"
           onClick={regenerate}
-          className="text-xs font-medium text-accent underline-offset-2 hover:text-accent-deep hover:underline"
+          className="text-xs font-medium leading-none text-accent underline-offset-2 hover:text-accent-deep hover:underline"
         >
           {value ? "Regenerate" : "Auto-generate"}
         </button>

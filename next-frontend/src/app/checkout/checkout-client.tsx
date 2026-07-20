@@ -13,6 +13,8 @@ import { useSettings } from "@/components/providers/settings-context";
 import { formatPrice } from "@/lib/utils";
 import { relayUrl } from "@/lib/api";
 import { COUNTRIES } from "@/lib/countries";
+import { PK_CITIES, PK_REGIONS } from "@/lib/pk-locations";
+import { Combobox } from "@/components/ui/combobox";
 import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
 import { trackInitiateCheckout, trackPurchase } from "@/lib/analytics";
 
@@ -344,21 +346,17 @@ export function CheckoutClient({
                 <select
                   id="country"
                   value={state.country}
-                  onChange={(e) => patch("country", e.target.value as Country)}
-                  onBlur={() => touch("country")}
-                  required
+                  disabled
                   autoComplete="country"
-                  className="mt-2 h-11 w-full rounded-md border border-line-strong bg-background px-3.5 text-sm text-ink focus:border-ink focus:outline-none"
+                  className="mt-2 h-11 w-full cursor-not-allowed rounded-md border border-line-strong bg-surface-2 px-3.5 text-sm text-ink opacity-80 focus:outline-none"
                 >
-                  {COUNTRIES.map((c) => (
+                  {COUNTRIES.filter((c) => c.code === "PK").map((c) => (
                     <option key={c.code} value={c.code}>
                       {c.name}
                     </option>
                   ))}
                 </select>
-                {touched.country && errors.country ? (
-                  <p className="mt-1.5 text-xs text-red-600">{errors.country}</p>
-                ) : null}
+                <p className="mt-1.5 text-xs text-muted">We currently ship within Pakistan only.</p>
               </div>
               <Field
                 name="line1"
@@ -379,26 +377,56 @@ export function CheckoutClient({
                 onChange={(v) => patch("line2", v)}
                 className="md:col-span-2"
               />
-              <Field
-                name="city"
-                label="City"
-                required
-                autoComplete="address-level2"
-                value={state.city}
-                onChange={(v) => patch("city", v)}
-                onBlur={() => touch("city")}
-                error={touched.city ? errors.city : undefined}
-              />
-              <Field
-                name="region"
-                label="State / region"
-                required
-                autoComplete="address-level1"
-                value={state.region}
-                onChange={(v) => patch("region", v)}
-                onBlur={() => touch("region")}
-                error={touched.region ? errors.region : undefined}
-              />
+              <div>
+                <label htmlFor="city" className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+                  City <span className="text-red-600">*</span>
+                </label>
+                <div className="mt-2">
+                  <Combobox
+                    id="city"
+                    name="city"
+                    autoComplete="address-level2"
+                    value={state.city}
+                    onChange={(v) => patch("city", v)}
+                    onBlur={() => touch("city")}
+                    options={PK_CITIES}
+                    placeholder="Search or type your city"
+                    required
+                    invalid={touched.city && !!errors.city}
+                    ariaDescribedBy={touched.city && errors.city ? "city-error" : undefined}
+                  />
+                </div>
+                {touched.city && errors.city ? (
+                  <p id="city-error" className="mt-1.5 text-xs text-red-600">{errors.city}</p>
+                ) : (
+                  <p className="mt-1.5 text-xs text-muted">Not listed? Just type it in.</p>
+                )}
+              </div>
+              <div>
+                <label htmlFor="region" className="font-mono text-xs uppercase tracking-[0.2em] text-muted">
+                  State / region <span className="text-red-600">*</span>
+                </label>
+                <div className="mt-2">
+                  <Combobox
+                    id="region"
+                    name="region"
+                    autoComplete="address-level1"
+                    value={state.region}
+                    onChange={(v) => patch("region", v)}
+                    onBlur={() => touch("region")}
+                    options={PK_REGIONS}
+                    placeholder="Search or type your province"
+                    required
+                    invalid={touched.region && !!errors.region}
+                    ariaDescribedBy={touched.region && errors.region ? "region-error" : undefined}
+                  />
+                </div>
+                {touched.region && errors.region ? (
+                  <p id="region-error" className="mt-1.5 text-xs text-red-600">{errors.region}</p>
+                ) : (
+                  <p className="mt-1.5 text-xs text-muted">Not listed? Just type it in.</p>
+                )}
+              </div>
               <Field
                 name="postalCode"
                 label="Postal code"

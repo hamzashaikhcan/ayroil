@@ -3,6 +3,7 @@ import { formatNumber, formatPrice } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusPill } from "@/components/ui/status-pill";
+import { DeleteCartButton } from "./cart-actions";
 
 type CartItem = {
   id: string;
@@ -120,12 +121,15 @@ function CartRow({ cart }: { cart: ActiveCart }) {
             Created {new Date(cart.createdAt).toLocaleDateString()}
           </div>
         </div>
-        <div className="text-right">
-          <div className="text-xs font-medium text-muted">Cart value</div>
-          <div className="mt-0.5 text-lg font-semibold tracking-tight text-ink tabular-nums">
-            {formatPrice(cart.subtotalCents)}
+        <div className="flex flex-col items-end gap-2">
+          <div className="text-right">
+            <div className="text-xs font-medium text-muted">Cart value</div>
+            <div className="mt-0.5 text-lg font-semibold tracking-tight text-ink tabular-nums">
+              {formatPrice(cart.subtotalCents)}
+            </div>
+            <div className="text-xs text-muted tabular-nums">{cart.totalUnits} item{cart.totalUnits === 1 ? "" : "s"}</div>
           </div>
-          <div className="text-xs text-muted tabular-nums">{cart.totalUnits} item{cart.totalUnits === 1 ? "" : "s"}</div>
+          <DeleteCartButton cartId={cart.id} label={cart.user?.email ?? "Guest cart"} />
         </div>
       </div>
 

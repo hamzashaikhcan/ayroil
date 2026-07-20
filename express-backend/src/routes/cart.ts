@@ -225,3 +225,15 @@ cartRouter.get("/active", requireAdmin, async (_req, res) => {
 
   res.json({ summary, carts: payload });
 });
+
+/**
+ * Admin: permanently delete a cart (and its items, via cascade) by id.
+ * Used to clear out active/guest carts from the admin panel.
+ */
+cartRouter.delete("/active/:cartId", requireAdmin, async (req, res) => {
+  const repo = AppDataSource.getRepository(Cart);
+  const cart = await repo.findOne({ where: { id: String(req.params.cartId) } });
+  if (!cart) return res.status(404).json({ error: "Cart not found" });
+  await repo.remove(cart);
+  res.status(204).end();
+});

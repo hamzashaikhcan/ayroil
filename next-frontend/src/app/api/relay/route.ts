@@ -39,6 +39,9 @@ async function handle(req: Request) {
   const body = req.method === "GET" || req.method === "DELETE" ? undefined : await req.text();
   const res = await fetch(`${API_URL}${path}`, { method: req.method, headers, body });
   const text = await res.text();
+  if (res.status === 204 || res.status === 205 || res.status === 304) {
+    return new NextResponse(null, { status: res.status });
+  }
   return new NextResponse(text, {
     status: res.status,
     headers: { "Content-Type": res.headers.get("content-type") ?? "application/json" },

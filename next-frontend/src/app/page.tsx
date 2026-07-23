@@ -6,8 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProductThumb } from '@/components/product/product-thumb';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
-import { fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
+import { fetchAllProducts, fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
 import { fetchSettings } from '@/lib/settings';
+import { formatPrice } from '@/lib/utils';
 import { HERO_2_IMAGE, PRODUCT_RATING } from '@/consts';
 
 const HOME_TITLE =
@@ -57,9 +58,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-	const [product, settings] = await Promise.all([
+	const [product, settings, allProducts] = await Promise.all([
 		fetchPrimaryProduct().then((p) => p ?? FALLBACK_PRODUCT),
 		fetchSettings(),
+		fetchAllProducts(),
 	]);
 	// Prefer site-wide FAQs from settings; fall back to the product's own FAQs if none set.
 	const faqs = settings.faqs?.length
@@ -245,6 +247,68 @@ export default async function HomePage() {
 					))}
 				</div>
 			</div>
+
+			{allProducts.length > 0 ? (
+				<section className='border-t border-line py-20'>
+					<Container>
+						<div className='flex flex-wrap items-end justify-between gap-4'>
+							<div className='max-w-2xl'>
+								<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
+									<span className='marker-dot'>Shop the range</span>
+								</div>
+								<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight text-ink md:text-5xl'>
+									Everything we make.
+								</h2>
+							</div>
+							<Button href='/shop' variant='secondary'>
+								View all
+							</Button>
+						</div>
+
+						<div className='mt-12 grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3'>
+							{allProducts.map((p) => (
+								<Link key={p.id} href={`/shop/${p.slug}`} className='group block'>
+									<div className='relative'>
+										<ProductThumb
+											image={p.images?.[0]}
+											slug={p.slug}
+											name={p.name}
+											className='aspect-square transition-transform duration-500 group-hover:-translate-y-1'
+										/>
+										{p.recommended ? (
+											<div className='pointer-events-none absolute left-3 top-3 z-10'>
+												<Badge tone='recommend'>
+													<span className='text-accent'>★</span> Recommended
+												</Badge>
+											</div>
+										) : null}
+									</div>
+									<div className='mt-3 flex items-start justify-between gap-4'>
+										<div className='min-w-0'>
+											<div className='font-display truncate text-base text-ink'>
+												{p.name}
+											</div>
+											<div className='mt-0.5 truncate text-xs text-muted'>
+												{p.tagline ?? p.shortDescription}
+											</div>
+										</div>
+										<div className='text-right'>
+											<div className='font-mono text-sm text-ink'>
+												{formatPrice(p.priceCents)}
+											</div>
+											{p.compareAtCents ? (
+												<div className='font-mono text-xs text-muted line-through'>
+													{formatPrice(p.compareAtCents)}
+												</div>
+											) : null}
+										</div>
+									</div>
+								</Link>
+							))}
+						</div>
+					</Container>
+				</section>
+			) : null}
 
 			<section className='py-20'>
 				<Container>

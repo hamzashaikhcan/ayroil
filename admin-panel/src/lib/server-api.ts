@@ -47,6 +47,7 @@ export type RecentOrder = {
   customerName: string;
   email: string;
   totalCents: number;
+  actualShippingCostCents: number | null;
   status: string;
   createdAt: string;
   user: { email: string } | null;

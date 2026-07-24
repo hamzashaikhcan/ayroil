@@ -7,6 +7,7 @@ import { Product } from "../entities/Product.js";
 import { SiteSettings } from "../entities/SiteSettings.js";
 import { User } from "../entities/User.js";
 import { guestKeyFromRequest } from "../lib/guest.js";
+import { lookupCartLocation } from "../lib/geo.js";
 import { requireAdmin } from "../middleware/auth.js";
 
 export const cartRouter: Router = Router();
@@ -18,7 +19,7 @@ async function getOrCreateCart(req: import("express").Request): Promise<Cart> {
     const user = await userRepo.findOne({ where: { id: req.auth.sub } });
     let cart = await repo.findOne({ where: { user: { id: req.auth.sub } } });
     if (!cart) {
-      cart = await repo.save(repo.create({ user: user ?? null, items: [] }));
+      cart = await repo.save(repo.create({ user: user ?? null, items: [], ...lookupCartLocation(req) }));
     }
     // merge guest cart into user cart, if a guest cart exists for this IP/UA
     const guestKey = guestKeyFromRequest(req);
@@ -36,7 +37,7 @@ async function getOrCreateCart(req: import("express").Request): Promise<Cart> {
   }
   const guestKey = guestKeyFromRequest(req);
   let cart = await repo.findOne({ where: { guestKey } });
-  if (!cart) cart = await repo.save(repo.create({ guestKey, items: [] }));
+  if (!cart) cart = await repo.save(repo.create({ guestKey, items: [], ...lookupCartLocation(req) }));
   return cart;
 }
 
@@ -207,6 +208,11 @@ cartRouter.get("/active", requireAdmin, async (_req, res) => {
           }
         : null,
       guestKey: cart.guestKey,
+      location: {
+        city: cart.city,
+        region: cart.region,
+        country: cart.country,
+      },
       items,
       subtotalCents,
       totalUnits,

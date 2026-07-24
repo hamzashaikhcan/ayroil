@@ -32,6 +32,19 @@ export class Cart {
   @Column({ type: "timestamp", nullable: true })
   offerExpiresAt!: Date | null;
 
+  // Best-effort location from the IP at cart creation (see lib/geo.ts).
+  // Never re-resolved after creation; null in local dev (no real client IP)
+  // or when the IP isn't in the geo dataset. Admin-facing only — shown on
+  // the "Active carts" page, not used for any business logic.
+  @Column({ type: "varchar", length: 120, nullable: true })
+  city!: string | null;
+
+  @Column({ type: "varchar", length: 10, nullable: true })
+  region!: string | null;
+
+  @Column({ type: "varchar", length: 2, nullable: true })
+  country!: string | null;
+
   @CreateDateColumn()
   createdAt!: Date;
 

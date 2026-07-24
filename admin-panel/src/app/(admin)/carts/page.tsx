@@ -20,6 +20,7 @@ type ActiveCart = {
   ownerType: "user" | "guest";
   user: { id: string; email: string; name: string | null; phone: string | null } | null;
   guestKey: string | null;
+  location: { city: string | null; region: string | null; country: string | null };
   items: CartItem[];
   subtotalCents: number;
   totalUnits: number;
@@ -97,6 +98,11 @@ export default async function CartsPage() {
   );
 }
 
+function formatLocation(location: ActiveCart["location"]): string {
+  const parts = [location.city, location.region, location.country].filter(Boolean);
+  return parts.length ? parts.join(", ") : "Location unknown";
+}
+
 function CartRow({ cart }: { cart: ActiveCart }) {
   return (
     <div className="card">
@@ -120,6 +126,7 @@ function CartRow({ cart }: { cart: ActiveCart }) {
             <span className="mx-2 text-line-strong">·</span>
             Created {new Date(cart.createdAt).toLocaleDateString()}
           </div>
+          <div className="mt-1 text-xs text-muted">{formatLocation(cart.location)}</div>
         </div>
         <div className="flex flex-col items-end gap-2">
           <div className="text-right">

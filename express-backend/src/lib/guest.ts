@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import type { Request } from "express";
 
-function getClientIp(req: Request): string {
+export function getClientIp(req: Request): string {
   const fwd = req.headers["x-forwarded-for"];
   if (typeof fwd === "string" && fwd.length) return fwd.split(",")[0].trim();
   if (Array.isArray(fwd) && fwd.length) return fwd[0];

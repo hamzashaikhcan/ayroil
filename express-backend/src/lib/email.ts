@@ -147,14 +147,15 @@ function renderOrderConfirmationBody(order: Order, settings: SiteSettings): stri
 }
 
 function renderShippedBody(order: Order, settings: SiteSettings): string {
-  const trackingUrl = `https://pk.leopardscourier.com/shipment_tracking_view?cn_number=${encodeURIComponent(order.trackingNumber ?? "")}`;
+	// const trackingUrl = `https://pk.leopardscourier.com/shipment_tracking_view?cn_number=${encodeURIComponent(order.trackingNumber ?? "")}`;
+	const trackingUrl = `https://pk.leopardscourier.com/shipment_tracking_view`;
 
-  return `
-    <h1 style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:21px;color:#111111;">Your order is on its way, ${order.customerName.split(" ")[0]}.</h1>
+	return `
+    <h1 style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:21px;color:#111111;">Your order is on its way, ${order.customerName.split(' ')[0]}.</h1>
     <p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped via Leopards Courier.</p>
     <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Tracking number: <strong style="color:#111111;">${order.trackingNumber}</strong></p>
 
-    ${emailButton("Track your package", trackingUrl, settings)}
+    ${emailButton('Track your package', trackingUrl, settings)}
 
     ${renderOrderItemsTable(order, settings)}`;
 }

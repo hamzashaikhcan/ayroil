@@ -20,12 +20,13 @@ export default async function OrdersPage() {
                 <th className="px-5 py-2.5 font-medium">Status</th>
                 <th className="px-5 py-2.5 font-medium">Total</th>
                 <th className="px-5 py-2.5 font-medium">Shipping cost</th>
+                <th className="px-5 py-2.5 font-medium">Profit</th>
                 <th className="px-5 py-2.5 font-medium">Date</th>
               </tr>
             </thead>
             <tbody>
               {orders.length === 0 ? (
-                <tr><td colSpan={6} className="px-5 py-16 text-center text-muted">No orders yet.</td></tr>
+                <tr><td colSpan={7} className="px-5 py-16 text-center text-muted">No orders yet.</td></tr>
               ) : orders.map((o) => (
                 <tr key={o.id} className="border-b border-line last:border-b-0 row-hover">
                   <td className="px-5 py-3" data-label="Order">
@@ -41,8 +42,14 @@ export default async function OrdersPage() {
                   <td className="px-5 py-3 font-medium tabular-nums text-ink" data-label="Total">{formatPrice(o.totalCents)}</td>
                   <td className="px-5 py-3 tabular-nums" data-label="Shipping cost">
                     {o.actualShippingCostCents != null
-                      ? <span className="text-ink">{formatPrice(o.actualShippingCostCents)}</span>
+                      ? <span className="font-medium text-ink">{formatPrice(o.actualShippingCostCents)}</span>
                       : <span className="text-muted">—</span>}
+                  </td>
+                  <td
+                    className={`px-5 py-3 font-medium tabular-nums ${o.profitCents < 0 ? "text-bad" : "text-ink"}`}
+                    data-label="Profit"
+                  >
+                    {formatPrice(o.profitCents)}
                   </td>
                   <td className="px-5 py-3 text-muted tabular-nums" data-label="Date">{new Date(o.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</td>
                 </tr>

@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminServerFetch } from "@/lib/server-api";
-import { formatPrice } from "@/lib/utils";
 import { OrderActions } from "./order-actions";
+import { OrderItemsCard } from "./order-items-card";
 import { StatusPill } from "@/components/ui/status-pill";
 
 type Order = {
@@ -30,7 +30,7 @@ type Order = {
     country: string;
     phone?: string | null;
   };
-  items: { productName: string; quantity: number; unitPriceCents: number }[];
+  items: { id: string; productName: string; quantity: number; unitPriceCents: number; unitCostCents: number }[];
   createdAt: string;
   notes: string | null;
   trackingNumber: string | null;
@@ -67,42 +67,16 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[2fr_1fr]">
         <div className="space-y-5">
-          <div className="card">
-            <div className="border-b border-line px-5 py-3.5">
-              <div className="text-sm font-semibold text-ink">Items</div>
-              <div className="text-xs text-muted">{order.items.length} line items</div>
-            </div>
-            <ul>
-              {order.items.map((i, idx) => (
-                <li key={idx} className="flex items-center justify-between border-b border-line px-5 py-3 last:border-b-0">
-                  <div>
-                    <div className="text-sm font-medium text-ink">{i.productName}</div>
-                    <div className="text-xs text-muted">{formatPrice(i.unitPriceCents)} × {i.quantity}</div>
-                  </div>
-                  <div className="font-medium tabular-nums text-ink">{formatPrice(i.unitPriceCents * i.quantity)}</div>
-                </li>
-              ))}
-            </ul>
-            <dl className="space-y-2 border-t border-line bg-surface-2 px-5 py-4 text-sm">
-              <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd className="tabular-nums">{formatPrice(order.subtotalCents)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Shipping (charged)</dt><dd className="tabular-nums">{formatPrice(order.shippingCents)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Tax</dt><dd className="tabular-nums">{formatPrice(order.taxCents)}</dd></div>
-              <div className="mt-2 flex items-center justify-between border-t border-line pt-2 text-sm font-semibold">
-                <dt>Total</dt>
-                <dd className="tabular-nums">{formatPrice(order.totalCents)}</dd>
-              </div>
-              <div className="flex justify-between text-xs text-muted">
-                <dt>Shipping cost (courier)</dt>
-                <dd className="tabular-nums">
-                  {order.actualShippingCostCents != null ? formatPrice(order.actualShippingCostCents) : "Not set"}
-                </dd>
-              </div>
-              <div className="flex justify-between text-xs text-muted">
-                <dt>{order.actualShippingCostCents != null ? "Profit" : "Estimated profit"}</dt>
-                <dd className="tabular-nums">{formatPrice(order.profitCents)}</dd>
-              </div>
-            </dl>
-          </div>
+          <OrderItemsCard
+            id={order.id}
+            items={order.items}
+            subtotalCents={order.subtotalCents}
+            shippingCents={order.shippingCents}
+            taxCents={order.taxCents}
+            totalCents={order.totalCents}
+            actualShippingCostCents={order.actualShippingCostCents}
+            profitCents={order.profitCents}
+          />
         </div>
 
         <div className="space-y-5">

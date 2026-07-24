@@ -279,6 +279,12 @@ ordersRouter.get("/:id", requireAdmin, async (req, res) => {
   res.json(order);
 });
 
+const orderItemUpdateSchema = z.object({
+  id: z.string().uuid(),
+  unitPriceCents: z.number().int().min(0),
+  unitCostCents: z.number().int().min(0),
+});
+
 const adminUpdateSchema = z.object({
   status: z.enum([
     ORDER_STATUS.PENDING,
@@ -297,25 +303,61 @@ const adminUpdateSchema = z.object({
   notes: z.string().optional().nullable(),
   trackingNumber: z.string().max(64).optional().nullable(),
   actualShippingCostCents: z.number().int().min(0).nullable().optional(),
+  shippingCents: z.number().int().min(0).optional(),
+  taxCents: z.number().int().min(0).optional(),
+  // Line-item price/cost corrections — e.g. a product's price changed after
+  // this order was placed and the historical snapshot needs fixing. Not
+  // used to change quantity, which is tied to stock reconciliation.
+  items: z.array(orderItemUpdateSchema).min(1).optional(),
 });
 
 ordersRouter.patch("/:id", requireAdmin, async (req, res) => {
   const parsed = adminUpdateSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "Invalid" });
+  const { items, ...orderFields } = parsed.data;
   const id = String(req.params.id);
   const repo = AppDataSource.getRepository(Order);
+  const itemRepo = AppDataSource.getRepository(OrderItem);
   const existing = await repo.findOne({ where: { id }, relations: { items: { product: true } } });
   if (!existing) return res.status(404).json({ error: "Not found" });
 
   const fromStatus = existing.status;
-  await repo.update({ id }, parsed.data);
+  await repo.update({ id }, orderFields);
 
-  // Recompute profit whenever the real courier cost is known/updated —
-  // falls back to the customer-facing shippingCents estimate until then.
-  if (parsed.data.actualShippingCostCents !== undefined) {
-    const shippingCostCents = parsed.data.actualShippingCostCents ?? existing.shippingCents;
-    const profitCents = existing.totalCents - existing.costCents - shippingCostCents;
-    await repo.update({ id }, { profitCents });
+  if (items) {
+    const byId = new Map(existing.items.map((i) => [i.id, i]));
+    for (const line of items) {
+      if (!byId.has(line.id)) return res.status(400).json({ error: "Item does not belong to this order" });
+    }
+    for (const line of items) {
+      await itemRepo.update({ id: line.id }, { unitPriceCents: line.unitPriceCents, unitCostCents: line.unitCostCents });
+      const item = byId.get(line.id)!;
+      item.unitPriceCents = line.unitPriceCents;
+      item.unitCostCents = line.unitCostCents;
+    }
+  }
+
+  // Recompute money fields whenever anything feeding them changed — line
+  // item prices/costs, the shipping/tax charged to the customer, or the
+  // real courier cost. Falls back to shippingCents as the profit estimate
+  // until an actual courier cost has been entered.
+  if (
+    items ||
+    orderFields.shippingCents !== undefined ||
+    orderFields.taxCents !== undefined ||
+    orderFields.actualShippingCostCents !== undefined
+  ) {
+    const shippingCents = orderFields.shippingCents ?? existing.shippingCents;
+    const taxCents = orderFields.taxCents ?? existing.taxCents;
+    const subtotalCents = existing.items.reduce((a, i) => a + i.unitPriceCents * i.quantity, 0);
+    const costCents = existing.items.reduce((a, i) => a + i.unitCostCents * i.quantity, 0);
+    const totalCents = subtotalCents + shippingCents + taxCents;
+    const actualShippingCostCents =
+      orderFields.actualShippingCostCents !== undefined
+        ? orderFields.actualShippingCostCents
+        : existing.actualShippingCostCents;
+    const profitCents = totalCents - costCents - (actualShippingCostCents ?? shippingCents);
+    await repo.update({ id }, { subtotalCents, costCents, totalCents, profitCents });
   }
 
   if (parsed.data.status && parsed.data.status !== fromStatus) {

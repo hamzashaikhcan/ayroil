@@ -17,6 +17,8 @@ type Order = {
   shippingCents: number;
   taxCents: number;
   totalCents: number;
+  costCents: number;
+  actualShippingCostCents: number | null;
   profitCents: number;
   shippingAddress: {
     fullName: string;
@@ -59,6 +61,7 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
           id={order.id}
           status={order.status}
           trackingNumber={order.trackingNumber}
+          actualShippingCostCents={order.actualShippingCostCents}
         />
       </div>
 
@@ -82,14 +85,20 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
             </ul>
             <dl className="space-y-2 border-t border-line bg-surface-2 px-5 py-4 text-sm">
               <div className="flex justify-between"><dt className="text-muted">Subtotal</dt><dd className="tabular-nums">{formatPrice(order.subtotalCents)}</dd></div>
-              <div className="flex justify-between"><dt className="text-muted">Shipping</dt><dd className="tabular-nums">{formatPrice(order.shippingCents)}</dd></div>
+              <div className="flex justify-between"><dt className="text-muted">Shipping (charged)</dt><dd className="tabular-nums">{formatPrice(order.shippingCents)}</dd></div>
               <div className="flex justify-between"><dt className="text-muted">Tax</dt><dd className="tabular-nums">{formatPrice(order.taxCents)}</dd></div>
               <div className="mt-2 flex items-center justify-between border-t border-line pt-2 text-sm font-semibold">
                 <dt>Total</dt>
                 <dd className="tabular-nums">{formatPrice(order.totalCents)}</dd>
               </div>
               <div className="flex justify-between text-xs text-muted">
-                <dt>Estimated profit</dt>
+                <dt>Shipping cost (courier)</dt>
+                <dd className="tabular-nums">
+                  {order.actualShippingCostCents != null ? formatPrice(order.actualShippingCostCents) : "Not set"}
+                </dd>
+              </div>
+              <div className="flex justify-between text-xs text-muted">
+                <dt>{order.actualShippingCostCents != null ? "Profit" : "Estimated profit"}</dt>
                 <dd className="tabular-nums">{formatPrice(order.profitCents)}</dd>
               </div>
             </dl>

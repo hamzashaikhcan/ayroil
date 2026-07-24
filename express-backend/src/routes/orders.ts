@@ -296,6 +296,7 @@ const adminUpdateSchema = z.object({
   ]).optional(),
   notes: z.string().optional().nullable(),
   trackingNumber: z.string().max(64).optional().nullable(),
+  actualShippingCostCents: z.number().int().min(0).nullable().optional(),
 });
 
 ordersRouter.patch("/:id", requireAdmin, async (req, res) => {
@@ -308,6 +309,14 @@ ordersRouter.patch("/:id", requireAdmin, async (req, res) => {
 
   const fromStatus = existing.status;
   await repo.update({ id }, parsed.data);
+
+  // Recompute profit whenever the real courier cost is known/updated —
+  // falls back to the customer-facing shippingCents estimate until then.
+  if (parsed.data.actualShippingCostCents !== undefined) {
+    const shippingCostCents = parsed.data.actualShippingCostCents ?? existing.shippingCents;
+    const profitCents = existing.totalCents - existing.costCents - shippingCostCents;
+    await repo.update({ id }, { profitCents });
+  }
 
   if (parsed.data.status && parsed.data.status !== fromStatus) {
     await reconcileStockForStatusChange(existing, fromStatus, parsed.data.status);

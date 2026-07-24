@@ -6,6 +6,7 @@ import { ORDER_STATUS, type OrderStatus } from "@consts";
 import { adminClientFetch } from "@/lib/admin-client";
 import { Button } from "@/components/ui/button";
 import { useConfirm } from "@/components/ui/confirm-dialog";
+import { getActiveCurrency } from "@/lib/utils";
 
 const STATUSES = Object.values(ORDER_STATUS);
 
@@ -18,23 +19,31 @@ export function OrderActions({
   id,
   status,
   trackingNumber,
+  actualShippingCostCents,
 }: {
   id: string;
   status: string;
   trackingNumber: string | null;
+  actualShippingCostCents: number | null;
 }) {
   const router = useRouter();
   const confirm = useConfirm();
+  const { symbol } = getActiveCurrency();
   const [pending, setPending] = useState(false);
   const [savedStatus, setSavedStatus] = useState(status);
   const [savedTracking, setSavedTracking] = useState((trackingNumber ?? "").trim());
+  const [savedShipCost, setSavedShipCost] = useState(
+    actualShippingCostCents != null ? String(actualShippingCostCents / 100) : "",
+  );
   const [s, setS] = useState(status);
   const [tracking, setTracking] = useState(trackingNumber ?? "");
+  const [shipCost, setShipCost] = useState(savedShipCost);
   const [sendingShipped, setSendingShipped] = useState(false);
   const [shippedMessage, setShippedMessage] = useState<string | null>(null);
 
   async function save() {
     const nextTracking = tracking.trim();
+    const nextShipCost = shipCost.trim();
     const statusChanged = s !== savedStatus;
     const isDestructiveTransition = statusChanged && DESTRUCTIVE_STATUSES.has(s);
     if (isDestructiveTransition) {
@@ -63,10 +72,15 @@ export function OrderActions({
     try {
       await adminClientFetch(`/orders/${id}`, {
         method: "PATCH",
-        body: JSON.stringify({ status: s, trackingNumber: nextTracking || null }),
+        body: JSON.stringify({
+          status: s,
+          trackingNumber: nextTracking || null,
+          actualShippingCostCents: nextShipCost ? Math.round(Number(nextShipCost) * 100) : null,
+        }),
       });
       setSavedStatus(s);
       setSavedTracking(nextTracking);
+      setSavedShipCost(nextShipCost);
       router.refresh();
     } finally {
       setPending(false);
@@ -102,7 +116,9 @@ export function OrderActions({
   }
 
   const normalizedTracking = tracking.trim();
-  const hasChanges = s !== savedStatus || normalizedTracking !== savedTracking;
+  const normalizedShipCost = shipCost.trim();
+  const hasChanges =
+    s !== savedStatus || normalizedTracking !== savedTracking || normalizedShipCost !== savedShipCost;
   const trackingSaved = savedTracking.length > 0 && normalizedTracking === savedTracking;
   const shippedEmailTitle = hasChanges
     ? "Save changes before sending"
@@ -111,9 +127,9 @@ export function OrderActions({
       : undefined;
 
   return (
-    <div className="w-full rounded-xl border border-line bg-surface p-3 shadow-[0_1px_2px_rgba(16,24,40,0.04)] lg:max-w-3xl">
-      <div className="flex flex-col gap-3 lg:flex-row lg:items-end">
-        <label className="min-w-0 flex-1">
+    <div className="w-full rounded-xl border border-line bg-surface p-3 shadow-[0_1px_2px_rgba(16,24,40,0.04)] lg:max-w-2xl">
+      <div className="flex flex-wrap gap-3">
+        <label className="min-w-[9rem] flex-1">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Status</span>
           <select
             value={s}
@@ -124,7 +140,7 @@ export function OrderActions({
           </select>
         </label>
 
-        <label className="min-w-0 flex-[1.35]">
+        <label className="min-w-[10rem] flex-[1.4]">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Tracking #</span>
           <input
             value={tracking}
@@ -134,23 +150,40 @@ export function OrderActions({
           />
         </label>
 
-        <div className="flex flex-wrap items-center gap-2 lg:pb-0">
-          <Button onClick={save} disabled={pending || !hasChanges} size="md">
-            {pending ? "Saving…" : "Save"}
-          </Button>
-          <Button
-            onClick={sendShippedEmail}
-            disabled={!trackingSaved || sendingShipped || hasChanges}
-            variant="secondary"
-            size="md"
-            title={shippedEmailTitle}
-          >
-            {sendingShipped ? "Sending…" : "Send shipped email"}
-          </Button>
-          <Button onClick={onDelete} variant="danger" size="md">
-            Delete
-          </Button>
-        </div>
+        <label className="min-w-[8rem] flex-1">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Shipping cost</span>
+          <div className="mt-1.5 flex h-9 items-center rounded-md border border-line bg-surface-2 px-2.5 text-sm hover:border-line-strong focus-within:border-ink/30 focus-within:bg-surface">
+            <span className="text-muted">{symbol}</span>
+            <input
+              type="number"
+              step="0.01"
+              min={0}
+              inputMode="decimal"
+              value={shipCost}
+              onChange={(e) => setShipCost(e.target.value)}
+              placeholder="0.00"
+              className="ml-1 w-full min-w-0 bg-transparent text-sm text-ink placeholder:text-muted focus:outline-none"
+            />
+          </div>
+        </label>
+      </div>
+
+      <div className="mt-3 flex flex-wrap items-center justify-end gap-2 border-t border-line pt-3">
+        <Button onClick={save} disabled={pending || !hasChanges} size="sm">
+          {pending ? "Saving…" : "Save"}
+        </Button>
+        <Button
+          onClick={sendShippedEmail}
+          disabled={!trackingSaved || sendingShipped || hasChanges}
+          variant="secondary"
+          size="sm"
+          title={shippedEmailTitle}
+        >
+          {sendingShipped ? "Sending…" : "Notify shipped"}
+        </Button>
+        <Button onClick={onDelete} variant="danger" size="sm">
+          Delete
+        </Button>
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">

@@ -71,6 +71,13 @@ export class Order {
   @Column({ type: "int", default: 0 })
   costCents!: number;
 
+  // Actual courier cost for this order, admin-entered once known (differs
+  // order-to-order and from `shippingCents`, the flat amount charged to the
+  // customer at checkout). Feeds profitCents below; falls back to
+  // shippingCents as an estimate until the admin fills this in.
+  @Column({ type: "int", nullable: true })
+  actualShippingCostCents!: number | null;
+
   @Column({ type: "int", default: 0 })
   profitCents!: number;
 

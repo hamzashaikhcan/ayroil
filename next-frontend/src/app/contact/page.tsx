@@ -69,7 +69,8 @@ export default async function ContactPage() {
                 <ContactCard
                   label="Phone"
                   value={settings.phone}
-                  href={`tel:${settings.phone.replace(/[^+\d]/g, "")}`}
+                  href={whatsappUrl(settings.phone, "Hi, I have a question about Ayroil products.")}
+                  external
                 />
               ) : null}
               {settings.address ? (
@@ -115,10 +116,12 @@ function ContactCard({
   label,
   value,
   href,
+  external,
 }: {
   label: string;
   value: string;
   href?: string;
+  external?: boolean;
 }) {
   const inner = (
     <>
@@ -134,6 +137,8 @@ function ContactCard({
     return (
       <a
         href={href}
+        target={external ? "_blank" : undefined}
+        rel={external ? "noopener noreferrer" : undefined}
         className="block rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-line-strong"
       >
         {inner}
@@ -141,4 +146,10 @@ function ContactCard({
     );
   }
   return <div className="rounded-2xl border border-line bg-surface p-5">{inner}</div>;
+}
+
+/** Same wa.me pattern used by the floating WhatsApp button and order pages — opens a chat with a pre-filled message instead of dialing. */
+function whatsappUrl(phone: string, message: string): string {
+  const number = phone.replace(/[^\d]/g, "");
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
 }

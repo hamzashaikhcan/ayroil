@@ -68,7 +68,7 @@ pushRouter.post("/unsubscribe", async (req, res) => {
 pushRouter.post("/test", async (_req, res) => {
   await sendAdminPush({
     title: "🔔 Notifications enabled",
-    body: "You'll get a ping here whenever a new order comes in.",
+    body: "You'll get a ping here whenever a new order or review comes in.",
     url: "/orders",
     tag: "push-test",
   });

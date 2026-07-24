@@ -15,7 +15,7 @@ import { newOrderNumber } from "../lib/orderNumber.js";
 import { guestKeyFromRequest } from "../lib/guest.js";
 import { sendOrderConfirmationEmail, sendShippedOrderEmail, sendDeliveredReviewEmail } from "../lib/email.js";
 import { sendNewOrderSlackAlert } from "../lib/slack.js";
-import { sendNewOrderPush } from "../lib/push.js";
+import { sendNewOrderPush, sendNewReviewPush } from "../lib/push.js";
 import { reconcileStockForStatusChange, STOCK_RELEASED_STATUSES } from "../lib/orderStock.js";
 import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
@@ -243,7 +243,7 @@ ordersRouter.post("/:number/review", async (req, res) => {
     return res.status(410).json({ error: "This review link is invalid or has already been used." });
   }
 
-  await AppDataSource.getRepository(Review).save({
+  const review = await AppDataSource.getRepository(Review).save({
     order,
     product: order.items[0]?.product ?? null,
     rating: parsed.data.rating,
@@ -252,6 +252,7 @@ ordersRouter.post("/:number/review", async (req, res) => {
     visible: false,
   });
   await orderRepo.update({ id: order.id }, { reviewTokenUsedAt: new Date() });
+  void sendNewReviewPush(review);
 
   res.json({ ok: true });
 });

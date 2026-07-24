@@ -3,6 +3,7 @@ import { ENV } from "../config/env.js";
 import { AppDataSource } from "../data-source.js";
 import { PushSubscription } from "../entities/PushSubscription.js";
 import type { Order } from "../entities/Order.js";
+import type { Review } from "../entities/Review.js";
 import type { SiteSettings } from "../entities/SiteSettings.js";
 
 let vapidConfigured = false;
@@ -78,5 +79,20 @@ export async function sendNewOrderPush(order: Order, settings: SiteSettings): Pr
     body: `${order.customerName} · ${units} item${units === 1 ? "" : "s"} · ${money(order.totalCents, symbol)}`,
     url: `/orders/${order.id}`,
     tag: `order-${order.id}`,
+  });
+}
+
+/**
+ * New-review push for admins. Only fired for customer-submitted reviews
+ * (the tokenized-link flow in POST /orders/:number/review) — not for
+ * reviews an admin creates directly, since that shouldn't self-notify.
+ */
+export async function sendNewReviewPush(review: Review): Promise<void> {
+  const stars = "★".repeat(review.rating) + "☆".repeat(5 - review.rating);
+  await sendAdminPush({
+    title: `⭐ New review from ${review.customerName}`,
+    body: review.comment.trim() ? `${stars} · ${review.comment.trim()}` : stars,
+    url: `/reviews`,
+    tag: `review-${review.id}`,
   });
 }

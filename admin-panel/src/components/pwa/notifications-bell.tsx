@@ -110,8 +110,8 @@ export function NotificationsBell() {
 			<button
 				type='button'
 				onClick={() => setOpen((v) => !v)}
-				aria-label='Order notifications'
-				title='Order notifications'
+				aria-label='Notifications'
+				title='Notifications'
 				className='relative inline-flex h-9 w-9 items-center justify-center rounded-md border border-line bg-surface text-ink hover:bg-surface-2'>
 				<BellIcon className='h-4 w-4' />
 				{/* Dot: accent when active, warn when action needed. */}
@@ -127,11 +127,11 @@ export function NotificationsBell() {
 			{open ? (
 				<div className='absolute right-0 z-50 mt-2 w-72 rounded-lg border border-line bg-surface p-3 shadow-[0_24px_60px_-24px_rgba(0,0,0,0.35)]'>
 					<div className='text-sm font-semibold text-ink'>
-						Order notifications
+						Notifications
 					</div>
 					<p className='mt-1 text-xs leading-relaxed text-muted'>
-						Get a push on this device whenever a new order comes in — even when
-						the admin is closed.
+						Get a push on this device whenever a new order or review comes in —
+						even when the admin is closed.
 					</p>
 
 					{support === 'needs-install' ? (

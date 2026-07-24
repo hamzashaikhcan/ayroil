@@ -11,6 +11,22 @@ import { fetchSettings } from '@/lib/settings';
 import { formatPrice } from '@/lib/utils';
 import { HERO_2_IMAGE, PRODUCT_RATING } from '@/consts';
 
+function LeafIcon({ className }: { className?: string }) {
+	return (
+		<svg viewBox='0 0 24 24' fill='none' aria-hidden className={className}>
+			<path
+				d='M4 20C4 11 11 4 20 4c0 9-7 16-16 16Z'
+				stroke='currentColor'
+				strokeWidth='1.4'
+				strokeLinejoin='round'
+				fill='currentColor'
+				fillOpacity='0.12'
+			/>
+			<path d='M6.5 17.5C10 13.5 14 9.5 17.5 6.5' stroke='currentColor' strokeWidth='1.3' strokeLinecap='round' />
+		</svg>
+	);
+}
+
 const HOME_TITLE =
 	'Ayroil Herbal Hair Oil — Nourishing Care for Hair Fall & Dandruff';
 const HOME_DESCRIPTION =
@@ -117,11 +133,16 @@ export default async function HomePage() {
 			/>
 
 			<section className='relative overflow-hidden'>
+				<div
+					aria-hidden
+					className='pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-accent/20 blur-3xl'
+				/>
 				<Container className='pt-10 pb-20 md:pt-16 md:pb-28'>
 					<div className='grid grid-cols-1 gap-10 md:grid-cols-[1.1fr_0.9fr] md:items-center'>
 						<div>
-							<div className='font-mono text-xs uppercase tracking-[0.22em] text-muted'>
-								<span className='marker-dot'>
+							<div className='flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-muted'>
+								<LeafIcon className='h-4 w-4 flex-none text-accent' />
+								<span>
 									{settings.heroEyebrow ||
 										`A single-product brand · Est. ${settings.foundedYear}`}
 								</span>
@@ -194,7 +215,7 @@ export default async function HomePage() {
 							{settings.heroImageUrl ? (
 								<Link
 									href={product ? `/shop/${product.slug}` : '/shop'}
-									className='relative block aspect-square overflow-hidden rounded-2xl bg-surface'>
+									className='relative block aspect-square overflow-hidden rounded-3xl bg-surface'>
 									<Image
 										src={settings.heroImageUrl}
 										alt={settings.heroTitle || settings.siteName}
@@ -267,7 +288,10 @@ export default async function HomePage() {
 
 						<div className='mt-12 grid grid-cols-1 gap-x-5 gap-y-10 sm:grid-cols-2 lg:grid-cols-3'>
 							{allProducts.map((p) => (
-								<Link key={p.id} href={`/shop/${p.slug}`} className='group block'>
+								<Link
+									key={p.id}
+									href={`/shop/${p.slug}`}
+									className='group block'>
 									<div className='relative'>
 										<ProductThumb
 											image={p.images?.[0]}
@@ -328,15 +352,11 @@ export default async function HomePage() {
 						</p>
 					</div>
 
-					<div className='mt-12 grid grid-cols-1 gap-5 md:grid-cols-3'>
+					<div className='mt-12 grid grid-cols-1 gap-5 md:grid-cols-2'>
 						{[
 							{
 								k: 'Cold-pressed extraction',
 								d: 'Pressed at low temperature so the actives never get cooked out, unlike heat-extracted oils.',
-							},
-							{
-								k: 'Batch traceability',
-								d: 'Each bottle is tied to a batch number you can look up. We know exactly when and how it was pressed.',
 							},
 							{
 								k: 'No filler oils',
@@ -346,7 +366,8 @@ export default async function HomePage() {
 							<div
 								key={s.k}
 								className='rounded-2xl border border-line bg-surface p-6'>
-								<div className='font-display text-xl text-ink'>{s.k}</div>
+								<LeafIcon className='h-6 w-6 text-accent' />
+								<div className='font-display mt-3 text-xl text-ink'>{s.k}</div>
 								<p className='mt-3 text-sm leading-relaxed text-muted'>{s.d}</p>
 							</div>
 						))}
@@ -354,10 +375,14 @@ export default async function HomePage() {
 				</Container>
 			</section>
 
-			<section className='border-t border-line bg-surface py-20'>
+			<section className='relative overflow-hidden border-t border-line bg-surface py-20'>
+				<div
+					aria-hidden
+					className='pointer-events-none absolute -left-20 bottom-0 h-80 w-80 rounded-full bg-accent/15 blur-3xl'
+				/>
 				<Container>
 					<div className='grid grid-cols-1 gap-12 md:grid-cols-2 md:items-center'>
-						<div className='relative aspect-[4/5] w-full overflow-hidden rounded-xl bg-surface'>
+						<div className='relative aspect-[4/5] w-full overflow-hidden rounded-3xl bg-surface'>
 							<Image
 								src={HERO_2_IMAGE}
 								alt='Heavy, heat-extracted hair oil leaving a greasy residue'
@@ -445,11 +470,16 @@ export default async function HomePage() {
 			</section>
 
 			{product.ingredients?.length ? (
-				<section className='border-t border-line bg-ink text-background py-20'>
+				<section className='relative overflow-hidden border-t border-line bg-ink text-background py-20'>
+					<div
+						aria-hidden
+						className='pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-accent/25 blur-3xl'
+					/>
 					<Container>
 						<div className='max-w-3xl'>
-							<div className='font-mono text-xs uppercase tracking-[0.22em] text-background/60'>
-								<span className='marker-dot'>What is inside</span>
+							<div className='flex items-center gap-2 font-mono text-xs uppercase tracking-[0.22em] text-background/60'>
+								<LeafIcon className='h-4 w-4 flex-none text-accent' />
+								<span>What is inside</span>
 							</div>
 							<h2 className='font-display mt-4 text-4xl leading-tight tracking-tight md:text-5xl'>
 								Every ingredient earns its line on the label.
@@ -463,10 +493,8 @@ export default async function HomePage() {
 							{product.ingredients.map((ing) => (
 								<div
 									key={ing.name}
-									className='rounded-2xl border border-background/15 bg-background/[0.04] p-6'>
-									<div className='font-mono text-xs uppercase tracking-[0.22em] text-background/60'>
-										Ingredient
-									</div>
+									className='rounded-2xl border border-accent/20 bg-accent/[0.07] p-6'>
+									<LeafIcon className='h-5 w-5 text-accent' />
 									<div className='font-display mt-3 text-2xl'>{ing.name}</div>
 									<p className='mt-3 text-sm leading-relaxed text-background/70'>
 										{ing.description}

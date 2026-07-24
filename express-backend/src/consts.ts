@@ -38,13 +38,13 @@ export const SITE = {
   },
 
   brand: {
-    backgroundHex: "#fafaf9",
-    surfaceHex: "#ffffff",
-    inkHex: "#0a0a0b",
-    accentHex: "#cdfb4a",
-    accentInkHex: "#0a0a0b",
-    mutedHex: "#6b6b70",
-    lineHex: "#e6e6e3",
+    backgroundHex: "#f7f4ec",
+    surfaceHex: "#fffdf8",
+    inkHex: "#1b1912",
+    accentHex: "#4f6e46",
+    accentInkHex: "#faf7ee",
+    mutedHex: "#79735f",
+    lineHex: "#e7e0cf",
   },
 
   currency: {

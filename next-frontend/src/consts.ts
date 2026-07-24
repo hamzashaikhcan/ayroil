@@ -10,67 +10,67 @@
  */
 
 export const HERO_2_IMAGE =
-	'https://res.cloudinary.com/dm2cefx8m/image/upload/v1783113909/Hero2_pvpfmj.webp';
+	'https://res.cloudinary.com/dm2cefx8m/image/upload/v1784932947/Second_Image_xxi3hj.webp';
 export const SITE = {
-  siteName: "Ayroil",
-  slogan: "Scalp first. Hair follows.",
-  shortDescription:
-    "A scalp-first natural hair oil for dry, dandruff-prone scalp, weak roots, and hair fall concerns. Formulated under the guidance of Dr. Maria.",
-  longDescription:
-    "Ayroil was created for people who are tired of confusing hair care routines, heavy oils, and exaggerated claims. We wanted a cleaner, simpler way to care for the scalp using natural oils known for nourishment, comfort, and hair strength support. Our belief is simple: when the scalp is cared for properly, hair has a better chance to look and feel healthier. That is why Ayroil is built around scalp-first care, guided by Dr. Maria.",
+	siteName: 'Ayroil',
+	slogan: 'Scalp first. Hair follows.',
+	shortDescription:
+		'A scalp-first natural hair oil for dry, dandruff-prone scalp, weak roots, and hair fall concerns. Formulated under the guidance of Dr. Maria.',
+	longDescription:
+		'Ayroil was created for people who are tired of confusing hair care routines, heavy oils, and exaggerated claims. We wanted a cleaner, simpler way to care for the scalp using natural oils known for nourishment, comfort, and hair strength support. Our belief is simple: when the scalp is cared for properly, hair has a better chance to look and feel healthier. That is why Ayroil is built around scalp-first care, guided by Dr. Maria.',
 
-  iconUrl: "/brand/icon.svg",
-  whiteLogoUrl: "/brand/logo-white.svg",
-  darkLogoUrl: "/brand/logo-dark.svg",
-  ogImageUrl: "/brand/og.png",
+	iconUrl: '/brand/icon.svg',
+	whiteLogoUrl: '/brand/logo-white.svg',
+	darkLogoUrl: '/brand/logo-dark.svg',
+	ogImageUrl: '/brand/og.png',
 
-  domain: "ayroil.pk",
-  storefrontUrl: "http://localhost:3000",
-  adminUrl: "http://localhost:3001",
-  apiUrl: "http://localhost:4000",
+	domain: 'ayroil.pk',
+	storefrontUrl: 'http://localhost:3000',
+	adminUrl: 'http://localhost:3001',
+	apiUrl: 'http://localhost:4000',
 
-  supportEmail: "ayroil.pk@gmail.com",
-  salesEmail: "ayroil.pk@gmail.com",
-  phone: "+92 309 1238888",
-  address: "",
+	supportEmail: 'ayroil.pk@gmail.com',
+	salesEmail: 'ayroil.pk@gmail.com',
+	phone: '+92 309 1238888',
+	address: '',
 
-  social: {
-    instagram: "https://instagram.com/ayroil",
-    facebook: "https://facebook.com/ayroil",
-  },
+	social: {
+		instagram: 'https://instagram.com/ayroil',
+		facebook: 'https://facebook.com/ayroil',
+	},
 
-  brand: {
-    backgroundHex: "#fafaf9",
-    surfaceHex: "#ffffff",
-    inkHex: "#0a0a0b",
-    accentHex: "#cdfb4a",
-    accentInkHex: "#0a0a0b",
-    mutedHex: "#6b6b70",
-    lineHex: "#e6e6e3",
-  },
+	brand: {
+		backgroundHex: '#f7f4ec',
+		surfaceHex: '#fffdf8',
+		inkHex: '#1b1912',
+		accentHex: '#4f6e46',
+		accentInkHex: '#faf7ee',
+		mutedHex: '#79735f',
+		lineHex: '#e7e0cf',
+	},
 
-  currency: {
-    code: "PKR",
-    symbol: "Rs",
-    locale: "en-PK",
-  },
+	currency: {
+		code: 'PKR',
+		symbol: 'Rs',
+		locale: 'en-PK',
+	},
 
-  legal: {
-    companyName: "Ayroil",
-    foundedYear: 2024,
-    taxId: "00-0000000",
-  },
+	legal: {
+		companyName: 'Ayroil',
+		foundedYear: 2024,
+		taxId: '00-0000000',
+	},
 
-  shipping: {
-    freeShippingThresholdCents: 5000,
-    standardCostCents: 600,
-    estStandardDays: "3-4",
-  },
+	shipping: {
+		freeShippingThresholdCents: 5000,
+		standardCostCents: 600,
+		estStandardDays: '3-4',
+	},
 
-  returns: {
-    windowDays: 7,
-    policyUrl: "/policies/returns",
-  },
+	returns: {
+		windowDays: 7,
+		policyUrl: '/policies/returns',
+	},
 } as const;
 
 /**

@@ -15,6 +15,7 @@ import { relayUrl } from "@/lib/api";
 import { COUNTRIES } from "@/lib/countries";
 import { PK_CITIES, PK_REGIONS } from "@/lib/pk-locations";
 import { Combobox } from "@/components/ui/combobox";
+import { SwitchField } from "@/components/ui/switch-field";
 import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
 import { trackInitiateCheckout, trackPurchase } from "@/lib/analytics";
 
@@ -45,6 +46,24 @@ type FormState = {
 };
 
 type FieldErrors = Partial<Record<keyof FormState, string>>;
+
+// Remembers guest checkout details on this device only — there's no logged-in
+// account to attach a saved address to (this storefront is guest-checkout
+// only right now). Opt-in via the "Save this information" switch below.
+const SAVED_INFO_KEY = "ayroil:checkout-saved-info";
+
+type SavedInfo = FormState;
+
+function readSavedInfo(): SavedInfo | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(SAVED_INFO_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SavedInfo;
+  } catch {
+    return null;
+  }
+}
 
 function validate(s: FormState, addressMode: "saved" | "new"): FieldErrors {
   const errors: FieldErrors = {};
@@ -100,6 +119,20 @@ export function CheckoutClient({
   const [touched, setTouched] = useState<Partial<Record<keyof FormState, boolean>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [saveInfo, setSaveInfo] = useState(false);
+
+  // Prefill from a previous guest checkout on this device, once, after mount
+  // (localStorage isn't available during SSR, so this can't be the initial
+  // state without risking a hydration mismatch).
+  useEffect(() => {
+    const saved = readSavedInfo();
+    if (!saved) return;
+    // Bridging browser-only localStorage into React state after mount is
+    // exactly what this effect is for — the setState calls are intentional.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setState(saved);
+    setSaveInfo(true);
+  }, []);
 
   function patch<K extends keyof FormState>(k: K, v: FormState[K]) {
     setState((prev) => ({ ...prev, [k]: v }));
@@ -203,6 +236,10 @@ export function CheckoutClient({
         totalCents,
         order.number,
       );
+      if (typeof window !== "undefined") {
+        if (saveInfo) window.localStorage.setItem(SAVED_INFO_KEY, JSON.stringify(state));
+        else window.localStorage.removeItem(SAVED_INFO_KEY);
+      }
       await clear();
       router.push(`/orders/${order.number}`);
     } catch (err) {
@@ -436,6 +473,14 @@ export function CheckoutClient({
                 onChange={(v) => patch("postalCode", v)}
                 onBlur={() => touch("postalCode")}
                 error={touched.postalCode ? errors.postalCode : undefined}
+              />
+
+              <SwitchField
+                checked={saveInfo}
+                onChange={setSaveInfo}
+                label="Save this information for next time"
+                description="We'll remember your details on this device so you don't have to fill this form again."
+                className="md:col-span-2"
               />
             </div>
           ) : null}

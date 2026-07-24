@@ -8,12 +8,12 @@ import { formatPrice } from "@/lib/utils";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Order = {
-  id: string;
   number: string;
   status: string;
   paymentStatus: string;
   totalCents: number;
   createdAt: string;
+  trackingNumber: string | null;
   items: { productName: string; quantity: number }[];
 };
 
@@ -43,7 +43,7 @@ export default function OrdersPage() {
       confirmLabel: "Cancel order",
     });
     if (!ok) return;
-    setBusyId(o.id);
+    setBusyId(o.number);
     setError(null);
     try {
       const res = await fetch(relayUrl(`/orders/mine/${o.number}/cancel`), {
@@ -68,7 +68,7 @@ export default function OrdersPage() {
       confirmLabel: "Delete order",
     });
     if (!ok) return;
-    setBusyId(o.id);
+    setBusyId(o.number);
     setError(null);
     try {
       const res = await fetch(relayUrl(`/orders/mine/${o.number}`), {
@@ -98,15 +98,17 @@ export default function OrdersPage() {
     <div className="space-y-3">
       {error ? <p className="text-sm text-bad">{error}</p> : null}
       {orders.map((o) => {
-        const busy = busyId === o.id;
+        const busy = busyId === o.number;
         const cancellable = o.status === ORDER_STATUS.PENDING;
         const deletable = o.status === ORDER_STATUS.CANCELLED;
         return (
-          <div key={o.id} className="rounded-2xl border border-line bg-surface p-5">
+          <div key={o.number} className="rounded-2xl border border-line bg-surface p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
                 <div className="font-mono text-xs uppercase tracking-[0.2em] text-muted">{new Date(o.createdAt).toLocaleDateString()}</div>
-                <div className="font-display mt-1 text-lg text-ink">Order {o.number}</div>
+                <Link href={`/orders/${o.number}`} className="font-display mt-1 block text-lg text-ink underline-offset-4 hover:underline">
+                  Order {o.number}
+                </Link>
               </div>
               <div className="flex flex-wrap gap-3 text-xs">
                 <span className="rounded-full bg-ink/5 px-2.5 py-1 font-mono tracking-[0.05em] text-ink">{capitalize(o.status)}</span>
@@ -117,9 +119,19 @@ export default function OrdersPage() {
             <ul className="mt-3 text-xs text-muted">
               {o.items.map((i, idx) => <li key={idx}>· {i.quantity} × {i.productName}</li>)}
             </ul>
-            {cancellable || deletable ? (
-              <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-3">
-                {cancellable ? (
+            {o.trackingNumber ? (
+              <div className="mt-3 font-mono text-xs text-muted">Tracking: {o.trackingNumber}</div>
+            ) : null}
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3">
+              <Link
+                href={`/orders/${o.number}`}
+                className="text-xs font-medium text-ink underline-offset-2 hover:underline"
+              >
+                View details
+              </Link>
+              {cancellable ? (
+                <>
+                  <span className="text-line">·</span>
                   <button
                     type="button"
                     onClick={() => onCancel(o)}
@@ -128,8 +140,11 @@ export default function OrdersPage() {
                   >
                     {busy ? "Cancelling…" : "Cancel order"}
                   </button>
-                ) : null}
-                {deletable ? (
+                </>
+              ) : null}
+              {deletable ? (
+                <>
+                  <span className="text-line">·</span>
                   <button
                     type="button"
                     onClick={() => onDelete(o)}
@@ -138,9 +153,9 @@ export default function OrdersPage() {
                   >
                     {busy ? "Deleting…" : "Delete"}
                   </button>
-                ) : null}
-              </div>
-            ) : null}
+                </>
+              ) : null}
+            </div>
           </div>
         );
       })}

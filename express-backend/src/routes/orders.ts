@@ -40,6 +40,34 @@ const checkoutSchema = z.object({
   notes: z.string().max(500).optional().nullable(),
 });
 
+// Shared response shape for every customer-facing order read (account list,
+// account detail, and the public number-based detail page). Deliberately
+// omits admin-only financial fields (costCents, profitCents,
+// actualShippingCostCents) and the internal user id — those must never reach
+// a customer's browser, whether logged in or via the public detail link.
+function serializeOrderForCustomer(order: Order) {
+  return {
+    number: order.number,
+    status: order.status,
+    paymentStatus: order.paymentStatus,
+    createdAt: order.createdAt,
+    customerName: order.customerName,
+    shippingAddress: order.shippingAddress,
+    trackingNumber: order.trackingNumber,
+    subtotalCents: order.subtotalCents,
+    shippingCents: order.shippingCents,
+    taxCents: order.taxCents,
+    totalCents: order.totalCents,
+    items: order.items.map((i) => ({
+      productName: i.productName,
+      quantity: i.quantity,
+      unitPriceCents: i.unitPriceCents,
+      slug: i.product?.slug ?? null,
+      image: i.product?.images?.[0] ?? null,
+    })),
+  };
+}
+
 ordersRouter.post("/checkout", async (req, res) => {
   const parsed = checkoutSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ error: "Invalid", issues: parsed.error.issues });
@@ -134,17 +162,39 @@ ordersRouter.post("/checkout", async (req, res) => {
 ordersRouter.get("/mine", requireAuth, async (req, res) => {
   const items = await AppDataSource.getRepository(Order).find({
     where: { user: { id: req.auth!.sub } },
+    relations: { items: { product: true } },
     order: { createdAt: "DESC" },
   });
-  res.json(items);
+  res.json(items.map(serializeOrderForCustomer));
 });
 
 ordersRouter.get("/mine/:number", requireAuth, async (req, res) => {
   const order = await AppDataSource.getRepository(Order).findOne({
     where: { number: String(req.params.number), user: { id: req.auth!.sub } },
+    relations: { items: { product: true } },
   });
   if (!order) return res.status(404).json({ error: "Not found" });
-  res.json(order);
+  res.json(serializeOrderForCustomer(order));
+});
+
+/**
+ * Public order-detail lookup — no session involved. The order number is the
+ * only credential (see newOrderNumber()'s CSPRNG note): this is the page
+ * customers land on right after checkout and can revisit any time, and what
+ * the confirmation/shipped emails link to. Same customer-safe shape as the
+ * authenticated /mine routes, so it's just as safe for a guest as for a
+ * logged-in customer viewing their own order.
+ *
+ * Keep this before the admin /:id routes below, otherwise Express treats an
+ * order number as the :id segment (see the /:number/review note further up).
+ */
+ordersRouter.get("/:number/detail", async (req, res) => {
+  const order = await AppDataSource.getRepository(Order).findOne({
+    where: { number: String(req.params.number) },
+    relations: { items: { product: true } },
+  });
+  if (!order) return res.status(404).json({ error: "Not found" });
+  res.json(serializeOrderForCustomer(order));
 });
 
 /**

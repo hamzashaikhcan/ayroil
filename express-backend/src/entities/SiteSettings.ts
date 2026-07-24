@@ -110,6 +110,12 @@ export class SiteSettings {
   @Column({ type: "varchar", length: 500, default: "/policies/returns" })
   returnsPolicyUrl!: string;
 
+  // Global note shown on every customer's order confirmation/detail page and
+  // in the confirmation + shipped emails (e.g. "Orders ship in 2-3 business
+  // days"). Not per-order — one message for all customers, admin-editable.
+  @Column({ type: "text", default: "" })
+  orderNote!: string;
+
   // Product detail urgency timer — optional countdown shown near purchase CTA.
   @Column({ type: "boolean", default: false })
   productTimerEnabled!: boolean;

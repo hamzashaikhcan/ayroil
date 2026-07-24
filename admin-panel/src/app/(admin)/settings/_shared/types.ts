@@ -38,6 +38,7 @@ export type SettingsLike = {
   estStandardDays: string;
   returnsWindowDays: number;
   returnsPolicyUrl: string;
+  orderNote: string;
   productTimerEnabled: boolean;
   productTimerDurationSeconds: number;
   productTimerDiscountPercent: number;

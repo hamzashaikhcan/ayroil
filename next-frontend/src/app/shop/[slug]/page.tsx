@@ -18,7 +18,9 @@ export async function generateMetadata(props: PageProps<"/shop/[slug]">): Promis
   const ogImage = product.images?.[0];
   const title = product.metaTitle || product.name;
   return {
-    title,
+    // `absolute` bypasses the root layout's title template so the admin-set
+    // metaTitle renders exactly as stored — no auto-appended site name suffix.
+    title: { absolute: title },
     description: product.shortDescription,
     alternates: { canonical: `/shop/${product.slug}` },
     openGraph: {

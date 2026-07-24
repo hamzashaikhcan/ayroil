@@ -11,6 +11,7 @@ function money(cents: number, symbol: string): string {
  * never blocks or fails checkout if Slack is unreachable or unconfigured.
  */
 export async function sendNewOrderSlackAlert(order: Order, settings: SiteSettings): Promise<void> {
+  if (ENV.nodeEnv === "development") return;
   if (!ENV.slack.token || !ENV.slack.alertChannel) return;
 
   const symbol = settings.currencySymbol || "$";

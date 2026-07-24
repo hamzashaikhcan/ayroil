@@ -42,6 +42,7 @@ export type Settings = {
   estStandardDays: string;
   returnsWindowDays: number;
   returnsPolicyUrl: string;
+  orderNote: string;
   productTimerEnabled: boolean;
   productTimerDurationSeconds: number;
   productTimerDiscountPercent: number;
@@ -98,6 +99,7 @@ const FALLBACK: Settings = {
   estStandardDays: SITE.shipping.estStandardDays,
   returnsWindowDays: SITE.returns.windowDays,
   returnsPolicyUrl: SITE.returns.policyUrl,
+  orderNote: "",
   productTimerEnabled: false,
   productTimerDurationSeconds: 300,
   productTimerDiscountPercent: 10,

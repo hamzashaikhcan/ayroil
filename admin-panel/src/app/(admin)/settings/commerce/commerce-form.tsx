@@ -1,10 +1,23 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { Card, Field, NumberField } from "../_shared/fields";
 import { StickySaveBar } from "../_shared/save-bar";
 import { useSettingsSave } from "../_shared/use-settings-save";
 import { CURRENCIES, type SettingsLike } from "../_shared/types";
 import { SwitchField } from "@/components/ui/switch-field";
+
+const RichEditor = dynamic(
+  () => import("@/components/ui/rich-editor").then((m) => m.RichEditor),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="h-40 w-full rounded-md border border-line bg-surface-2 p-3 text-sm text-muted">
+        Loading editor…
+      </div>
+    ),
+  },
+);
 
 type CommerceSlice = Pick<
   SettingsLike,
@@ -17,6 +30,7 @@ type CommerceSlice = Pick<
   | "estStandardDays"
   | "returnsWindowDays"
   | "returnsPolicyUrl"
+  | "orderNote"
   | "productTimerEnabled"
   | "productTimerDurationSeconds"
   | "productTimerDiscountPercent"
@@ -34,6 +48,7 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
     estStandardDays: initial.estStandardDays,
     returnsWindowDays: initial.returnsWindowDays,
     returnsPolicyUrl: initial.returnsPolicyUrl,
+    orderNote: initial.orderNote,
     productTimerEnabled: initial.productTimerEnabled,
     productTimerDurationSeconds: initial.productTimerDurationSeconds,
     productTimerDiscountPercent: initial.productTimerDiscountPercent,
@@ -154,6 +169,17 @@ export function CommerceForm({ initial }: { initial: SettingsLike }) {
             placeholder="/policies/returns"
           />
         </div>
+      </Card>
+
+      <Card
+        title="Order note"
+        subtitle="Shown to every customer on their order confirmation/detail page. Leave blank to hide it."
+      >
+        <RichEditor
+          value={s.orderNote}
+          onChange={(html) => patch("orderNote", html)}
+          placeholder="e.g. Orders ship in 2-3 business days. We'll call to confirm before dispatch."
+        />
       </Card>
 
       <Card

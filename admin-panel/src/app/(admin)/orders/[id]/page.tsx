@@ -97,12 +97,6 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
             </div>
             <div className="text-xs text-muted">{order.shippingAddress.country}</div>
           </div>
-          {order.notes ? (
-            <div className="card p-5">
-              <div className="text-xs font-medium text-muted">Notes</div>
-              <div className="mt-2 text-sm text-ink">{order.notes}</div>
-            </div>
-          ) : null}
         </div>
       </div>
     </div>

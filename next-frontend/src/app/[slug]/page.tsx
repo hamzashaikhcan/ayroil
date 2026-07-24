@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { ANSWER_PAGES, getAnswerPage } from "@/content/answer-pages";
 import { fetchSettings } from "@/lib/settings";
+import { fetchPrimaryProduct, FALLBACK_PRODUCT } from "@/lib/server-api";
 
 /**
  * Answer-style guide pages at the site root (e.g. /hair-oil-for-dry-scalp).
@@ -43,6 +44,11 @@ export default async function AnswerPage(props: PageProps<"/[slug]">) {
   const page = getAnswerPage(slug);
   if (!page) notFound();
 
+  const [settings, product] = await Promise.all([
+    fetchSettings(),
+    fetchPrimaryProduct().then((p) => p ?? FALLBACK_PRODUCT),
+  ]);
+
   // The page's own question leads the FAQPage entity, so the direct answer is
   // liftable by answer engines alongside the FAQ block.
   const faqLd = {
@@ -58,9 +64,49 @@ export default async function AnswerPage(props: PageProps<"/[slug]">) {
     ],
   };
 
+  const articleLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: page.metaTitle,
+    description: page.metaDescription,
+    mainEntityOfPage: { "@type": "WebPage", "@id": `/${page.slug}` },
+    image: settings.ogImageUrl || undefined,
+    author: { "@type": "Organization", name: settings.siteName },
+    publisher: {
+      "@type": "Organization",
+      name: settings.siteName,
+      logo: settings.darkLogoUrl
+        ? { "@type": "ImageObject", url: settings.darkLogoUrl }
+        : undefined,
+    },
+  };
+
+  // The usage guide has a literal step-by-step list — lift it into HowTo
+  // structured data instead of duplicating it as new copy.
+  const stepSection = page.sections.find((s) => s.heading.toLowerCase() === "step by step");
+  const howToLd = stepSection?.list?.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        name: page.question,
+        description: page.answer,
+        step: stepSection.list.map((text, i) => ({
+          "@type": "HowToStep",
+          position: i + 1,
+          text,
+        })),
+      }
+    : null;
+
+  const relatedPages = page.related.map((s) => getAnswerPage(s)).filter((p): p is NonNullable<typeof p> => Boolean(p));
+
   return (
     <section className="py-12 md:py-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqLd) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleLd) }} />
+      {howToLd ? (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(howToLd) }} />
+      ) : null}
       <Container>
         <div className="mx-auto max-w-3xl">
           <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted">
@@ -94,6 +140,35 @@ export default async function AnswerPage(props: PageProps<"/[slug]">) {
                     ))}
                   </ul>
                 ) : null}
+                {section.table ? (
+                  <div className="mt-4 overflow-x-auto rounded-lg border border-line">
+                    <table className="w-full min-w-[480px] text-left text-sm">
+                      <thead>
+                        <tr className="border-b border-line bg-surface">
+                          {section.table.headers.map((h, i) => (
+                            <th key={i} className="px-4 py-3 font-mono text-xs uppercase tracking-[0.14em] text-muted">
+                              {h}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-line">
+                        {section.table.rows.map((row, i) => (
+                          <tr key={i}>
+                            {row.map((cell, j) => (
+                              <td
+                                key={j}
+                                className={j === 0 ? "px-4 py-3 font-medium text-ink" : "px-4 py-3 text-muted"}
+                              >
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ) : null}
               </div>
             ))}
           </div>
@@ -110,9 +185,30 @@ export default async function AnswerPage(props: PageProps<"/[slug]">) {
             </div>
           </div>
 
+          {relatedPages.length ? (
+            <div className="mt-12 border-t border-line pt-8">
+              <h2 className="font-display text-xl tracking-tight text-ink sm:text-2xl">Related guides</h2>
+              <ul className="mt-4 space-y-2">
+                {relatedPages.map((r) => (
+                  <li key={r.slug}>
+                    <Link
+                      href={`/${r.slug}`}
+                      className="text-sm font-medium text-ink underline underline-offset-4 hover:text-accent-deep"
+                    >
+                      {r.question}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           <div className="mt-12 flex flex-wrap items-center gap-4 border-t border-line pt-6 text-sm">
-            <Link href="/shop" className="font-medium text-ink underline underline-offset-4 hover:text-accent-deep">
-              Shop Ayroil
+            <Link
+              href={`/shop/${product.slug}`}
+              className="font-medium text-ink underline underline-offset-4 hover:text-accent-deep"
+            >
+              Shop {product.name}
             </Link>
             <Link href="/benefits" className="text-muted hover:text-ink">
               All benefits

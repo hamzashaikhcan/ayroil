@@ -73,6 +73,7 @@ const settingsSchema = z
     estStandardDays: z.string(),
     returnsWindowDays: z.number().int().min(0),
     returnsPolicyUrl: z.string(),
+    orderNote: z.string(),
     productTimerEnabled: z.boolean(),
     productTimerDurationSeconds: z.number().int().min(1).max(86400),
     productTimerDiscountPercent: z.number().int().min(1).max(95),

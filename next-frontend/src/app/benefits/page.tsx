@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Container } from "@/components/ui/container";
 import { ProductDescription } from "@/components/product/product-description";
 import { fetchSettings } from "@/lib/settings";
+import { ANSWER_PAGES } from "@/content/answer-pages";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
@@ -47,6 +49,26 @@ export default async function BenefitsPage() {
               {settings.longDescription}
             </p>
           )}
+
+          <div className="mt-16 border-t border-line pt-8">
+            <h2 className="font-display text-2xl tracking-tight text-ink">Go deeper on a specific concern</h2>
+            <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted">
+              Every scalp is a little different. These guides walk through the routine, ingredients, and honest
+              expectations for the concern closest to yours:
+            </p>
+            <ul className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              {ANSWER_PAGES.map((p) => (
+                <li key={p.slug}>
+                  <Link
+                    href={`/${p.slug}`}
+                    className="block rounded-xl border border-line bg-surface px-4 py-3 text-sm font-medium text-ink underline-offset-4 hover:border-line-strong hover:text-accent-deep hover:underline"
+                  >
+                    {p.question}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       </Container>
     </section>

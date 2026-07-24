@@ -16,6 +16,11 @@ function productUrl(settings: SiteSettings, slug: string): string {
   return `${siteBaseUrl(settings)}/shop/${slug}`;
 }
 
+/** Permanent, revisit-anytime order detail page — the order number is the credential (see newOrderNumber()). */
+function orderUrl(settings: SiteSettings, order: Order): string {
+  return `${siteBaseUrl(settings)}/orders/${order.number}`;
+}
+
 /**
  * A real CTA button. Plain <a> buttons render inconsistently across email
  * clients (Outlook in particular), so this uses the table-cell trick —
@@ -80,7 +85,7 @@ function renderEmailLayout(settings: SiteSettings, bodyHtml: string): string {
   const siteName = settings.siteName || SITE.siteName;
   const logo = settings.iconUrl || settings.darkLogoUrl;
   const year = new Date().getFullYear();
-  const footerLines = [settings.companyName || siteName, settings.address, settings.supportEmail]
+  const footerLines = [settings.companyName || siteName, settings.supportEmail]
     .filter(Boolean)
     .join(" · ");
 
@@ -143,7 +148,9 @@ function renderOrderConfirmationBody(order: Order, settings: SiteSettings): stri
 
     <p style="margin-top:24px;font-family:Helvetica,Arial,sans-serif;font-size:13px;line-height:1.6;color:#666666;">
       Shipping to ${addr.fullName}, ${addr.line1}${addr.line2 ? `, ${addr.line2}` : ""}, ${addr.city}, ${addr.region} ${addr.postalCode}, ${addr.country}.
-    </p>`;
+    </p>
+
+    ${emailButton("View order", orderUrl(settings, order), settings)}`;
 }
 
 function renderShippedBody(order: Order, settings: SiteSettings): string {
@@ -157,7 +164,9 @@ function renderShippedBody(order: Order, settings: SiteSettings): string {
 
     ${emailButton('Track your package', trackingUrl, settings)}
 
-    ${renderOrderItemsTable(order, settings)}`;
+    ${renderOrderItemsTable(order, settings)}
+
+    ${emailButton("View order", orderUrl(settings, order), settings)}`;
 }
 
 function renderDeliveredReviewBody(order: Order, settings: SiteSettings, reviewUrl: string): string {
@@ -170,7 +179,9 @@ function renderDeliveredReviewBody(order: Order, settings: SiteSettings, reviewU
 
     ${renderOrderItemsTable(order, settings)}
 
-    <p style="margin-top:20px;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#999999;">This review link can only be used once.</p>`;
+    <p style="margin-top:20px;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:#999999;">
+      This review link can only be used once. <a href="${orderUrl(settings, order)}" style="color:#666666;">View your order</a> any time.
+    </p>`;
 }
 
 async function sendEmail(order: Order, settings: SiteSettings, subject: string, bodyHtml: string): Promise<void> {

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Container } from "@/components/ui/container";
 import { ProductDescription } from "@/components/product/product-description";
 import { fetchSettings } from "@/lib/settings";
+import { formatDate } from "@/lib/utils";
 
 export async function generateMetadata(): Promise<Metadata> {
   const settings = await fetchSettings();
@@ -42,11 +43,7 @@ export default async function TermsPage() {
           </h1>
           <div className="mt-3 text-xs text-muted">
             Last updated{" "}
-            {new Date().toLocaleDateString(undefined, {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {formatDate(new Date(), { year: "numeric", month: "long", day: "numeric" })}
           </div>
           {body ? (
             <ProductDescription html={body} className="mt-8" />

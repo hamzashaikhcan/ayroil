@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { fetchOrders } from "@/lib/server-api";
-import { formatPrice } from "@/lib/utils";
+import { formatDate, formatPrice } from "@/lib/utils";
 import { StatusPill } from "@/components/ui/status-pill";
 import { PageHeader } from "@/components/ui/page-header";
 
@@ -51,7 +51,7 @@ export default async function OrdersPage() {
                   >
                     {formatPrice(o.profitCents)}
                   </td>
-                  <td className="px-5 py-3 text-muted tabular-nums" data-label="Date">{new Date(o.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</td>
+                  <td className="px-5 py-3 text-muted tabular-nums" data-label="Date">{formatDate(o.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

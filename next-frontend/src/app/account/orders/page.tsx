@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { ORDER_STATUS } from "@consts";
 import { relayUrl } from "@/lib/api";
-import { formatPrice } from "@/lib/utils";
+import { formatDate, formatPrice } from "@/lib/utils";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 
 type Order = {
@@ -105,7 +105,7 @@ export default function OrdersPage() {
           <div key={o.number} className="rounded-2xl border border-line bg-surface p-5">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <div className="font-mono text-xs uppercase tracking-[0.2em] text-muted">{new Date(o.createdAt).toLocaleDateString()}</div>
+                <div className="font-mono text-xs uppercase tracking-[0.2em] text-muted">{formatDate(o.createdAt)}</div>
                 <Link href={`/orders/${o.number}`} className="font-display mt-1 block text-lg text-ink underline-offset-4 hover:underline">
                   Order {o.number}
                 </Link>

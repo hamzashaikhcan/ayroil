@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { ProductDescription } from "@/components/product/product-description";
 import { API_URL } from "@/lib/api";
 import { fetchSettings } from "@/lib/settings";
-import { formatPrice } from "@/lib/utils";
+import { formatDate, formatPrice } from "@/lib/utils";
 import { ORDER_STATUS } from "@consts";
 
 type OrderDetail = {
@@ -129,7 +129,7 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[number]
             </span>
             <span className="hidden h-1 w-1 rounded-full bg-line-strong sm:inline-block" />
             <span className="text-muted">
-              {new Date(order.createdAt).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })}
+              {formatDate(order.createdAt, { year: "numeric", month: "long", day: "numeric" })}
             </span>
             {isPending ? null : (
               <Badge tone={isCancelled ? "outline" : "accent"} className="ml-auto">

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { PasswordInput } from "@/components/ui/password-input";
 import { useConfirm } from "@/components/ui/confirm-dialog";
 import { Card, Field } from "../_shared/fields";
+import { formatDate } from "@/lib/utils";
 
 export type AdminMe = {
   id: string;
@@ -193,11 +194,7 @@ export function ProfileForm({ initial }: { initial: AdminMe }) {
       <div className="card p-5">
         <div className="text-xs font-medium text-muted">Member since</div>
         <div className="mt-1 text-sm text-ink">
-          {new Date(initial.createdAt).toLocaleDateString(undefined, {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })}
+          {formatDate(initial.createdAt, { year: "numeric", month: "long", day: "numeric" })}
         </div>
       </div>
     </div>

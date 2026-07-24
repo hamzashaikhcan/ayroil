@@ -1,5 +1,5 @@
 import { adminServerFetch } from "@/lib/server-api";
-import { formatNumber, formatPrice } from "@/lib/utils";
+import { formatDate, formatDateTime, formatNumber, formatPrice } from "@/lib/utils";
 import { PageHeader } from "@/components/ui/page-header";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { StatusPill } from "@/components/ui/status-pill";
@@ -122,9 +122,9 @@ function CartRow({ cart }: { cart: ActiveCart }) {
             {cart.guestKey ? <span className="font-mono">key {cart.guestKey.slice(0, 10)}…</span> : null}
           </div>
           <div className="mt-1.5 text-xs text-muted tabular-nums">
-            Last update {new Date(cart.updatedAt).toLocaleString()}
+            Last update {formatDateTime(cart.updatedAt)}
             <span className="mx-2 text-line-strong">·</span>
-            Created {new Date(cart.createdAt).toLocaleDateString()}
+            Created {formatDate(cart.createdAt)}
           </div>
           <div className="mt-1 text-xs text-muted">{formatLocation(cart.location)}</div>
         </div>

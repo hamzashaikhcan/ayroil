@@ -44,3 +44,34 @@ export function formatNumber(n: number): string {
     return String(n);
   }
 }
+
+// This store operates in Pakistan only — every date/time shown anywhere in
+// the admin console (server-rendered or client-rendered) must read as
+// Asia/Karachi time regardless of the server's or the admin's own device
+// timezone. Never format a date with the ambient locale/timezone directly;
+// always go through these.
+const APP_TIMEZONE = "Asia/Karachi";
+const DEFAULT_DATE_OPTS: Intl.DateTimeFormatOptions = { year: "numeric", month: "short", day: "numeric" };
+const DEFAULT_DATETIME_OPTS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "short",
+  day: "numeric",
+  hour: "numeric",
+  minute: "2-digit",
+};
+
+export function formatDate(date: Date | string, opts: Intl.DateTimeFormatOptions = DEFAULT_DATE_OPTS): string {
+  try {
+    return new Intl.DateTimeFormat("en-US", { ...opts, timeZone: APP_TIMEZONE }).format(new Date(date));
+  } catch {
+    return new Date(date).toISOString().slice(0, 10);
+  }
+}
+
+export function formatDateTime(date: Date | string, opts: Intl.DateTimeFormatOptions = DEFAULT_DATETIME_OPTS): string {
+  try {
+    return new Intl.DateTimeFormat("en-US", { ...opts, timeZone: APP_TIMEZONE }).format(new Date(date));
+  } catch {
+    return new Date(date).toISOString();
+  }
+}

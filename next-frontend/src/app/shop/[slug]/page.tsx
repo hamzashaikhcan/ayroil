@@ -10,6 +10,7 @@ import { ProductPurchasePanel } from "@/components/product/product-purchase-pane
 import { fetchProductBySlug, fetchProductReviews, FALLBACK_PRODUCT } from "@/lib/server-api";
 import { PRODUCT_RATING } from "@/consts";
 import { fetchSettings } from "@/lib/settings";
+import { formatDate } from "@/lib/utils";
 
 export async function generateMetadata(props: PageProps<"/shop/[slug]">): Promise<Metadata> {
   const { slug } = await props.params;
@@ -313,11 +314,7 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
                     <div>
                       <div className="font-display text-lg text-ink">{review.customerName}</div>
                       <div className="mt-1 text-xs text-muted">
-                        {new Date(review.createdAt).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
+                        {formatDate(review.createdAt)}
                       </div>
                     </div>
                     <StarRating rating={review.rating} />

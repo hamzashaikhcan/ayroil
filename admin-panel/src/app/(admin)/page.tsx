@@ -5,7 +5,7 @@ import { OrdersLineChart } from "@/components/charts/orders-line-chart";
 import { StatusPill } from "@/components/ui/status-pill";
 import { PageHeader } from "@/components/ui/page-header";
 import { fetchOverview, fetchTimeseries, fetchTopProducts } from "@/lib/server-api";
-import { formatNumber, formatPrice } from "@/lib/utils";
+import { formatDate, formatNumber, formatPrice } from "@/lib/utils";
 import type { RangePreset } from "@/lib/api";
 import { IconChevronRight } from "@/components/ui/icons";
 
@@ -33,8 +33,8 @@ export default async function OverviewPage(props: PageProps<"/">) {
   }
 
   const k = overview.kpis;
-  const rangeFrom = new Date(overview.range.from).toLocaleDateString();
-  const rangeTo = new Date(overview.range.to).toLocaleDateString();
+  const rangeFrom = formatDate(overview.range.from);
+  const rangeTo = formatDate(overview.range.to);
 
   return (
     <div className="space-y-6">
@@ -155,7 +155,7 @@ export default async function OverviewPage(props: PageProps<"/">) {
                   >
                     {formatPrice(o.profitCents)}
                   </td>
-                  <td className="px-5 py-3 text-muted tabular-nums" data-label="Date">{new Date(o.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</td>
+                  <td className="px-5 py-3 text-muted tabular-nums" data-label="Date">{formatDate(o.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

@@ -3,7 +3,7 @@ import { OrdersLineChart } from "@/components/charts/orders-line-chart";
 import { KpiCard } from "@/components/ui/kpi-card";
 import { PageHeader } from "@/components/ui/page-header";
 import { fetchOverview, fetchTimeseries, fetchTopProducts } from "@/lib/server-api";
-import { formatNumber, formatPrice } from "@/lib/utils";
+import { formatDate, formatNumber, formatPrice } from "@/lib/utils";
 import type { RangePreset } from "@/lib/api";
 
 export default async function AnalyticsPage(props: PageProps<"/analytics">) {
@@ -27,8 +27,8 @@ export default async function AnalyticsPage(props: PageProps<"/analytics">) {
   }
 
   const k = overview.kpis;
-  const rangeFrom = new Date(overview.range.from).toLocaleDateString();
-  const rangeTo = new Date(overview.range.to).toLocaleDateString();
+  const rangeFrom = formatDate(overview.range.from);
+  const rangeTo = formatDate(overview.range.to);
 
   return (
     <div className="space-y-5">

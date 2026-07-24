@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { StatusPill } from "@/components/ui/status-pill";
 import { AddReviewDialog, EditReviewDialog } from "./add-review-dialog";
 import { ReviewActions } from "./review-actions";
+import { formatDate } from "@/lib/utils";
 
 export default async function ReviewsPage(props: PageProps<"/reviews">) {
   const sp = await props.searchParams;
@@ -79,11 +80,7 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
                       <StatusPill value={review.visible ? "visible" : "hidden"} />
                     </td>
                     <td className="px-5 py-4 text-muted tabular-nums" data-label="Date">
-                      {new Date(review.createdAt).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {formatDate(review.createdAt)}
                     </td>
                     <td className="px-5 py-4" data-label="Actions">
                       <div className="flex flex-wrap items-center gap-2">

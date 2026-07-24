@@ -10,10 +10,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import type { TimeseriesPoint } from "@/lib/server-api";
+import { formatDate } from "@/lib/utils";
 
 export function OrdersLineChart({ series }: { series: TimeseriesPoint[] }) {
   const data = series.map((p) => ({
-    date: new Date(p.bucket).toLocaleDateString(undefined, { month: "short", day: "numeric" }),
+    date: formatDate(p.bucket, { month: "short", day: "numeric" }),
     orders: p.orders,
     revenue: Math.round(p.revenueCents / 100),
   }));

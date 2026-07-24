@@ -4,6 +4,7 @@ import { adminServerFetch } from "@/lib/server-api";
 import { OrderActions } from "./order-actions";
 import { OrderItemsCard } from "./order-items-card";
 import { StatusPill } from "@/components/ui/status-pill";
+import { formatDateTime } from "@/lib/utils";
 
 type Order = {
   id: string;
@@ -55,7 +56,7 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
             <h2 className="text-xl font-semibold tracking-tight text-ink">Order {order.number}</h2>
             <StatusPill value={order.status} />
           </div>
-          <div className="mt-1 text-xs text-muted">{new Date(order.createdAt).toLocaleString()}</div>
+          <div className="mt-1 text-xs text-muted">{formatDateTime(order.createdAt)}</div>
         </div>
         <OrderActions
           id={order.id}

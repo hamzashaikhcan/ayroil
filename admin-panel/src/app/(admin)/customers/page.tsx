@@ -1,6 +1,7 @@
 import { fetchUsers } from "@/lib/server-api";
 import { StatusPill } from "@/components/ui/status-pill";
 import { PageHeader } from "@/components/ui/page-header";
+import { formatDate } from "@/lib/utils";
 
 export default async function CustomersPage() {
   const users = await fetchUsers();
@@ -34,7 +35,7 @@ export default async function CustomersPage() {
                   </td>
                   <td className="px-5 py-3 text-ink" data-label="Name">{u.name ?? "—"}</td>
                   <td className="px-5 py-3" data-label="Role"><StatusPill value={u.role} /></td>
-                  <td className="px-5 py-3 text-muted tabular-nums" data-label="Joined">{new Date(u.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</td>
+                  <td className="px-5 py-3 text-muted tabular-nums" data-label="Joined">{formatDate(u.createdAt)}</td>
                 </tr>
               ))}
             </tbody>

@@ -44,11 +44,10 @@ export default async function OverviewPage(props: PageProps<"/">) {
         actions={<RangePicker />}
       />
 
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <KpiCard label="Revenue" value={formatPrice(k.revenueCents)} sub={`${formatNumber(k.totalOrders)} orders`} />
         <KpiCard label="Profit" value={formatPrice(k.profitCents)} sub={`AOV ${formatPrice(k.aovCents)}`} />
         <KpiCard label="Units sold" value={formatNumber(k.unitsSold)} sub={`${formatNumber(k.totalProducts)} products live`} />
-        <KpiCard label="New customers" value={formatNumber(k.newUsers)} sub={`${formatNumber(k.totalUsers)} total`} />
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[2fr_1fr]">
@@ -124,12 +123,14 @@ export default async function OverviewPage(props: PageProps<"/">) {
                 <th className="px-5 py-2.5 font-medium">Customer</th>
                 <th className="px-5 py-2.5 font-medium">Status</th>
                 <th className="px-5 py-2.5 font-medium">Total</th>
+                <th className="px-5 py-2.5 font-medium">Shipping cost</th>
+                <th className="px-5 py-2.5 font-medium">Profit</th>
                 <th className="px-5 py-2.5 font-medium">Date</th>
               </tr>
             </thead>
             <tbody>
               {overview.recentOrders.length === 0 ? (
-                <tr><td colSpan={5} className="px-5 py-12 text-center text-muted">No orders yet.</td></tr>
+                <tr><td colSpan={7} className="px-5 py-12 text-center text-muted">No orders yet.</td></tr>
               ) : overview.recentOrders.map((o) => (
                 <tr key={o.id} className="border-b border-line last:border-b-0 row-hover">
                   <td className="px-5 py-3" data-label="Order">
@@ -143,6 +144,17 @@ export default async function OverviewPage(props: PageProps<"/">) {
                   </td>
                   <td className="px-5 py-3" data-label="Status"><StatusPill value={o.status} /></td>
                   <td className="px-5 py-3 font-medium tabular-nums text-ink" data-label="Total">{formatPrice(o.totalCents)}</td>
+                  <td className="px-5 py-3 tabular-nums" data-label="Shipping cost">
+                    {o.actualShippingCostCents != null
+                      ? <span className="font-medium text-ink">{formatPrice(o.actualShippingCostCents)}</span>
+                      : <span className="text-muted">—</span>}
+                  </td>
+                  <td
+                    className={`px-5 py-3 font-medium tabular-nums ${o.profitCents < 0 ? "text-bad" : "text-ink"}`}
+                    data-label="Profit"
+                  >
+                    {formatPrice(o.profitCents)}
+                  </td>
                   <td className="px-5 py-3 text-muted tabular-nums" data-label="Date">{new Date(o.createdAt).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}</td>
                 </tr>
               ))}

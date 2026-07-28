@@ -18,7 +18,7 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "sw
 const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: ["latin"], display: "swap" });
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"], display: "swap" });
 const GA_MEASUREMENT_ID = "G-ECSBHST4TC";
-const META_PIXEL_ID = "1631927431705759";
+const META_PIXEL_ID = "1011312245107880";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();

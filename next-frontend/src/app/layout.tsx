@@ -19,6 +19,7 @@ const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: 
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"], display: "swap" });
 const GA_MEASUREMENT_ID = "G-ECSBHST4TC";
 const META_PIXEL_ID = "1011312245107880";
+const GTM_ID = "GTM-NWKGZK5Z";
 
 export async function generateMetadata(): Promise<Metadata> {
   const h = await headers();
@@ -123,7 +124,22 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       style={brandStyle(settings)}
       suppressHydrationWarning
     >
+      <Script id="gtm-script" strategy="beforeInteractive">
+        {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','${GTM_ID}');`}
+      </Script>
       <body className="min-h-full bg-background text-ink flex flex-col" suppressHydrationWarning>
+        <noscript>
+          <iframe
+            src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          />
+        </noscript>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(orgLd) }} />
         {/* Stubs define window.gtag/fbq and their call queues immediately
             (afterInteractive, negligible cost) so events fired by user

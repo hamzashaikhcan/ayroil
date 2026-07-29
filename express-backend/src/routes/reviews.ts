@@ -61,6 +61,7 @@ const createReviewSchema = z.object({
   comment: z.string().max(4000).default(""),
   customerName: z.string().min(1).max(120),
   visible: z.boolean().default(true),
+  images: z.array(z.string()).max(5).optional().default([]),
   /** Optional backdate so admin-added reviews can carry a realistic date. */
   createdAt: z.coerce.date().optional(),
 });
@@ -83,6 +84,7 @@ reviewsRouter.post("/", async (req, res) => {
     comment: parsed.data.comment,
     customerName: parsed.data.customerName,
     visible: parsed.data.visible,
+    images: parsed.data.images,
     ...(parsed.data.createdAt ? { createdAt: parsed.data.createdAt } : {}),
   });
   const saved = await repo.save(review);
@@ -94,6 +96,7 @@ const updateReviewSchema = z.object({
   rating: z.number().int().min(1).max(5).optional(),
   comment: z.string().max(4000).optional(),
   customerName: z.string().min(1).max(120).optional(),
+  images: z.array(z.string()).max(5).optional(),
   createdAt: z.coerce.date().optional(),
 });
 
@@ -105,11 +108,12 @@ reviewsRouter.patch("/:id", async (req, res) => {
   const review = await repo.findOne({ where: { id: String(req.params.id) } });
   if (!review) return res.status(404).json({ error: "Not found" });
 
-  const { visible, rating, comment, customerName, createdAt } = parsed.data;
+  const { visible, rating, comment, customerName, images, createdAt } = parsed.data;
   if (visible !== undefined) review.visible = visible;
   if (rating !== undefined) review.rating = rating;
   if (comment !== undefined) review.comment = comment;
   if (customerName !== undefined) review.customerName = customerName;
+  if (images !== undefined) review.images = images;
   if (createdAt !== undefined) review.createdAt = createdAt;
   const saved = await repo.save(review);
   res.json(saved);

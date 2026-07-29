@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { adminClientFetch } from "@/lib/admin-client";
 import { Button } from "@/components/ui/button";
 import { SwitchField } from "@/components/ui/switch-field";
+import { ImageUploader } from "@/components/ui/image-uploader";
 
 type ProductOption = { id: string; name: string; slug: string };
 
@@ -15,6 +16,7 @@ type ReviewFormValues = {
   date: string;
   visible: boolean;
   comment: string;
+  images: string[];
 };
 
 const inputClass =
@@ -33,7 +35,7 @@ export function AddReviewDialog({ products }: { products: ProductOption[] }) {
         <ReviewDialogForm
           title="Add review"
           submitLabel="Add review"
-          initial={{ rating: 5, customerName: "", date: "", visible: true, comment: "" }}
+          initial={{ rating: 5, customerName: "", date: "", visible: true, comment: "", images: [] }}
           productField={
             <div>
               <label className="text-xs font-medium text-muted">Product</label>
@@ -56,6 +58,7 @@ export function AddReviewDialog({ products }: { products: ProductOption[] }) {
                 customerName: values.customerName.trim(),
                 comment: values.comment.trim(),
                 visible: values.visible,
+                images: values.images,
                 ...(values.date ? { createdAt: new Date(`${values.date}T12:00:00`).toISOString() } : {}),
               }),
             })
@@ -76,6 +79,7 @@ export function EditReviewDialog({
     comment: string;
     customerName: string;
     visible: boolean;
+    images: string[];
     createdAt: string;
     productName: string;
   };
@@ -97,6 +101,7 @@ export function EditReviewDialog({
             date: review.createdAt.slice(0, 10),
             visible: review.visible,
             comment: review.comment,
+            images: review.images ?? [],
           }}
           productField={
             <div>
@@ -115,6 +120,7 @@ export function EditReviewDialog({
                 customerName: values.customerName.trim(),
                 comment: values.comment.trim(),
                 visible: values.visible,
+                images: values.images,
                 ...(values.date ? { createdAt: new Date(`${values.date}T12:00:00`).toISOString() } : {}),
               }),
             })
@@ -152,8 +158,9 @@ function ReviewDialogForm({
   const [date, setDate] = useState(initial.date);
   const [visible, setVisible] = useState(initial.visible);
   const [comment, setComment] = useState(initial.comment);
+  const [images, setImages] = useState(initial.images);
 
-  const values: ReviewFormValues = { rating, customerName, date, visible, comment };
+  const values: ReviewFormValues = { rating, customerName, date, visible, comment, images };
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -223,6 +230,12 @@ function ReviewDialogForm({
               placeholder="What the customer said about the product…"
               className="mt-1.5 w-full rounded-md border border-line bg-surface-2 px-3 py-2 text-sm text-ink placeholder:text-muted focus:border-ink/30 focus:bg-surface focus:outline-none"
             />
+          </div>
+          <div className="sm:col-span-2">
+            <label className="text-xs font-medium text-muted">Photos</label>
+            <div className="mt-1.5">
+              <ImageUploader images={images} onChange={setImages} />
+            </div>
           </div>
         </div>
 

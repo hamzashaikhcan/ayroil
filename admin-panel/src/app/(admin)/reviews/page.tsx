@@ -107,6 +107,7 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
                             comment: review.comment,
                             customerName: review.customerName,
                             visible: review.visible,
+                            images: review.images ?? [],
                             createdAt: review.createdAt,
                             productName: review.product?.name ?? "Deleted product",
                           }}

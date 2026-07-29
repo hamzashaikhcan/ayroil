@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
 import { API_URL } from "@/lib/api";
 import { RatingField } from "./rating-field";
+import { ReviewImages } from "./review-images";
 
 type ReviewLookup = {
   number: string;
@@ -49,12 +50,13 @@ async function submitReview(number: string, formData: FormData) {
   const token = String(formData.get("token") ?? "");
   const rating = Number(formData.get("rating") ?? 0);
   const comment = String(formData.get("comment") ?? "").trim();
+  const images = formData.getAll("images").map(String).filter(Boolean);
 
   const res = await fetch(`${API_URL}/orders/${encodeURIComponent(number)}/review`, {
     method: "POST",
     cache: "no-store",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token, rating, comment }),
+    body: JSON.stringify({ token, rating, comment, images }),
   });
 
   if (res.ok) {
@@ -199,6 +201,8 @@ export default async function OrderReviewPage(props: PageProps<"/orders/[number]
                   className="mt-2 w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink placeholder:text-muted hover:border-line-strong focus:border-ink/30 focus:outline-none"
                 />
               </div>
+
+              <ReviewImages number={number} token={token} />
 
               <div className="flex flex-wrap items-center gap-3 border-t border-line pt-6">
                 <Button type="submit" variant="primary">

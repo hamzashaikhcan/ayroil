@@ -27,47 +27,35 @@ productsRouter.get("/", async (req, res) => {
 
   if (!items.length) return res.json(items);
 
-  const productIds = items.map((item) => item.id);
-  const reviewRows = await AppDataSource.getRepository(Review)
-    .createQueryBuilder("r")
-    .leftJoin("r.product", "p")
-    .select("p.id", "productId")
-    .addSelect("COUNT(r.id)", "reviewCount")
-    .addSelect("AVG(r.rating)", "averageRating")
-    .where("p.id IN (:...productIds)", { productIds })
-    .andWhere("r.visible = true")
-    .groupBy("p.id")
-    .getRawMany<{ productId: string; reviewCount: string; averageRating: string | null }>();
+  // Reviews are shown site-wide (not scoped per product — the catalog is one
+  // physical product sold in different bundle sizes), so every product gets
+  // the same combined rating/count rather than its own slice.
+  const { reviewCount, averageRating } = await siteWideReviewSummary();
 
-  const reviewSummaryByProductId = new Map(
-    reviewRows.map((row) => [
-      row.productId,
-      {
-        reviewCount: Number(row.reviewCount),
-        averageRating: row.averageRating ? Number(row.averageRating) : 0,
-      },
-    ]),
-  );
-
-  res.json(
-    items.map((item) => ({
-      ...item,
-      reviewCount: reviewSummaryByProductId.get(item.id)?.reviewCount ?? 0,
-      averageRating: reviewSummaryByProductId.get(item.id)?.averageRating ?? 0,
-    })),
-  );
+  res.json(items.map((item) => ({ ...item, reviewCount, averageRating })));
 });
 
-productsRouter.get("/:slug/reviews", async (req, res) => {
-  const product = await AppDataSource.getRepository(Product).findOne({
-    where: { slug: req.params.slug, active: true },
-  });
-  if (!product) return res.status(404).json({ error: "Not found" });
+async function siteWideReviewSummary(): Promise<{ reviewCount: number; averageRating: number }> {
+  const row = await AppDataSource.getRepository(Review)
+    .createQueryBuilder("r")
+    .select("COUNT(r.id)", "reviewCount")
+    .addSelect("AVG(r.rating)", "averageRating")
+    .where("r.visible = true")
+    .getRawOne<{ reviewCount: string; averageRating: string | null }>();
+  return {
+    reviewCount: Number(row?.reviewCount ?? 0),
+    averageRating: row?.averageRating ? Number(row.averageRating) : 0,
+  };
+}
 
+// Site-wide review pool — every product detail page shows the same combined
+// list, since the catalog is one physical product in different bundle sizes.
+// Registered before /:slug so "reviews" isn't swallowed as a slug value.
+productsRouter.get("/reviews", async (_req, res) => {
   const reviews = await AppDataSource.getRepository(Review).find({
-    where: { product: { id: product.id }, visible: true },
+    where: { visible: true },
     order: { createdAt: "DESC" },
-    take: 50,
+    take: 100,
   });
 
   res.json(
@@ -76,6 +64,7 @@ productsRouter.get("/:slug/reviews", async (req, res) => {
       rating: review.rating,
       comment: review.comment,
       customerName: review.customerName,
+      images: review.images ?? [],
       createdAt: review.createdAt,
     })),
   );

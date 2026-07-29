@@ -36,6 +36,7 @@ reviewsRouter.get("/", async (req, res) => {
       comment: review.comment,
       customerName: review.customerName,
       visible: review.visible,
+      images: review.images ?? [],
       createdAt: review.createdAt,
       product: review.product
         ? {

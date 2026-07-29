@@ -11,6 +11,7 @@ import { CartItem } from "../entities/CartItem.js";
 import { Product } from "../entities/Product.js";
 import { User } from "../entities/User.js";
 import { SiteSettings } from "../entities/SiteSettings.js";
+import { ENV } from "../config/env.js";
 import { newOrderNumber } from "../lib/orderNumber.js";
 import { guestKeyFromRequest } from "../lib/guest.js";
 import { sendOrderConfirmationEmail, sendShippedOrderEmail, sendDeliveredReviewEmail } from "../lib/email.js";
@@ -274,10 +275,52 @@ ordersRouter.get("/:number/review", async (req, res) => {
   });
 });
 
+/**
+ * Signed Cloudinary upload params for review photos — same signing recipe as
+ * the admin-only /uploads/sign, but gated by the one-time review token
+ * instead of requireAdmin, since the reviewer has no session at all.
+ * Minting a signature doesn't consume the token; only POST /review does.
+ */
+ordersRouter.get("/:number/review/upload-sign", async (req, res) => {
+  const order = await AppDataSource.getRepository(Order).findOne({
+    where: { number: String(req.params.number) },
+  });
+  if (!reviewTokenIsValid(order, req.query.token as string | undefined)) {
+    return res.status(410).json({ error: "This review link is invalid or has already been used." });
+  }
+  if (!ENV.cloudinary.cloudName || !ENV.cloudinary.apiKey || !ENV.cloudinary.apiSecret) {
+    return res.status(503).json({ error: "Image uploads aren't configured yet." });
+  }
+
+  const timestamp = Math.floor(Date.now() / 1000);
+  const folder = "reviews";
+  const signedParams: Record<string, string> = { folder, timestamp: String(timestamp) };
+  const toSign = Object.keys(signedParams)
+    .sort()
+    .map((k) => `${k}=${signedParams[k]}`)
+    .join("&");
+  const signature = crypto.createHash("sha1").update(toSign + ENV.cloudinary.apiSecret).digest("hex");
+
+  res.json({
+    cloudName: ENV.cloudinary.cloudName,
+    apiKey: ENV.cloudinary.apiKey,
+    timestamp,
+    folder,
+    signature,
+    uploadUrl: `https://api.cloudinary.com/v1_1/${ENV.cloudinary.cloudName}/image/upload`,
+  });
+});
+
+const reviewImageUrl = z
+  .string()
+  .url()
+  .refine((url) => new URL(url).hostname === "res.cloudinary.com", "Image must be hosted on Cloudinary");
+
 const reviewSubmitSchema = z.object({
   token: z.string().min(1),
   rating: z.coerce.number().int().min(1).max(5),
   comment: z.string().max(1000).optional().default(""),
+  images: z.array(reviewImageUrl).max(5).optional().default([]),
 });
 
 ordersRouter.post("/:number/review", async (req, res) => {
@@ -299,6 +342,7 @@ ordersRouter.post("/:number/review", async (req, res) => {
     rating: parsed.data.rating,
     comment: parsed.data.comment.trim(),
     customerName: order.customerName,
+    images: parsed.data.images,
     visible: false,
   });
   await orderRepo.update({ id: order.id }, { reviewTokenUsedAt: new Date() });

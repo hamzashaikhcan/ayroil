@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import Link from "next/link";
@@ -9,7 +10,7 @@ import { ProductDescription } from "@/components/product/product-description";
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
 import { CustomerTestimonials } from "@/components/product/customer-testimonials";
 import { BeforeAfterSlider } from "@/components/product/before-after-slider";
-import { fetchProductBySlug, fetchProductReviews, FALLBACK_PRODUCT } from "@/lib/server-api";
+import { fetchProductBySlug, fetchReviews, FALLBACK_PRODUCT } from "@/lib/server-api";
 import { PRODUCT_RATING } from "@/consts";
 import { fetchSettings } from "@/lib/settings";
 import { formatDate } from "@/lib/utils";
@@ -46,7 +47,7 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
   const { slug } = await props.params;
   const [product, reviews, settings, headerList] = await Promise.all([
     fetchProductBySlug(slug).then((p) => p ?? (slug === FALLBACK_PRODUCT.slug ? FALLBACK_PRODUCT : null)),
-    fetchProductReviews(slug),
+    fetchReviews(),
     fetchSettings(),
     headers(),
   ]);
@@ -333,6 +334,24 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
                   ) : (
                     <p className="mt-4 text-sm leading-relaxed text-muted">Rated {review.rating} out of 5.</p>
                   )}
+                  {review.images?.length ? (
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {review.images.map((url, i) => (
+                        <div
+                          key={url}
+                          className="relative h-20 w-20 flex-none overflow-hidden rounded-lg border border-line bg-background"
+                        >
+                          <Image
+                            src={url}
+                            alt={`${review.customerName}'s photo ${i + 1}`}
+                            fill
+                            sizes="80px"
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </div>

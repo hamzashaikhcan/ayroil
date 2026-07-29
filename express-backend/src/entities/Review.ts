@@ -43,6 +43,9 @@ export class Review {
   @Column({ type: "boolean", default: false })
   visible!: boolean;
 
+  @Column({ type: "jsonb", default: () => "'[]'" })
+  images!: string[];
+
   @CreateDateColumn()
   createdAt!: Date;
 }

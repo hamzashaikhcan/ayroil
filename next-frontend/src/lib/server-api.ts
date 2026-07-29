@@ -32,9 +32,13 @@ export async function fetchProductBySlug(slug: string): Promise<Product | null> 
   }
 }
 
-export async function fetchProductReviews(slug: string): Promise<ProductReview[]> {
+/**
+ * Site-wide review pool — every product detail page shows the same combined
+ * list, since the catalog is one physical product in different bundle sizes.
+ */
+export async function fetchReviews(): Promise<ProductReview[]> {
   try {
-    const res = await fetch(`${API_URL}/products/${encodeURIComponent(slug)}/reviews`, { cache: "no-store" });
+    const res = await fetch(`${API_URL}/products/reviews`, { cache: "no-store" });
     if (!res.ok) return [];
     return (await res.json()) as ProductReview[];
   } catch {

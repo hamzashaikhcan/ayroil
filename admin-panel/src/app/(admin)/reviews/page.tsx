@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { fetchProducts, fetchReviews } from "@/lib/server-api";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatusPill } from "@/components/ui/status-pill";
@@ -54,6 +55,21 @@ export default async function ReviewsPage(props: PageProps<"/reviews">) {
                       <p className="mt-2 text-sm leading-relaxed text-ink">
                         {review.comment.trim() || "No written comment."}
                       </p>
+                      {review.images?.length ? (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {review.images.map((url, i) => (
+                            <a
+                              key={url}
+                              href={url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="relative block h-12 w-12 flex-none overflow-hidden rounded-md border border-line"
+                            >
+                              <Image src={url} alt={`Attachment ${i + 1}`} fill sizes="48px" className="object-cover" unoptimized />
+                            </a>
+                          ))}
+                        </div>
+                      ) : null}
                       {review.order ? (
                         <Link
                           href={`/orders/${review.order.id}`}

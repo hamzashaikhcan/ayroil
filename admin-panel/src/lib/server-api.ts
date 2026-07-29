@@ -137,6 +137,7 @@ export type AdminReview = {
   comment: string;
   customerName: string;
   visible: boolean;
+  images: string[];
   createdAt: string;
   product: { id: string; slug: string; name: string } | null;
   order: { id: string; number: string } | null;

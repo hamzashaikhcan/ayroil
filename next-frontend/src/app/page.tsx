@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProductThumb } from '@/components/product/product-thumb';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
-import { fetchAllProducts, fetchPrimaryProduct, FALLBACK_PRODUCT } from '@/lib/server-api';
+import { fetchAllProducts, fetchPrimaryProduct, fetchReviews, FALLBACK_PRODUCT } from '@/lib/server-api';
 import { fetchSettings } from '@/lib/settings';
-import { formatPrice } from '@/lib/utils';
+import { formatPrice, formatDate } from '@/lib/utils';
 import { HERO_2_IMAGE, PRODUCT_RATING } from '@/consts';
 
 function LeafIcon({ className }: { className?: string }) {
@@ -74,11 +74,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function HomePage() {
-	const [product, settings, allProducts] = await Promise.all([
+	const [product, settings, allProducts, reviews] = await Promise.all([
 		fetchPrimaryProduct().then((p) => p ?? FALLBACK_PRODUCT),
 		fetchSettings(),
 		fetchAllProducts(),
+		fetchReviews(),
 	]);
+	const homeReviews = reviews.slice(0, 12);
 	// Prefer site-wide FAQs from settings; fall back to the product's own FAQs if none set.
 	const faqs = settings.faqs?.length
 		? settings.faqs
@@ -517,119 +519,52 @@ export default async function HomePage() {
 						</h2>
 						<p className='mt-5 text-base leading-relaxed text-muted'>
 							We do not pay for reviews and we do not delete the bad ones. The
-							quotes here are pulled straight from our inbox.
+							quotes here come straight from verified orders.
 						</p>
 					</div>
-					<div className='mt-12 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3'>
-						{[
-							{
-								q: 'honestly mujhe zyada umeed nahi thi par 3 hafte hue hain aur takiye pe baal kaafi kam aa rahe hain ab. dekhte hain aage kya hota hai',
-								n: 'Sadia R.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'mere baal bht rough thay. ye laga ke ab thore soft lagte hain. start me thora chipchipa lagta hai but raat ko lagao subah dho lo to theek hai',
-								n: 'Anum K.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'dandruff ke liye le tha. khujli kaafi kam hui hai sach me. abhi puri tarah gaya to nahi but pehle se behtar hai',
-								n: 'Bilal P.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'itni oils try kar chuka hun yaar, koi kaam nahi karti thi. ye pehli baar hai k bottle khatam ki maine. paisa wasool',
-								n: 'Hanif Z.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'ammi ke kehne pe mangwaya tha. smell achi hai light si, mujhe pasand aayi. ab ghar me sab use kar rahe',
-								n: 'Maryam S.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'thora mehnga laga pehle but bottle kaafi chal jati hai, 2 mahine se upar ho gaye abhi bhi bachi hui hai. thori thori lagani parti hai bas',
-								n: 'Usman T.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'shadi ki wajah se start kiya tha. growth ka pata nahi abhi itni jaldi but baal pehle se thore ghane lag rahe hain shayad. continue kar rahi hun',
-								n: 'Hira N.',
-								role: 'Verified buyer',
-								s: 4,
-							},
-							{
-								q: 'delivery me 4 din lage thay but packaging sahi thi leak waghera nahi hua. oil baqi sastay walon jaisa chipchipa nahi hai ye acha hai',
-								n: 'Faizan A.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'mere baal patle ho rahe thay. abhi 1 mahina hua hai, thora difference lag raha hai par pura yakeen se nahi keh sakta. update karunga baad me',
-								n: 'Komal J.',
-								role: 'Verified buyer',
-								s: 4,
-							},
-							{
-								q: 'raat ko lagata hun subah dho leta hun. scalp halka feel hota hai. bas dhone me thora effort lagta hai warna theek hai',
-								n: 'Ahmed R.',
-								role: 'Verified buyer',
-								s: 4,
-							},
-							{
-								q: 'was a bit skeptical ngl but after a month my hairfall is def less. texture bhi softer feel hoti hai. happy so far',
-								n: 'Zoya M.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'main roz to nahi laga pata, week me 3 4 din laga leta hun. itne me bhi baal pehle se behtar lag rahe hain. khushboo zyada tez nahi hai ye achi baat hai mujhe strong smell pasand nahi',
-								n: 'Tariq H.',
-								role: 'Verified buyer',
-							},
-							{
-								q: 'split ends ka masla tha bht. thora behtar hua hai. roz lagana parta hai consistency se warna farq nahi parta itna',
-								n: 'Nida F.',
-								role: 'Verified buyer',
-								s: 4,
-							},
-							{
-								q: 'travel ke liye le tha, bottle leak nahi karti bag me. light hai zyada heavy nahi karta baalon ko. ok hai overall',
-								n: 'Salman K.',
-								role: 'Verified buyer',
-								s: 4,
-							},
-						].map((r) => (
-							<figure
-								key={r.n}
-								className='mb-4 break-inside-avoid rounded-2xl border border-line bg-surface p-6'>
-								<div className='flex gap-0.5' aria-hidden>
-									{Array.from({ length: 5 }).map((_, i) => (
-										<svg
-											key={i}
-											viewBox='0 0 20 20'
-											className={`size-4 fill-current ${
-												i < (r.s ?? 5) ? 'text-accent-deep' : 'text-line'
-											}`}>
-											<path d='M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 15l-5.2 2.6 1-5.8L1.5 7.7l5.9-.9L10 1.5z' />
-										</svg>
-									))}
-								</div>
-								<blockquote className='mt-4 text-sm leading-relaxed text-ink'>
-									&ldquo;{r.q}&rdquo;
-								</blockquote>
-								<figcaption className='mt-5 flex items-center gap-3'>
-									<span className='flex size-9 shrink-0 items-center justify-center rounded-full bg-accent font-display text-sm text-accent-ink'>
-										{r.n.charAt(0)}
-									</span>
-									<span className='leading-tight'>
-										<span className='block text-sm font-medium text-ink'>
-											{r.n}
-										</span>
-										<span className='block text-xs text-muted'>{r.role}</span>
-									</span>
-								</figcaption>
-							</figure>
-						))}
-					</div>
+					{homeReviews.length ? (
+						<>
+							<div className='mt-12 gap-4 [column-fill:_balance] sm:columns-2 lg:columns-3'>
+								{homeReviews.map((r) => (
+									<figure
+										key={r.id}
+										className='mb-4 break-inside-avoid rounded-2xl border border-line bg-surface p-6'>
+										<div className='flex gap-0.5' aria-hidden>
+											{Array.from({ length: 5 }).map((_, i) => (
+												<svg
+													key={i}
+													viewBox='0 0 20 20'
+													className={`size-4 fill-current ${
+														i < r.rating ? 'text-accent-deep' : 'text-line'
+													}`}>
+													<path d='M10 1.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L10 15l-5.2 2.6 1-5.8L1.5 7.7l5.9-.9L10 1.5z' />
+												</svg>
+											))}
+										</div>
+										<blockquote className='mt-4 text-sm leading-relaxed text-ink'>
+											&ldquo;{r.comment.trim() || `Rated ${r.rating} out of 5.`}&rdquo;
+										</blockquote>
+										<figcaption className='mt-5 flex items-center gap-3'>
+											<span className='flex size-9 shrink-0 items-center justify-center rounded-full bg-accent font-display text-sm text-accent-ink'>
+												{r.customerName.charAt(0)}
+											</span>
+											<span className='leading-tight'>
+												<span className='block text-sm font-medium text-ink'>
+													{r.customerName}
+												</span>
+												<span className='block text-xs text-muted'>{formatDate(r.createdAt)}</span>
+											</span>
+										</figcaption>
+									</figure>
+								))}
+							</div>
+							<div className='mt-10 text-center'>
+								<Button href='/reviews' variant='secondary'>
+									See all reviews
+								</Button>
+							</div>
+						</>
+					) : null}
 				</Container>
 			</section>
 

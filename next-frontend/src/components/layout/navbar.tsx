@@ -15,6 +15,7 @@ import { AUTH_UI_ENABLED } from "@/lib/auth-ui";
 const PRIMARY = [
   { href: "/shop", label: "Shop" },
   { href: "/benefits", label: "Benefits" },
+  { href: "/reviews", label: "Reviews" },
   { href: "/faq", label: "FAQ" },
 ];
 

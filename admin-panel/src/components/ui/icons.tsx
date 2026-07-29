@@ -189,6 +189,25 @@ export function IconDoc(p: Props) {
   );
 }
 
+export function IconChat(p: Props) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M2 3.5h12v7.5H6.5L3.5 13.5V11H2z" />
+      <path d="M5 6.5h6M5 8.5h4" />
+    </svg>
+  );
+}
+
+export function IconCompare(p: Props) {
+  return (
+    <svg {...base} {...p}>
+      <rect x="2" y="2.5" width="12" height="11" rx="1.5" />
+      <path d="M8 2.5v11" />
+      <path d="M5 8h-1M12 8h-1" />
+    </svg>
+  );
+}
+
 export function IconHelp(p: Props) {
   return (
     <svg {...base} {...p}>

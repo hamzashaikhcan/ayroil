@@ -63,6 +63,9 @@ export type Settings = {
   benefitsTitle: string;
   benefitsBody: string;
   faqs: { q: string; a: string }[];
+  testimonials: string[];
+  beforeAfterBeforeImageUrl: string;
+  beforeAfterAfterImageUrl: string;
   termsTitle: string;
   termsBody: string;
   privacyTitle: string;
@@ -120,6 +123,9 @@ const FALLBACK: Settings = {
   benefitsTitle: "Benefits",
   benefitsBody: `<p>${SITE.longDescription}</p>`,
   faqs: [],
+  testimonials: [],
+  beforeAfterBeforeImageUrl: "",
+  beforeAfterAfterImageUrl: "",
   termsTitle: "Terms of Service",
   termsBody: "",
   privacyTitle: "Privacy Policy",

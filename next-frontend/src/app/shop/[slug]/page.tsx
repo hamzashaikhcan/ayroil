@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { ProductGallery } from "@/components/product/product-gallery";
 import { ProductDescription } from "@/components/product/product-description";
 import { ProductPurchasePanel } from "@/components/product/product-purchase-panel";
+import { CustomerTestimonials } from "@/components/product/customer-testimonials";
+import { BeforeAfterSlider } from "@/components/product/before-after-slider";
 import { fetchProductBySlug, fetchProductReviews, FALLBACK_PRODUCT } from "@/lib/server-api";
 import { PRODUCT_RATING } from "@/consts";
 import { fetchSettings } from "@/lib/settings";
@@ -281,6 +283,13 @@ export default async function PDP(props: PageProps<"/shop/[slug]">) {
           </Container>
         </section>
       ) : null}
+
+      <CustomerTestimonials images={settings.testimonials} />
+
+      <BeforeAfterSlider
+        beforeUrl={settings.beforeAfterBeforeImageUrl}
+        afterUrl={settings.beforeAfterAfterImageUrl}
+      />
 
       {reviews.length ? (
         <section className="border-t border-line py-16">

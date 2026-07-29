@@ -440,9 +440,6 @@ ordersRouter.post("/:id/notify-shipped", requireAdmin, async (req, res) => {
     relations: { items: { product: true } },
   });
   if (!order) return res.status(404).json({ error: "Not found" });
-  if (!order.trackingNumber?.trim()) {
-    return res.status(400).json({ error: "Add a tracking number before sending the shipped email." });
-  }
   const settings = await AppDataSource.getRepository(SiteSettings).findOne({ where: {} });
   if (!settings) return res.status(400).json({ error: "Email isn't configured yet." });
   await sendShippedOrderEmail(order, settings);

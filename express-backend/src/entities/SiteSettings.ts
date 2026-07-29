@@ -191,6 +191,20 @@ export class SiteSettings {
   @Column({ type: "jsonb", default: () => "'[]'" })
   faqs!: { q: string; a: string }[];
 
+  // Screenshot-style customer testimonials (WhatsApp/Instagram DMs etc.),
+  // curated once by the admin and rendered identically on every product
+  // detail page — not per-product content.
+  @Column({ type: "jsonb", default: () => "'[]'" })
+  testimonials!: string[];
+
+  // Site-wide before/after comparison slider, shown on every product detail
+  // page. Section only renders when both images are set.
+  @Column({ type: "varchar", length: 500, default: "" })
+  beforeAfterBeforeImageUrl!: string;
+
+  @Column({ type: "varchar", length: 500, default: "" })
+  beforeAfterAfterImageUrl!: string;
+
   // Legal pages — rendered on /terms and /privacy.
   @Column({ type: "varchar", length: 240, default: "Terms of Service" })
   termsTitle!: string;

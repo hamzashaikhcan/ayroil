@@ -22,10 +22,17 @@ export function ProductDescription({
     ADD_ATTR: ["target", "rel"],
   });
 
+  // The editor's HTML export always marks toggle-list blocks as `open`
+  // (it doesn't persist collapsed state), which made every "toggle list" on
+  // the storefront render permanently expanded — no actual toggling. Default
+  // them closed here so they behave like a real accordion; native <details>
+  // still handles the click-to-expand interaction with no JS required.
+  const collapsed = clean.replace(/<details open(?:="")?>/g, "<details>");
+
   return (
     <div
       className={cn("product-prose", className)}
-      dangerouslySetInnerHTML={{ __html: clean }}
+      dangerouslySetInnerHTML={{ __html: collapsed }}
     />
   );
 }

@@ -1,9 +1,15 @@
 import { Router } from "express";
 import { z } from "zod";
+import { ORDER_STATUS } from "@consts";
 import { AppDataSource } from "../data-source.js";
 import { Product } from "../entities/Product.js";
 import { Review } from "../entities/Review.js";
+import { OrderItem } from "../entities/OrderItem.js";
 import { requireAdmin } from "../middleware/auth.js";
+
+// Same "real sale" definition used by admin analytics — cancelled/refunded
+// orders never counted as demand, everything else (including pending COD) does.
+const EXCLUDED_FROM_SALES_COUNT = [ORDER_STATUS.CANCELLED, ORDER_STATUS.REFUNDED];
 
 export const productsRouter: Router = Router();
 
@@ -79,7 +85,18 @@ productsRouter.get("/:slug", async (req, res) => {
   const repo = AppDataSource.getRepository(Product);
   const product = await repo.findOne({ where: { slug: req.params.slug } });
   if (!product) return res.status(404).json({ error: "Not found" });
-  res.json(product);
+
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000);
+  const soldRow = await AppDataSource.getRepository(OrderItem)
+    .createQueryBuilder("oi")
+    .innerJoin("oi.order", "o")
+    .select("COALESCE(SUM(oi.quantity), 0)::int", "units")
+    .where("oi.product = :productId", { productId: product.id })
+    .andWhere("o.createdAt >= :since", { since })
+    .andWhere("o.status NOT IN (:...excluded)", { excluded: EXCLUDED_FROM_SALES_COUNT })
+    .getRawOne<{ units: number }>();
+
+  res.json({ ...product, soldLast24h: soldRow?.units ?? 0 });
 });
 
 const productSchema = z.object({

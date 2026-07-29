@@ -115,6 +115,87 @@
     border-top: 1px solid var(--line);
     margin: 2em 0;
   }
+
+  /* Toggle-list blocks export as:
+       <li><details><summary>...</summary></details><ul>...children...</ul></li>
+     Note the children list is a SIBLING of <details>, not nested inside it —
+     so the native <details> open/close state doesn't hide/show anything on
+     its own. Key the child list's visibility off the sibling <details>[open]
+     and style the whole <li> as one accordion card. */
+  .product-prose ul:has(> li > details) {
+    list-style: none;
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+  }
+  .product-prose li:has(> details) {
+    margin-top: 0;
+    border: 1px solid var(--line);
+    border-radius: 1rem;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .product-prose li:has(> details)::marker {
+    content: none;
+  }
+  .product-prose li:has(> details) > details {
+    border: 0;
+    background: transparent;
+  }
+  .product-prose li:has(> details) > ul,
+  .product-prose li:has(> details) > ol {
+    display: none;
+    margin: 0;
+    padding: 0 1.25em 1.25em 2.6em;
+  }
+  .product-prose li:has(> details[open]) > ul,
+  .product-prose li:has(> details[open]) > ol {
+    display: block;
+  }
+  .product-prose li:has(> details[open]) > details summary {
+    border-bottom: 1px solid var(--line);
+  }
+  .product-prose summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75em;
+    padding: 1em 1.25em;
+    cursor: pointer;
+    list-style: none;
+    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--ink);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .product-prose summary::-webkit-details-marker {
+    display: none;
+  }
+  .product-prose summary::marker {
+    content: none;
+  }
+  .product-prose summary p {
+    display: inline;
+    margin: 0;
+    color: inherit;
+  }
+  .product-prose summary::after {
+    content: "";
+    flex: none;
+    width: 0.45em;
+    height: 0.45em;
+    margin-top: -0.15em;
+    border-right: 2px solid var(--muted);
+    border-bottom: 2px solid var(--muted);
+    transform: rotate(-45deg);
+    transition: transform 200ms ease;
+  }
+  .product-prose details[open] summary::after {
+    transform: rotate(45deg);
+    margin-top: 0.05em;
+  }
 }
 
 /* When the product sticky buy bar is pinned (see StickyBuyBar), lift the

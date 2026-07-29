@@ -119,11 +119,10 @@ export function OrderActions({
   const normalizedShipCost = shipCost.trim();
   const hasChanges =
     s !== savedStatus || normalizedTracking !== savedTracking || normalizedShipCost !== savedShipCost;
-  const trackingSaved = savedTracking.length > 0 && normalizedTracking === savedTracking;
   const shippedEmailTitle = hasChanges
     ? "Save changes before sending"
-    : !trackingSaved
-      ? "Save a tracking number first"
+    : savedTracking.length === 0
+      ? "No tracking number set — email will be sent without tracking details"
       : undefined;
 
   return (
@@ -174,7 +173,7 @@ export function OrderActions({
         </Button>
         <Button
           onClick={sendShippedEmail}
-          disabled={!trackingSaved || sendingShipped || hasChanges}
+          disabled={sendingShipped || hasChanges}
           variant="secondary"
           size="sm"
           title={shippedEmailTitle}

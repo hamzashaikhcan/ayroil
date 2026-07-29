@@ -154,15 +154,19 @@ function renderOrderConfirmationBody(order: Order, settings: SiteSettings): stri
 }
 
 function renderShippedBody(order: Order, settings: SiteSettings): string {
-	// const trackingUrl = `https://pk.leopardscourier.com/shipment_tracking_view?cn_number=${encodeURIComponent(order.trackingNumber ?? "")}`;
+	const trackingNumber = order.trackingNumber?.trim();
 	const trackingUrl = `https://pk.leopardscourier.com/shipment_tracking_view`;
+
+	const trackingSection = trackingNumber
+		? `<p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped via Leopards Courier.</p>
+    <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Tracking number: <strong style="color:#111111;">${trackingNumber}</strong></p>
+
+    ${emailButton('Track your package', trackingUrl, settings)}`
+		: `<p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped and is on its way to you.</p>`;
 
 	return `
     <h1 style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:21px;color:#111111;">Your order is on its way, ${order.customerName.split(' ')[0]}.</h1>
-    <p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped via Leopards Courier.</p>
-    <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Tracking number: <strong style="color:#111111;">${order.trackingNumber}</strong></p>
-
-    ${emailButton('Track your package', trackingUrl, settings)}
+    ${trackingSection}
 
     ${renderOrderItemsTable(order, settings)}
 
@@ -215,7 +219,7 @@ export async function sendOrderConfirmationEmail(order: Order, settings: SiteSet
   await sendEmail(order, settings, `Order confirmed — ${order.number}`, renderOrderConfirmationBody(order, settings));
 }
 
-/** Fire-and-forget "your order shipped" email with a Leopards tracking link. Requires order.trackingNumber to be set. */
+/** Fire-and-forget "your order shipped" email. Includes a Leopards tracking link/number only if order.trackingNumber is set. */
 export async function sendShippedOrderEmail(order: Order, settings: SiteSettings): Promise<void> {
   await sendEmail(order, settings, `Order shipped — ${order.number}`, renderShippedBody(order, settings));
 }

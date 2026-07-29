@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-type Tone = "neutral" | "accent" | "soft" | "outline" | "recommend";
+type Tone = "neutral" | "accent" | "soft" | "outline" | "recommend" | "warning";
 
 const tones: Record<Tone, string> = {
   neutral: "bg-ink text-background",
@@ -8,6 +8,7 @@ const tones: Record<Tone, string> = {
   soft: "bg-ink/5 text-ink",
   outline: "bg-transparent text-ink border border-line-strong",
   recommend: "bg-ink/85 text-background backdrop-blur-sm",
+  warning: "bg-amber-500/15 text-amber-800 border border-amber-500/30",
 };
 
 export function Badge({ tone = "neutral", children, className }: { tone?: Tone; children: React.ReactNode; className?: string }) {

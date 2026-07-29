@@ -60,6 +60,9 @@ export type SettingsLike = {
   benefitsTitle: string;
   benefitsBody: string;
   faqs: { q: string; a: string }[];
+  testimonials: string[];
+  beforeAfterBeforeImageUrl: string;
+  beforeAfterAfterImageUrl: string;
   termsTitle: string;
   termsBody: string;
   privacyTitle: string;

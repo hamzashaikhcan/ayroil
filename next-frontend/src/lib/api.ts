@@ -48,6 +48,7 @@ export type Product = {
   faqs: { q: string; a: string }[];
   reviewCount?: number;
   averageRating?: number;
+  soldLast24h?: number;
   createdAt: string;
   updatedAt: string;
 };

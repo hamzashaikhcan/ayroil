@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Inter, Fraunces, JetBrains_Mono } from "next/font/google";
 import { headers } from "next/headers";
 import Script from "next/script";
 import { SITE } from "@consts";
@@ -15,7 +15,12 @@ import { setActiveCurrency } from "@/lib/utils";
 import "./globals.css";
 
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
-const spaceGrotesk = Space_Grotesk({ variable: "--font-space-grotesk", subsets: ["latin"], display: "swap" });
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
+  subsets: ["latin"],
+  display: "swap",
+  axes: ["opsz", "SOFT", "WONK"],
+});
 const jetbrainsMono = JetBrains_Mono({ variable: "--font-jetbrains-mono", subsets: ["latin"], display: "swap" });
 const GA_MEASUREMENT_ID = "G-ECSBHST4TC";
 const META_PIXEL_ID = "1011312245107880";
@@ -120,7 +125,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html
       lang={lang}
-      className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
+      className={`${inter.variable} ${fraunces.variable} ${jetbrainsMono.variable} h-full antialiased`}
       style={brandStyle(settings)}
       suppressHydrationWarning
     >

@@ -25,7 +25,7 @@
   --color-accent-ink: var(--accent-ink);
   --color-accent-deep: var(--accent-deep);
   --font-sans: var(--font-inter);
-  --font-display: var(--font-space-grotesk);
+  --font-display: var(--font-fraunces);
   --font-mono: var(--font-jetbrains-mono);
 }
 
@@ -40,7 +40,7 @@
 }
 
 @layer utilities {
-  .font-display { font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif; letter-spacing: -0.02em; }
+  .font-display { font-family: var(--font-display), ui-serif, Georgia, serif; letter-spacing: -0.02em; }
   .font-mono { font-family: var(--font-mono), ui-monospace, monospace; }
   .marker-dot::before {
     content: ""; display: inline-block; width: 6px; height: 6px;
@@ -71,7 +71,7 @@
   .product-prose h3,
   .product-prose h4 {
     color: var(--ink);
-    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     letter-spacing: -0.015em;
     line-height: 1.2;
     margin-top: 1.6em;
@@ -164,7 +164,7 @@
     padding: 1em 1.25em;
     cursor: pointer;
     list-style: none;
-    font-family: var(--font-display), ui-sans-serif, system-ui, sans-serif;
+    font-family: var(--font-display), ui-serif, Georgia, serif;
     font-size: 17px;
     font-weight: 600;
     color: var(--ink);

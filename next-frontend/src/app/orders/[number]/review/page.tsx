@@ -130,7 +130,7 @@ export default async function OrderReviewPage(props: PageProps<"/orders/[number]
   return (
     <section className="bg-[linear-gradient(180deg,var(--background)_0%,var(--surface)_100%)] py-12 sm:py-20">
       <Container>
-        <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
+        <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
           <aside className="rounded-2xl border border-line bg-background p-6 shadow-sm sm:p-7">
             <div className="font-mono text-xs uppercase tracking-[0.22em] text-muted">
               <span className="marker-dot">Delivered order</span>

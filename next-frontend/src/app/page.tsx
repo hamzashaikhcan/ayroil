@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ProductThumb } from '@/components/product/product-thumb';
 import { AddToCartButton } from '@/components/product/add-to-cart-button';
+import { CustomerTestimonials } from '@/components/product/customer-testimonials';
+import { BeforeAfterSlider } from '@/components/product/before-after-slider';
 import { fetchAllProducts, fetchPrimaryProduct, fetchReviews, FALLBACK_PRODUCT } from '@/lib/server-api';
 import { fetchSettings } from '@/lib/settings';
 import { formatPrice, formatDate } from '@/lib/utils';
@@ -507,6 +509,13 @@ export default async function HomePage() {
 					</Container>
 				</section>
 			) : null}
+
+			<CustomerTestimonials images={settings.testimonials} />
+
+			<BeforeAfterSlider
+				beforeUrl={settings.beforeAfterBeforeImageUrl}
+				afterUrl={settings.beforeAfterAfterImageUrl}
+			/>
 
 			<section className='py-20'>
 				<Container>

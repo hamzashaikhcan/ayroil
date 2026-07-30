@@ -62,4 +62,15 @@ export const ENV = {
     privateKey: process.env.VAPID_PRIVATE_KEY ?? "",
     subject: process.env.VAPID_SUBJECT ?? "mailto:admin@example.com",
   },
+
+  // Twilio WhatsApp — order-confirmation message on checkout. Skipped
+  // entirely when accountSid/authToken are absent.
+  twilio: {
+    accountSid: process.env.TWILIO_ACCOUNT_SID ?? "",
+    authToken: process.env.TWILIO_AUTH_TOKEN ?? "",
+    whatsappFrom: process.env.TWILIO_WHATSAPP_FROM ?? "",
+    messagingServiceSid: process.env.TWILIO_MESSAGING_SERVICE_SID ?? "",
+    contentSid: process.env.TWILIO_CONTENT_SID ?? "",
+    defaultCountry: (process.env.WHATSAPP_DEFAULT_COUNTRY ?? "PK") as string,
+  },
 };

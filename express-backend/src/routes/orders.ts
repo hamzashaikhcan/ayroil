@@ -17,6 +17,7 @@ import { guestKeyFromRequest } from "../lib/guest.js";
 import { sendOrderConfirmationEmail, sendShippedOrderEmail, sendDeliveredReviewEmail } from "../lib/email.js";
 import { sendNewOrderSlackAlert } from "../lib/slack.js";
 import { sendNewOrderPush, sendNewReviewPush } from "../lib/push.js";
+import { sendOrderConfirmationWhatsapp } from "../lib/whatsapp.js";
 import { reconcileStockForStatusChange, STOCK_RELEASED_STATUSES } from "../lib/orderStock.js";
 import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
@@ -155,6 +156,7 @@ ordersRouter.post("/checkout", async (req, res) => {
     void sendOrderConfirmationEmail(order, settings);
     void sendNewOrderSlackAlert(order, settings);
     void sendNewOrderPush(order, settings);
+    void sendOrderConfirmationWhatsapp(order, settings);
   }
 
   res.status(201).json(order);

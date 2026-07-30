@@ -47,7 +47,9 @@ const STATUS_STEPS: { key: string; label: string }[] = [
   { key: ORDER_STATUS.DELIVERED, label: "Delivered" },
 ];
 
-const TRACKING_URL = "https://pk.leopardscourier.com/shipment_tracking_view";
+function trackingUrl(trackingNumber: string): string {
+  return `https://merchantapi.leopardscourier.com/track?no=${encodeURIComponent(trackingNumber)}`;
+}
 
 // Same number the floating WhatsApp button uses (src/components/layout/whatsapp-button.tsx).
 const WHATSAPP_NUMBER = "923091238888";
@@ -199,7 +201,7 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[number]
                 <span className="text-muted">Tracking number</span>
                 <span className="font-mono text-ink">{order.trackingNumber}</span>
                 <a
-                  href={TRACKING_URL}
+                  href={trackingUrl(order.trackingNumber)}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="ml-auto font-medium text-ink underline underline-offset-4 hover:text-accent-deep"

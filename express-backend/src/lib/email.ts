@@ -155,7 +155,9 @@ function renderOrderConfirmationBody(order: Order, settings: SiteSettings): stri
 
 function renderShippedBody(order: Order, settings: SiteSettings): string {
 	const trackingNumber = order.trackingNumber?.trim();
-	const trackingUrl = `https://pk.leopardscourier.com/shipment_tracking_view`;
+	const trackingUrl = trackingNumber
+		? `https://merchantapi.leopardscourier.com/track?no=${encodeURIComponent(trackingNumber)}`
+		: "";
 
 	const trackingSection = trackingNumber
 		? `<p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped via Leopards Courier.</p>

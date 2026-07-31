@@ -23,11 +23,8 @@ import {
   IconDoc,
   IconHelp,
   IconChat,
-  IconCompare,
-  IconTruck,
-  IconRefund,
   IconScale,
-  IconShield,
+  IconPackage,
 } from "@/components/ui/icons";
 
 type NavItem = {
@@ -39,6 +36,7 @@ type NavItem = {
 const NAV: NavItem[] = [
   { href: "/", label: "Overview", Icon: IconHome },
   { href: "/orders", label: "Orders", Icon: IconOrders },
+  { href: "/postex", label: "PostEx", Icon: IconPackage },
   { href: "/carts", label: "Active carts", Icon: IconCart },
   { href: "/products", label: "Products", Icon: IconProducts },
   { href: "/reviews", label: "Reviews", Icon: IconStar },
@@ -50,12 +48,8 @@ const CONTENT: NavItem[] = [
   { href: "/settings/hero", label: "Hero", Icon: IconHero },
   { href: "/settings/benefits", label: "Benefits page", Icon: IconDoc },
   { href: "/settings/faqs", label: "FAQs", Icon: IconHelp },
-  { href: "/settings/testimonials", label: "Testimonials", Icon: IconChat },
-  { href: "/settings/before-after", label: "Before / after", Icon: IconCompare },
-  { href: "/settings/shipping", label: "Shipping policy", Icon: IconTruck },
-  { href: "/settings/returns", label: "Returns policy", Icon: IconRefund },
-  { href: "/settings/terms", label: "Terms", Icon: IconScale },
-  { href: "/settings/privacy", label: "Privacy", Icon: IconShield },
+  { href: "/settings/social-proof", label: "Social proof", Icon: IconChat },
+  { href: "/settings/legal", label: "Legal & policies", Icon: IconScale },
 ];
 
 const SECONDARY: NavItem[] = [

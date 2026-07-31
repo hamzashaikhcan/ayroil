@@ -18,6 +18,7 @@ import { sendOrderConfirmationEmail, sendShippedOrderEmail, sendDeliveredReviewE
 import { sendNewOrderSlackAlert } from "../lib/slack.js";
 import { sendNewOrderPush, sendNewReviewPush } from "../lib/push.js";
 import { sendOrderConfirmationWhatsapp } from "../lib/whatsapp.js";
+import { autoCreatePostexShipment } from "../lib/postexOrders.js";
 import { reconcileStockForStatusChange, STOCK_RELEASED_STATUSES } from "../lib/orderStock.js";
 import { requireAdmin, requireAuth } from "../middleware/auth.js";
 
@@ -105,6 +106,7 @@ ordersRouter.post("/checkout", async (req, res) => {
       productName: i.product.name,
       unitPriceCents,
       unitCostCents: i.product.costCents,
+      unitWeightGrams: i.product.weightGrams,
       quantity: i.quantity,
     };
   });
@@ -138,6 +140,7 @@ ordersRouter.post("/checkout", async (req, res) => {
         oi.productName = s.productName;
         oi.unitPriceCents = s.unitPriceCents;
         oi.unitCostCents = s.unitCostCents;
+        oi.unitWeightGrams = s.unitWeightGrams;
         oi.quantity = s.quantity;
         return oi;
       }),
@@ -158,6 +161,10 @@ ordersRouter.post("/checkout", async (req, res) => {
     void sendNewOrderPush(order, settings);
     void sendOrderConfirmationWhatsapp(order, settings);
   }
+  // Auto-book the shipment with PostEx — same fire-and-forget treatment; a
+  // failure here (unserved city, no token yet, PostEx downtime) never blocks
+  // checkout. The admin can still book manually from the order detail page.
+  void autoCreatePostexShipment(order, settings);
 
   res.status(201).json(order);
 });

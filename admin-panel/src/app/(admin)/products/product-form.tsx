@@ -37,6 +37,7 @@ type ProductLike = {
   compareAtCents: number | null;
   costCents: number;
   stock: number;
+  weightGrams: number | null;
   sku: string | null;
   active: boolean;
   recommended: boolean;
@@ -58,6 +59,7 @@ const EMPTY: ProductLike = {
   compareAtCents: null,
   costCents: 0,
   stock: 0,
+  weightGrams: null,
   sku: null,
   active: true,
   recommended: false,
@@ -211,17 +213,24 @@ export function ProductForm({
           </p>
         </Card>
 
-        <Card title="Inventory" subtitle="Stock count and SKU for fulfillment.">
+        <Card title="Inventory" subtitle="Stock count, weight, and SKU for fulfillment.">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <NumberField label="Stock on hand" value={p.stock} onChange={(v) => patch("stock", v)} />
+            <NumberField
+              label="Weight (grams)"
+              value={p.weightGrams ?? 0}
+              onChange={(v) => patch("weightGrams", v || null)}
+            />
             <SkuField
               value={p.sku ?? ""}
               onChange={(v) => patch("sku", v || null)}
               seedSlug={p.slug}
               seedName={p.name}
-              className="md:col-span-2"
             />
           </div>
+          <p className="mt-3 text-xs text-muted">
+            Used to report the total shipment weight to couriers (e.g. PostEx) when this product is ordered.
+          </p>
         </Card>
 
         <Card title="Highlights" subtitle="One bullet per line. Shown as a list on the PDP.">

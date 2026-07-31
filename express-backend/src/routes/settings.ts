@@ -20,7 +20,7 @@ settingsRouter.get("/", async (req, res) => {
   if (!row) return res.json(row);
   const isAdmin = req.auth?.role === ROLES.ADMIN && req.auth?.aud === ENV.auth.adminAudience;
   if (isAdmin) return res.json(row);
-  const { resendApiKey, ...publicRow } = row;
+  const { resendApiKey, postexApiToken, ...publicRow } = row;
   res.json(publicRow);
 });
 

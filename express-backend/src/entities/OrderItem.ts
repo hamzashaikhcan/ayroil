@@ -28,6 +28,12 @@ export class OrderItem {
   @Column({ type: "int" })
   unitCostCents!: number;
 
+  // Snapshot of Product.weightGrams at order time — same rationale as
+  // unitPriceCents/unitCostCents: a later change to the product's weight
+  // shouldn't retroactively change what was reported to the courier.
+  @Column({ type: "int", nullable: true })
+  unitWeightGrams!: number | null;
+
   @Column({ type: "int", default: 1 })
   quantity!: number;
 

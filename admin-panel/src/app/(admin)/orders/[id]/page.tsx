@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { adminServerFetch } from "@/lib/server-api";
+import { fetchPostexSettings, fetchPostexShipments, fetchPostexPickupAddresses, fetchPostexCities } from "@/lib/postex";
 import { OrderActions } from "./order-actions";
 import { OrderItemsCard } from "./order-items-card";
+import { OrderPostexCard } from "./order-postex-card";
 import { StatusPill } from "@/components/ui/status-pill";
 import { formatDateTime } from "@/lib/utils";
 
@@ -47,6 +49,13 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
   }
   if (!order) notFound();
 
+  const [postexShipments, postexSettings, postexPickupAddresses, postexCities] = await Promise.all([
+    fetchPostexShipments(order.id),
+    fetchPostexSettings(),
+    fetchPostexPickupAddresses(),
+    fetchPostexCities(),
+  ]);
+
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-[1fr_auto] xl:items-start">
@@ -63,6 +72,7 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
           status={order.status}
           trackingNumber={order.trackingNumber}
           actualShippingCostCents={order.actualShippingCostCents}
+          postexActive={postexSettings?.active ?? false}
         />
       </div>
 
@@ -98,6 +108,22 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[id]">) 
             </div>
             <div className="text-xs text-muted">{order.shippingAddress.country}</div>
           </div>
+          <OrderPostexCard
+            order={{
+              id: order.id,
+              number: order.number,
+              customerName: order.customerName,
+              email: order.email,
+              phone: order.phone,
+              totalCents: order.totalCents,
+              shippingAddress: order.shippingAddress,
+            }}
+            initialShipments={postexShipments}
+            cities={postexCities}
+            pickupAddresses={postexPickupAddresses}
+            defaultPickupAddressCode={postexSettings?.postexDefaultPickupAddressCode ?? ""}
+            configured={postexSettings?.configured ?? false}
+          />
         </div>
       </div>
     </div>

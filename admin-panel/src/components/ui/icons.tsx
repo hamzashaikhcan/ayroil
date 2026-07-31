@@ -258,6 +258,25 @@ export function IconShield(p: Props) {
   );
 }
 
+export function IconDots(p: Props) {
+  return (
+    <svg {...base} {...p} fill="currentColor" stroke="none">
+      <circle cx="3" cy="8" r="1.4" />
+      <circle cx="8" cy="8" r="1.4" />
+      <circle cx="13" cy="8" r="1.4" />
+    </svg>
+  );
+}
+
+export function IconPackage(p: Props) {
+  return (
+    <svg {...base} {...p}>
+      <path d="M8 1.5l6 3.25v6.5L8 14.5l-6-3.25v-6.5L8 1.5z" />
+      <path d="M2 4.75L8 8l6-3.25M8 8v6.5" />
+    </svg>
+  );
+}
+
 export function IconSparkles(p: Props) {
   return (
     <svg {...base} {...p}>

@@ -21,6 +21,11 @@ function orderUrl(settings: SiteSettings, order: Order): string {
   return `${siteBaseUrl(settings)}/orders/${order.number}`;
 }
 
+/** Our own live tracking page (GET /track route on the backend) — never link out to a courier's site directly. */
+function trackUrl(settings: SiteSettings, order: Order): string {
+  return `${siteBaseUrl(settings)}/track?query=${encodeURIComponent(order.number)}`;
+}
+
 /**
  * A real CTA button. Plain <a> buttons render inconsistently across email
  * clients (Outlook in particular), so this uses the table-cell trick —
@@ -155,15 +160,12 @@ function renderOrderConfirmationBody(order: Order, settings: SiteSettings): stri
 
 function renderShippedBody(order: Order, settings: SiteSettings): string {
 	const trackingNumber = order.trackingNumber?.trim();
-	const trackingUrl = trackingNumber
-		? `https://merchantapi.leopardscourier.com/track?no=${encodeURIComponent(trackingNumber)}`
-		: "";
 
 	const trackingSection = trackingNumber
-		? `<p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped via Leopards Courier.</p>
+		? `<p style="margin:0 0 4px;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped.</p>
     <p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Tracking number: <strong style="color:#111111;">${trackingNumber}</strong></p>
 
-    ${emailButton('Track your package', trackingUrl, settings)}`
+    ${emailButton('Track your package', trackUrl(settings, order), settings)}`
 		: `<p style="margin:0;font-family:Helvetica,Arial,sans-serif;font-size:14px;color:#666666;">Order <strong>${order.number}</strong> has shipped and is on its way to you.</p>`;
 
 	return `
@@ -221,7 +223,7 @@ export async function sendOrderConfirmationEmail(order: Order, settings: SiteSet
   await sendEmail(order, settings, `Order confirmed — ${order.number}`, renderOrderConfirmationBody(order, settings));
 }
 
-/** Fire-and-forget "your order shipped" email. Includes a Leopards tracking link/number only if order.trackingNumber is set. */
+/** Fire-and-forget "your order shipped" email. Includes a tracking link/number (to our own /track page) only if order.trackingNumber is set. */
 export async function sendShippedOrderEmail(order: Order, settings: SiteSettings): Promise<void> {
   await sendEmail(order, settings, `Order shipped — ${order.number}`, renderShippedBody(order, settings));
 }

@@ -45,6 +45,11 @@ export class Product {
   @Column({ type: "int", default: 0 })
   stock!: number;
 
+  // Shipping weight of one unit — feeds the total weight reported to
+  // couriers (see PostexShipment.weightGrams / orderWeightGrams()).
+  @Column({ type: "int", nullable: true })
+  weightGrams!: number | null;
+
   @Column({ type: "varchar", length: 64, nullable: true })
   sku!: string | null;
 

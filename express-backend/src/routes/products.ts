@@ -99,6 +99,7 @@ const productSchema = z.object({
   compareAtCents: z.number().int().min(0).optional().nullable(),
   costCents: z.number().int().min(0),
   stock: z.number().int().min(0).default(0),
+  weightGrams: z.number().int().min(0).optional().nullable(),
   sku: z.string().max(64).optional().nullable(),
   active: z.boolean().default(true),
   recommended: z.boolean().default(false),

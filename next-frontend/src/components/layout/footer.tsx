@@ -17,6 +17,7 @@ const COLS: { title: string; links: { href: string; label: string }[] }[] = [
     title: "Company",
     links: [
       { href: "/benefits", label: "Benefits" },
+      { href: "/track", label: "Track order" },
       { href: "/shipping", label: "Shipping" },
       { href: "/returns", label: "Returns" },
       { href: "/contact", label: "Contact" },

@@ -20,11 +20,14 @@ export function OrderActions({
   status,
   trackingNumber,
   actualShippingCostCents,
+  postexActive,
 }: {
   id: string;
   status: string;
   trackingNumber: string | null;
   actualShippingCostCents: number | null;
+  /** PostEx is enabled and configured — tracking numbers come from PostEx, not manual entry. */
+  postexActive: boolean;
 }) {
   const router = useRouter();
   const confirm = useConfirm();
@@ -141,12 +144,21 @@ export function OrderActions({
 
         <label className="min-w-[10rem] flex-[1.4]">
           <span className="text-[11px] font-semibold uppercase tracking-wide text-muted">Tracking #</span>
-          <input
-            value={tracking}
-            onChange={(e) => setTracking(e.target.value)}
-            placeholder="Leopards CN number"
-            className="mt-1.5 h-9 w-full rounded-md border border-line bg-surface-2 px-2.5 text-sm text-ink placeholder:text-muted hover:border-line-strong focus:border-ink/30 focus:bg-surface focus:outline-none"
-          />
+          {postexActive ? (
+            <div
+              className="mt-1.5 flex h-9 w-full items-center rounded-md border border-line bg-surface-2 px-2.5 text-sm text-ink"
+              title="PostEx is on — tracking numbers come from PostEx automatically, not manual entry."
+            >
+              {tracking || <span className="text-muted">Not yet booked</span>}
+            </div>
+          ) : (
+            <input
+              value={tracking}
+              onChange={(e) => setTracking(e.target.value)}
+              placeholder="Leopards CN number"
+              className="mt-1.5 h-9 w-full rounded-md border border-line bg-surface-2 px-2.5 text-sm text-ink placeholder:text-muted hover:border-line-strong focus:border-ink/30 focus:bg-surface focus:outline-none"
+            />
+          )}
         </label>
 
         <label className="min-w-[8rem] flex-1">

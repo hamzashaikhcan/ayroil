@@ -231,6 +231,31 @@ export class SiteSettings {
   @Column({ type: "text", default: "" })
   returnsPolicyBody!: string;
 
+  // PostEx COD courier — Merchant API token, admin-editable from the PostEx
+  // > Settings tab. There is no env var fallback (see
+  // lib/postex.ts::resolvePostexToken) — an empty value means PostEx is
+  // fully off. Like resendApiKey, this is a secret and is stripped from
+  // non-admin reads.
+  @Column({ type: "varchar", length: 255, default: "" })
+  postexApiToken!: string;
+
+  // Master on/off switch for automatic fulfillment, independent of whether
+  // a token is saved. Off ⇒ checkout never auto-books with PostEx (falls
+  // back to the pre-PostEx manual-courier flow) and the order detail page's
+  // tracking number field stays freely editable. On ⇒ checkout auto-books
+  // and tracking numbers on PostEx-fulfilled orders are read-only, sourced
+  // from PostEx itself. Either way, the admin PostEx tab keeps working for
+  // manual bookings as long as a token is saved — this switch only governs
+  // automatic behavior, not the tab itself.
+  @Column({ type: "boolean", default: false })
+  postexEnabled!: boolean;
+
+  // Default pickup address code used when creating a shipment without an
+  // explicit override — set once the admin has created/fetched a warehouse
+  // address via the PostEx > Pickup addresses tab.
+  @Column({ type: "varchar", length: 64, default: "" })
+  postexDefaultPickupAddressCode!: string;
+
   @CreateDateColumn()
   createdAt!: Date;
 

@@ -19,6 +19,8 @@ import { uploadsRouter } from "./routes/uploads.js";
 import { settingsRouter } from "./routes/settings.js";
 import { searchRouter } from "./routes/search.js";
 import { pushRouter } from "./routes/push.js";
+import { postexRouter } from "./routes/postex.js";
+import { trackRouter } from "./routes/track.js";
 
 async function main() {
   await AppDataSource.initialize();
@@ -55,6 +57,8 @@ async function main() {
   app.use("/settings", settingsRouter);
   app.use("/search", searchRouter);
   app.use("/push", pushRouter);
+  app.use("/postex", postexRouter);
+  app.use("/track", trackRouter);
 
   app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     console.error(err);

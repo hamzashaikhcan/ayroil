@@ -47,10 +47,6 @@ const STATUS_STEPS: { key: string; label: string }[] = [
   { key: ORDER_STATUS.DELIVERED, label: "Delivered" },
 ];
 
-function trackingUrl(trackingNumber: string): string {
-  return `https://merchantapi.leopardscourier.com/track?no=${encodeURIComponent(trackingNumber)}`;
-}
-
 // Same number the floating WhatsApp button uses (src/components/layout/whatsapp-button.tsx).
 const WHATSAPP_NUMBER = "923091238888";
 
@@ -200,14 +196,12 @@ export default async function OrderDetailPage(props: PageProps<"/orders/[number]
               <div className="mt-8 flex flex-wrap items-center gap-3 rounded-lg border border-line bg-surface px-4 py-3 text-sm">
                 <span className="text-muted">Tracking number</span>
                 <span className="font-mono text-ink">{order.trackingNumber}</span>
-                <a
-                  href={trackingUrl(order.trackingNumber)}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href={`/track?query=${encodeURIComponent(order.number)}`}
                   className="ml-auto font-medium text-ink underline underline-offset-4 hover:text-accent-deep"
                 >
                   Track package →
-                </a>
+                </Link>
               </div>
             ) : null}
           </div>

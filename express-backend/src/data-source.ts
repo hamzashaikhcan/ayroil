@@ -12,6 +12,7 @@ import { OrderItem } from "./entities/OrderItem.js";
 import { Review } from "./entities/Review.js";
 import { SiteSettings } from "./entities/SiteSettings.js";
 import { PushSubscription } from "./entities/PushSubscription.js";
+import { PostexShipment } from "./entities/PostexShipment.js";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -22,5 +23,5 @@ export const AppDataSource = new DataSource({
   database: ENV.db.name,
   synchronize: true,
   logging: ENV.nodeEnv === "development" ? ["error", "warn"] : ["error"],
-  entities: [User, Product, Address, Cart, CartItem, WishlistItem, Order, OrderItem, Review, SiteSettings, PushSubscription],
+  entities: [User, Product, Address, Cart, CartItem, WishlistItem, Order, OrderItem, Review, SiteSettings, PushSubscription, PostexShipment],
 });

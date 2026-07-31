@@ -16,6 +16,7 @@ type Product = {
   compareAtCents: number | null;
   costCents: number;
   stock: number;
+  weightGrams: number | null;
   sku: string | null;
   active: boolean;
   recommended: boolean;
